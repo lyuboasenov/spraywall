@@ -1,0 +1,7 @@
+{
+  "name": "SprayWall",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}
