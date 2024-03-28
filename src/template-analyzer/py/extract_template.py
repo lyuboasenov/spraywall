@@ -93,15 +93,22 @@ def preprocess(src):
          else:
             _rectangles.append(rect)
 
-def export(img):
+def export(filename):
+   colorImg = cv.imread(cv.samples.findFile(filename), cv.IMREAD_COLOR)
    ellipsesArray = []
    for el in _ellipses:
       (x, y), (width, height), angle = el
       if valid_size(width, height) and valid_area(width, height) and valid_ratio(width, height):
          ellipsesArray.append(((x, y), (width, height), angle))
 
-   _, img_data = cv.imencode('.JPG', img)
-   json_str = json.dumps({"ellipses": ellipsesArray, "image": base64.b64encode(img_data).decode('ascii')}, indent = 2)
+   _, img_data = cv.imencode('.JPG', colorImg)
+   json_str = json.dumps({
+      "size_threshold": _max_size_threshold,
+      "min_area": _min_area_threshold,
+      "max_ratio": _ratio,
+      "ellipses": ellipsesArray,
+      "image": base64.b64encode(img_data).decode('ascii')
+      }, indent = 2)
    open("export.json", "w").write(json_str)
 
 def main(argv):
@@ -136,6 +143,9 @@ def main(argv):
    redraw_img(_filename)
 
    cv.waitKey()
+
+   export(_filename)
+
    return 0
 
 if __name__ == "__main__":
