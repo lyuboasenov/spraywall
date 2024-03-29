@@ -7,6 +7,7 @@ using SpraywallTemplateAnalyzer.Models;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Windows;
@@ -136,7 +137,19 @@ namespace SpraywallTemplateAnalyzer {
                paint.StrokeWidth = 5;
                paint.Style = SKPaintStyle.Stroke;
 
-               canvas.DrawImage(SKImage.FromBitmap(_bitmap), new SKPoint());
+               using var imgpaint = new SKPaint();
+
+               // Define a grayscale color filter to apply to the image
+               imgpaint.ColorFilter = SKColorFilter.CreateColorMatrix(new float[]
+               {
+                            0.2126f, 0.7152f, 0.0722f, 0, 0,  // red channel weights
+                    0.2126f, 0.7152f, 0.0722f, 0, 0,  // green channel weights
+                    0.2126f, 0.7152f, 0.0722f, 0, 0,  // blue channel weights
+                    0,       0,       0,       1, 0   // alpha channel weights
+                                 });
+
+               // redraw the image using the color filter
+               canvas.DrawImage(SKImage.FromBitmap(_bitmap), 0, 0, imgpaint);
                if (_selectableEllipses.Any()) {
                   foreach (var elItem in _selectableEllipses.Where(e => e.IsSelected)) {
                      var el = elItem.RotatedRect;
@@ -227,6 +240,38 @@ namespace SpraywallTemplateAnalyzer {
             });
 
             img.InvalidateVisual();
+         }
+      }
+
+      private void btnSelectAll_Click(object sender, RoutedEventArgs e) {
+         foreach (var el in _selectableEllipses) {
+            el.IsSelected = true;
+         }
+         img.InvalidateVisual();
+      }
+
+      private void btnSelectNone_Click(object sender, RoutedEventArgs e) {
+         foreach (var el in _selectableEllipses) {
+            el.IsSelected = false;
+         }
+         img.InvalidateVisual();
+      }
+
+      private void StackPanel_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e) {
+         if (sender is StackPanel sp) {
+            if (sp.DataContext is SelectableRotatedRect rr) {
+               rr.IsSelected = !rr.IsSelected;
+               img.InvalidateVisual();
+            }
+         }
+      }
+
+      private void StackPanel_MouseLeave(object sender, System.Windows.Input.MouseEventArgs e) {
+         if (sender is StackPanel sp) {
+            if (sp.DataContext is SelectableRotatedRect rr) {
+               rr.IsSelected = !rr.IsSelected;
+               img.InvalidateVisual();
+            } 
          }
       }
    }

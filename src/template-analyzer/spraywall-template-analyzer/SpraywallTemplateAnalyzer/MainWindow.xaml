@@ -50,25 +50,36 @@
                          PaintSurface="img_PaintSurface"/>
       </ScrollViewer>
 
-      <StackPanel Grid.Row="1" Grid.Column="1" Width="70">
+      <Grid Grid.Row="1" Grid.Column="1" Width="70">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
 
-         <Button x:Name="btnAdd" Click="btnAdd_Click">Add</Button>
+            <StackPanel Orientation="Horizontal">
+                <Button x:Name="btnSelectAll" Click="btnSelectAll_Click">A</Button>
+                <Button x:Name="btnSelectNone" Click="btnSelectNone_Click">N</Button>
+            </StackPanel>
+         
 
-         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+         <StackPanel Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Center">
             <TextBlock x:Name="txtAddedPoints">0</TextBlock>
          </StackPanel>
 
-         <ListView x:Name="lstEllipses" >
-            <ListView.ItemTemplate>
-               <DataTemplate DataType="models:SelectableRotatedRect">
-                  <StackPanel Orientation="Horizontal">
-                     <CheckBox Width="20" Height="20" IsChecked="{Binding Path=IsSelected}" Click="CheckBox_Checked"></CheckBox>
-                     <Button x:Name="btnRemoveItem" Click="btnRemoveItem_Click">-</Button>
-                  </StackPanel>
-               </DataTemplate>
-            </ListView.ItemTemplate>
-         </ListView>
-      </StackPanel>
+            <ScrollViewer Grid.Row="2" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+                <ListView x:Name="lstEllipses">
+                    <ListView.ItemTemplate>
+                        <DataTemplate DataType="models:SelectableRotatedRect">
+                            <StackPanel Orientation="Horizontal" MouseEnter="StackPanel_MouseEnter" MouseLeave="StackPanel_MouseLeave">
+                                <CheckBox Width="20" Height="20" IsChecked="{Binding Path=IsSelected}" Click="CheckBox_Checked"></CheckBox>
+                                <Button x:Name="btnRemoveItem" Click="btnRemoveItem_Click">-</Button>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+            </ScrollViewer>
+        </Grid>
 
    </Grid>
 </Window>
