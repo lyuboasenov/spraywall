@@ -3,9 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.4.33103.184
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "spraywall-template-analyzer", "spraywall-template-analyzer\spraywall-template-analyzer.csproj", "{7B943216-53B4-4048-91B4-35CA5C94A3C3}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpraywallTemplateAnalyzer", "SpraywallTemplateAnalyzer\SpraywallTemplateAnalyzer.csproj", "{2E47E643-6853-47AF-BBD8-8A5282487992}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpraywallTemplateAnalyzer", "SpraywallTemplateAnalyzer\SpraywallTemplateAnalyzer.csproj", "{2E47E643-6853-47AF-BBD8-8A5282487992}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -13,10 +11,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{7B943216-53B4-4048-91B4-35CA5C94A3C3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7B943216-53B4-4048-91B4-35CA5C94A3C3}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7B943216-53B4-4048-91B4-35CA5C94A3C3}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7B943216-53B4-4048-91B4-35CA5C94A3C3}.Release|Any CPU.Build.0 = Release|Any CPU
 		{2E47E643-6853-47AF-BBD8-8A5282487992}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{2E47E643-6853-47AF-BBD8-8A5282487992}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2E47E643-6853-47AF-BBD8-8A5282487992}.Release|Any CPU.ActiveCfg = Release|Any CPU

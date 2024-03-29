@@ -4,32 +4,43 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SpraywallTemplateAnalyzer"
+        xmlns:skia="clr-namespace:SkiaSharp.Views.WPF;assembly=SkiaSharp.Views.WPF"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
 
-        <StackPanel Grid.ColumnSpan="2" Orientation="Horizontal">
-            <Button x:Name="btnBrawses" Click="btnBrawses_Click">Brawse</Button>
-            <Button x:Name="btnCalculate" Click="btnCalculate_Click">Calculate</Button>
-            <Button x:Name="btnExport" Click="btnExport_Click" Grid.Column="1">Export</Button>
-        </StackPanel>
-        <StackPanel Grid.Row="1" Grid.ColumnSpan="2" Orientation="Horizontal">
-            <TextBox Name="txtSize">250</TextBox>
-            <TextBlock></TextBlock>
-            <TextBlock></TextBlock>
-        </StackPanel>
-        
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
 
-        <Image Name="imgSource" Grid.Column="0" Grid.Row="2" />
-        <Image x:Name="imgResult" Grid.Column="1" Grid.Row="2" />
+            <Button x:Name="btnBrawses" Click="btnBrawses_Click" Grid.RowSpan="2">Brawse</Button>
+            <Button x:Name="btnExport" Click="btnExport_Click" Grid.Column="1" Grid.RowSpan="2">Export</Button>
+
+            <Slider x:Name="slSize" Grid.Column="2" Minimum="10" Maximum="1000" ValueChanged="slSize_ValueChanged"></Slider>
+            <Slider x:Name="slArea" Grid.Column="3" Minimum="10" Maximum="500" ValueChanged="slArea_ValueChanged"></Slider>
+            <Slider x:Name="slRatio" Grid.Column="4" Minimum="1" Maximum="20" ValueChanged="slRatio_ValueChanged"></Slider>
+            <TextBlock Text="{Binding ElementName=slSize, Path=Value}" Grid.Row="1" Grid.Column="2"/>
+            <TextBlock Text="{Binding ElementName=slArea, Path=Value}" Grid.Row="1" Grid.Column="3"/>
+            <TextBlock Text="{Binding ElementName=slRatio, Path=Value}" Grid.Row="1" Grid.Column="4"/>
+        </Grid>
+
+        <ScrollViewer Grid.Column="0" Grid.Row="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+            <skia:SKElement
+                Name="img"
+                PaintSurface="img_PaintSurface"/>
+        </ScrollViewer>
     </Grid>
 </Window>
