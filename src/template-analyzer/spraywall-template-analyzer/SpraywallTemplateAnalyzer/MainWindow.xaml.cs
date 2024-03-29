@@ -4,13 +4,10 @@ using SkiaSharp;
 using SpraywallTemplateAnalyzer.ImageProcessing;
 using SpraywallTemplateAnalyzer.Models;
 using System;
-using System.Buffers.Text;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text.Json.Serialization;
 using System.Windows;
-using System.Windows.Controls;
 
 namespace SpraywallTemplateAnalyzer {
    /// <summary>
@@ -33,9 +30,10 @@ namespace SpraywallTemplateAnalyzer {
          if (!string.IsNullOrEmpty(imgLocation) && File.Exists(imgLocation) && null != _selectableEllipses) {
             var imgBytes = File.ReadAllBytes(imgLocation);
             result.EncodedImage = Convert.ToBase64String(imgBytes);
-            foreach(var el in _processor.Ellipses) {
+            result.MaxSize = _processor.MaxSize;
+            result.MinArea = _processor.MinArea;
+            result.MaxRatio = _processor.MaxRatio;
 
-            }
             result.Elllipses = _processor.Ellipses.OrderByDescending(e => e.Size.Width * e.Size.Height).
                Select(e => new SelectableRotatedRect() {
                   RotatedRect = e,
@@ -54,7 +52,6 @@ namespace SpraywallTemplateAnalyzer {
                JsonConvert.SerializeObject(
                   result, 
                   new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore }));
-
          }
       }
 
@@ -76,6 +73,39 @@ namespace SpraywallTemplateAnalyzer {
             img.Height = _bitmap.Height;
             img.InvalidateVisual();
             ReLoadEllipses();
+         }
+      }
+
+      private void btnImport_Click(object sender, RoutedEventArgs e) {
+         var dialog = new Microsoft.Win32.OpenFileDialog();
+         dialog.FileName = "template-draft"; // Default file name
+         dialog.DefaultExt = ".json"; // Default file extension
+         dialog.Filter = "JSON (*.json)|*.json"; // Filter files by extension
+
+         if (dialog.ShowDialog() ?? false) {
+            var template = JsonConvert.DeserializeObject<Template>(File.ReadAllText(dialog.FileName));
+
+            _processor = TemplateProcessor.Import(
+               template.Elllipses.Select(e => e.RotatedRect), 
+               template.MaxSize, 
+               template.MinArea, 
+               template.MaxRatio);
+
+            slArea.Value = _processor.MinArea;
+            slRatio.Value = _processor.MaxRatio;
+            slSize.Value = _processor.MaxSize;
+
+            _bitmap = SKBitmap.Decode(Convert.FromBase64String(template.EncodedImage));
+            img.Width = _bitmap.Width;
+            img.Height = _bitmap.Height;
+            img.InvalidateVisual();
+            ReLoadEllipses();
+
+            foreach(var el in _selectableEllipses) {
+               if (template.Elllipses.Any(e => e.IsSelected && e.RotatedRect.Equals(el.RotatedRect))) {
+                  el.IsSelected = true;
+               }
+            }
          }
       }
 

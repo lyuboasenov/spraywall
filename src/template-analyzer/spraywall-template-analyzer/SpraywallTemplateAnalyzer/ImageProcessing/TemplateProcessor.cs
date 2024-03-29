@@ -5,12 +5,12 @@ using Emgu.CV;
 using System.Collections.Generic;
 using System.Linq;
 using System.Diagnostics;
+using System;
 
 namespace SpraywallTemplateAnalyzer.ImageProcessing {
    internal class TemplateProcessor {
       private string _imgLocation;
       private const int MIN_SIZE = 10;
-      private List<RotatedRect> _rects = new List<RotatedRect>();
       private List<RotatedRect> _ellipses = new List<RotatedRect>();
 
       public uint MaxSize { get; set; } = 400;
@@ -20,6 +20,10 @@ namespace SpraywallTemplateAnalyzer.ImageProcessing {
       public IEnumerable<RotatedRect> Ellipses { get {  return _ellipses; } }
       public IEnumerable<RotatedRect> FilteredEllipses { get {  return _ellipses.Where(IsValid); } }
 
+      private TemplateProcessor() {
+
+      }
+
       private TemplateProcessor(string imgLocation) {
          _imgLocation = imgLocation;
       }
@@ -27,6 +31,16 @@ namespace SpraywallTemplateAnalyzer.ImageProcessing {
       public static TemplateProcessor Process(string imgLocation) {
          var processor = new TemplateProcessor(imgLocation);
          processor.ProcessImage();
+
+         return processor;
+      }
+
+      public static TemplateProcessor Import(IEnumerable<RotatedRect> enumerable, uint maxSize, uint minArea, uint maxRatio) {
+         var processor = new TemplateProcessor();
+         processor._ellipses.AddRange(enumerable);
+         processor.MaxSize = maxSize;
+         processor.MinArea = minArea;
+         processor.MaxRatio = maxRatio;
 
          return processor;
       }
@@ -77,8 +91,6 @@ namespace SpraywallTemplateAnalyzer.ImageProcessing {
                   if (rect.Size.Width > MIN_SIZE && rect.Size.Height > MIN_SIZE) {
                      if (contour.Length > 4) {
                         _ellipses.Add(CvInvoke.FitEllipse(contour));
-                     } else {
-                        _rects.Add(rect);
                      }
                   }
                }
