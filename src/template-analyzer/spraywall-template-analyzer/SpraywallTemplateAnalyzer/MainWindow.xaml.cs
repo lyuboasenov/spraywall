@@ -6,6 +6,7 @@ using SpraywallTemplateAnalyzer.ImageProcessing;
 using SpraywallTemplateAnalyzer.Models;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Windows;
@@ -21,7 +22,7 @@ namespace SpraywallTemplateAnalyzer {
       private string imgLocation;
       private TemplateProcessor _processor;
       private SKBitmap _bitmap;
-      private List<SelectableRotatedRect> _selectableEllipses = new List<SelectableRotatedRect>();
+      private ObservableCollection<SelectableRotatedRect> _selectableEllipses = new ObservableCollection<SelectableRotatedRect>();
 
 
       public MainWindow() {
@@ -191,8 +192,6 @@ namespace SpraywallTemplateAnalyzer {
          if (item != null) {
             _processor.Remove(item.RotatedRect);
             _selectableEllipses.Remove(item);
-            lstEllipses.ItemsSource = null;
-            lstEllipses.ItemsSource = _selectableEllipses;
             img.InvalidateVisual();
          }
       }
@@ -222,12 +221,10 @@ namespace SpraywallTemplateAnalyzer {
             var rect = _processor.Add(_addEllipseBuffer);
             _addEllipseBuffer.Clear();
 
-            lstEllipses.ItemsSource = null;
             _selectableEllipses.Insert(0, new SelectableRotatedRect() {
                RotatedRect = rect,
                IsSelected = true
             });
-            lstEllipses.ItemsSource = _selectableEllipses;
 
             img.InvalidateVisual();
          }
