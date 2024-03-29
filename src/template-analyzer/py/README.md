@@ -22,3 +22,14 @@ pip install -r requirements.txt
 ``` pwsh
 python .\hough_emug.py .\20240313_184427-EDIT.jpg
 ```
+
+### Point within ellipse
+
+Ellipse = (h, k), (2rx, 2ry), a
+
+(x - h)^2/rx^2 + (y - k)^2/ry^2 <= 1
+
+Coordinate transform - (x, y), a -> (x', y')
+
+x' = x*cos(a) + y*sin(a)
+y' = y*cos(a) - x*sin(a)
