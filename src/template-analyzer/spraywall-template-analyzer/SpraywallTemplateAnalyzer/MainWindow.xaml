@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:SpraywallTemplateAnalyzer"
+        xmlns:models="clr-namespace:SpraywallTemplateAnalyzer.Models"
         xmlns:skia="clr-namespace:SkiaSharp.Views.WPF;assembly=SkiaSharp.Views.WPF"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
@@ -12,8 +12,12 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
 
-        <Grid>
+        <Grid Grid.ColumnSpan="2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
@@ -42,5 +46,13 @@
                 Name="img"
                 PaintSurface="img_PaintSurface"/>
         </ScrollViewer>
+
+        <ListView x:Name="lstEllipses" Grid.Row="1" Grid.Column="1" Width="50">
+            <ListView.ItemTemplate>
+                <DataTemplate DataType="models:SelectableRotatedRect">
+                    <CheckBox Width="20" Height="20" IsChecked="{Binding Path=IsSelected}" Checked="CheckBox_Checked"></CheckBox>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
     </Grid>
 </Window>
