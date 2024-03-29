@@ -50,7 +50,7 @@
         <ListView x:Name="lstEllipses" Grid.Row="1" Grid.Column="1" Width="50">
             <ListView.ItemTemplate>
                 <DataTemplate DataType="models:SelectableRotatedRect">
-                    <CheckBox Width="20" Height="20" IsChecked="{Binding Path=IsSelected}" Checked="CheckBox_Checked"></CheckBox>
+                    <CheckBox Width="20" Height="20" IsChecked="{Binding Path=IsSelected}" Click="CheckBox_Checked"></CheckBox>
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>

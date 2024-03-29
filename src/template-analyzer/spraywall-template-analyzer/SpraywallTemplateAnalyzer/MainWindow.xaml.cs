@@ -1,11 +1,14 @@
 ﻿using Emgu.CV.Structure;
+using Newtonsoft.Json;
 using SkiaSharp;
 using SpraywallTemplateAnalyzer.ImageProcessing;
 using SpraywallTemplateAnalyzer.Models;
 using System;
+using System.Buffers.Text;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.Json.Serialization;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -26,6 +29,33 @@ namespace SpraywallTemplateAnalyzer {
 
 
       private void btnExport_Click(object sender, RoutedEventArgs e) {
+         var result = new Template();
+         if (!string.IsNullOrEmpty(imgLocation) && File.Exists(imgLocation) && null != _selectableEllipses) {
+            var imgBytes = File.ReadAllBytes(imgLocation);
+            result.EncodedImage = Convert.ToBase64String(imgBytes);
+            foreach(var el in _processor.Ellipses) {
+
+            }
+            result.Elllipses = _processor.Ellipses.OrderByDescending(e => e.Size.Width * e.Size.Height).
+               Select(e => new SelectableRotatedRect() {
+                  RotatedRect = e,
+                  IsSelected = _selectableEllipses.Any(ee => ee.IsSelected && ee.RotatedRect.Equals(e))
+               }).ToArray();
+         }
+
+         var dialog = new Microsoft.Win32.SaveFileDialog();
+         dialog.FileName = "template-draft"; // Default file name
+         dialog.DefaultExt = ".json"; // Default file extension
+         dialog.Filter = "JSON (*.json)|*.json"; // Filter files by extension
+
+         if (dialog.ShowDialog() ?? false) {
+            File.WriteAllText(
+               dialog.FileName, 
+               JsonConvert.SerializeObject(
+                  result, 
+                  new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore }));
+
+         }
       }
 
       private void btnBrawses_Click(object sender, RoutedEventArgs e) {
@@ -53,7 +83,7 @@ namespace SpraywallTemplateAnalyzer {
          lstEllipses.ItemsSource = null;
          _selectableEllipses.Clear();
          
-         foreach(var el in _processor?.FilteredEllipses ?? Enumerable.Empty<RotatedRect>()) {
+         foreach(var el in _processor?.FilteredEllipses.OrderByDescending(e => e.Size.Width * e.Size.Height) ?? Enumerable.Empty<RotatedRect>()) {
             var elItem = new SelectableRotatedRect() {
                RotatedRect = el,
                IsSelected = false
