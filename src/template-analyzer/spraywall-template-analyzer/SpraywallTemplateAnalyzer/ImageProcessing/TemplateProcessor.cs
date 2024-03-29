@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Diagnostics;
 using System;
+using System.Drawing;
 
 namespace SpraywallTemplateAnalyzer.ImageProcessing {
    internal class TemplateProcessor {
@@ -43,6 +44,17 @@ namespace SpraywallTemplateAnalyzer.ImageProcessing {
          processor.MaxRatio = maxRatio;
 
          return processor;
+      }
+
+      public void Remove(RotatedRect rect) {
+         _ellipses.Remove(rect);
+      }
+
+      public RotatedRect Add(IEnumerable<PointF> points) {
+         var rect = CvInvoke.MinAreaRect(points.ToArray());
+         _ellipses.Insert(0, rect);
+
+         return rect;
       }
 
       public bool IsValidSize(RotatedRect r) {

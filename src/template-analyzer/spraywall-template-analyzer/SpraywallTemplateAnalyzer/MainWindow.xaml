@@ -7,54 +7,68 @@
         xmlns:skia="clr-namespace:SkiaSharp.Views.WPF;assembly=SkiaSharp.Views.WPF"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="Auto" />
-        </Grid.ColumnDefinitions>
+   <Grid>
+      <Grid.RowDefinitions>
+         <RowDefinition Height="Auto"/>
+         <RowDefinition Height="*"/>
+      </Grid.RowDefinitions>
+      <Grid.ColumnDefinitions>
+         <ColumnDefinition Width="*" />
+         <ColumnDefinition Width="Auto" />
+      </Grid.ColumnDefinitions>
 
-        <Grid Grid.ColumnSpan="2">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
+      <Grid Grid.ColumnSpan="2">
+         <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+         </Grid.ColumnDefinitions>
+         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+         </Grid.RowDefinitions>
 
-            <Button x:Name="btnBrawses" Click="btnBrawses_Click" Grid.RowSpan="2">Brawse</Button>
-            <Button x:Name="btnImport" Click="btnImport_Click" Grid.Column="1" Grid.RowSpan="2">Import</Button>
-            <Button x:Name="btnExport" Click="btnExport_Click" Grid.Column="2" Grid.RowSpan="2">Export</Button>
+         <Button x:Name="btnBrawses" Click="btnBrawses_Click" Grid.RowSpan="2">Brawse</Button>
+         <Button x:Name="btnImport" Click="btnImport_Click" Grid.Column="1" Grid.RowSpan="2">Import</Button>
+         <Button x:Name="btnExport" Click="btnExport_Click" Grid.Column="2" Grid.RowSpan="2">Export</Button>
 
-            <Slider x:Name="slSize" Grid.Column="3" Minimum="10" Maximum="1000" ValueChanged="slSize_ValueChanged"></Slider>
-            <Slider x:Name="slArea" Grid.Column="4" Minimum="10" Maximum="500" ValueChanged="slArea_ValueChanged"></Slider>
-            <Slider x:Name="slRatio" Grid.Column="5" Minimum="1" Maximum="20" ValueChanged="slRatio_ValueChanged"></Slider>
-            <TextBlock Text="{Binding ElementName=slSize, Path=Value}" Grid.Row="1" Grid.Column="3"/>
-            <TextBlock Text="{Binding ElementName=slArea, Path=Value}" Grid.Row="1" Grid.Column="4"/>
-            <TextBlock Text="{Binding ElementName=slRatio, Path=Value}" Grid.Row="1" Grid.Column="5"/>
-        </Grid>
+         <Slider x:Name="slSize" Grid.Column="3" Minimum="10" Maximum="1000" ValueChanged="slSize_ValueChanged"></Slider>
+         <Slider x:Name="slArea" Grid.Column="4" Minimum="10" Maximum="500" ValueChanged="slArea_ValueChanged"></Slider>
+         <Slider x:Name="slRatio" Grid.Column="5" Minimum="1" Maximum="20" ValueChanged="slRatio_ValueChanged"></Slider>
+         <TextBlock Text="{Binding ElementName=slSize, Path=Value}" Grid.Row="1" Grid.Column="3"/>
+         <TextBlock Text="{Binding ElementName=slArea, Path=Value}" Grid.Row="1" Grid.Column="4"/>
+         <TextBlock Text="{Binding ElementName=slRatio, Path=Value}" Grid.Row="1" Grid.Column="5"/>
+      </Grid>
 
-        <ScrollViewer Grid.Column="0" Grid.Row="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
-            <skia:SKElement
-                Name="img"
-                PaintSurface="img_PaintSurface"/>
-        </ScrollViewer>
+      <ScrollViewer Grid.Column="0" Grid.Row="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+         <skia:SKElement Name="img"
+                         MouseLeftButtonDown="img_MouseLeftButtonDown"
+                         MouseRightButtonDown="img_MouseRightButtonDown"
+                         PaintSurface="img_PaintSurface"/>
+      </ScrollViewer>
 
-        <ListView x:Name="lstEllipses" Grid.Row="1" Grid.Column="1" Width="50">
+      <StackPanel Grid.Row="1" Grid.Column="1" Width="70">
+
+         <Button x:Name="btnAdd" Click="btnAdd_Click">Add</Button>
+
+         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+            <TextBlock x:Name="txtAddedPoints">0</TextBlock>
+         </StackPanel>
+
+         <ListView x:Name="lstEllipses" >
             <ListView.ItemTemplate>
-                <DataTemplate DataType="models:SelectableRotatedRect">
-                    <CheckBox Width="20" Height="20" IsChecked="{Binding Path=IsSelected}" Click="CheckBox_Checked"></CheckBox>
-                </DataTemplate>
+               <DataTemplate DataType="models:SelectableRotatedRect">
+                  <StackPanel Orientation="Horizontal">
+                     <CheckBox Width="20" Height="20" IsChecked="{Binding Path=IsSelected}" Click="CheckBox_Checked"></CheckBox>
+                     <Button x:Name="btnRemoveItem" Click="btnRemoveItem_Click">-</Button>
+                  </StackPanel>
+               </DataTemplate>
             </ListView.ItemTemplate>
-        </ListView>
-    </Grid>
+         </ListView>
+      </StackPanel>
+
+   </Grid>
 </Window>

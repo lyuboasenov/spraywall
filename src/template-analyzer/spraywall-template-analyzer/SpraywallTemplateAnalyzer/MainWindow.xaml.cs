@@ -1,6 +1,7 @@
 ﻿using Emgu.CV.Structure;
 using Newtonsoft.Json;
 using SkiaSharp;
+using SkiaSharp.Views.WPF;
 using SpraywallTemplateAnalyzer.ImageProcessing;
 using SpraywallTemplateAnalyzer.Models;
 using System;
@@ -8,6 +9,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Media;
 
 namespace SpraywallTemplateAnalyzer {
    /// <summary>
@@ -20,10 +23,10 @@ namespace SpraywallTemplateAnalyzer {
       private SKBitmap _bitmap;
       private List<SelectableRotatedRect> _selectableEllipses = new List<SelectableRotatedRect>();
 
+
       public MainWindow() {
          InitializeComponent();
       }
-
 
       private void btnExport_Click(object sender, RoutedEventArgs e) {
          var result = new Template();
@@ -141,6 +144,12 @@ namespace SpraywallTemplateAnalyzer {
                      canvas.RotateDegrees(-el.Angle, el.Center.X, el.Center.Y);
                   }
                }
+
+               if (_addEllipseBuffer.Any()) {
+                  foreach (var p in _addEllipseBuffer) {
+                     canvas.DrawCircle(new SKPoint(p.X, p.Y), 2, paint);
+                  }
+               }
             }
          }
       }
@@ -171,6 +180,57 @@ namespace SpraywallTemplateAnalyzer {
 
       private void CheckBox_Checked(object sender, RoutedEventArgs e) {
          img.InvalidateVisual();
+      }
+
+      private void btnAdd_Click(object sender, RoutedEventArgs e) {
+
+      }
+
+      private void btnRemoveItem_Click(object sender, RoutedEventArgs e) {
+         var item = ((Button) sender).DataContext as SelectableRotatedRect;
+         if (item != null) {
+            _processor.Remove(item.RotatedRect);
+            _selectableEllipses.Remove(item);
+            lstEllipses.ItemsSource = null;
+            lstEllipses.ItemsSource = _selectableEllipses;
+            img.InvalidateVisual();
+         }
+      }
+
+      private List<System.Drawing.PointF> _addEllipseBuffer = new List<System.Drawing.PointF>();
+
+      private void img_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e) {
+         var mainWindow = Application.Current.MainWindow;
+         var dpiScale = VisualTreeHelper.GetDpi(mainWindow);
+
+         var dpiScaleX = dpiScale.DpiScaleX;
+         var dpiScaleY = dpiScale.DpiScaleY;
+
+         
+         var pixelPosition = e.GetPosition(sender as SKElement);
+         var scaledPixelPosition = new System.Drawing.PointF((float) (pixelPosition.X * dpiScaleX), (float) (pixelPosition.Y * dpiScaleY));
+
+         _addEllipseBuffer.Add(scaledPixelPosition);
+
+         txtAddedPoints.Text = _addEllipseBuffer.Count.ToString();
+
+         img.InvalidateVisual();
+      }
+
+      private void img_MouseRightButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e) {
+         if (_addEllipseBuffer.Count > 3) {
+            var rect = _processor.Add(_addEllipseBuffer);
+            _addEllipseBuffer.Clear();
+
+            lstEllipses.ItemsSource = null;
+            _selectableEllipses.Insert(0, new SelectableRotatedRect() {
+               RotatedRect = rect,
+               IsSelected = true
+            });
+            lstEllipses.ItemsSource = _selectableEllipses;
+
+            img.InvalidateVisual();
+         }
       }
    }
 }
