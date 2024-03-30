@@ -4,9 +4,8 @@ using Emgu.CV.Util;
 using Emgu.CV;
 using System.Collections.Generic;
 using System.Linq;
-using System.Diagnostics;
-using System;
 using System.Drawing;
+using System;
 
 namespace SpraywallTemplateAnalyzer.ImageProcessing {
    internal class TemplateProcessor {
@@ -18,8 +17,32 @@ namespace SpraywallTemplateAnalyzer.ImageProcessing {
       public uint MinArea { get; set; } = 164;
       public uint MaxRatio { get; set; } = 4;
 
+      public uint CenterOffset { get; set; } = 5;
+      public uint SizeThreshold { get; set; } = 10;
+      
+      public uint AngleOffset { get; set; } = 5;
+
       public IEnumerable<RotatedRect> Ellipses { get {  return _ellipses; } }
-      public IEnumerable<RotatedRect> FilteredEllipses { get {  return _ellipses.Where(IsValid); } }
+      public IEnumerable<RotatedRect> FilteredEllipses { 
+         get {
+            var result = new List<RotatedRect>();
+            foreach (var rect in _ellipses.Where(IsValid)) {
+               if (!result.Any(r => IsSimilar(r, rect))) {
+                  result.Add(rect);
+               }
+            }
+            return result;
+         } 
+      }
+
+      private bool IsSimilar(RotatedRect x, RotatedRect y) {
+         return
+            Math.Abs(x.Center.X - y.Center.X) <= CenterOffset &&
+            Math.Abs(x.Center.Y - y.Center.Y) <= CenterOffset &&
+            Math.Abs(x.Size.Width - y.Size.Width) <= SizeThreshold &&
+            Math.Abs(x.Size.Height - y.Size.Height) <= SizeThreshold &&
+            Math.Abs(x.Angle - y.Angle) <= AngleOffset;
+      }
 
       private TemplateProcessor() {
 

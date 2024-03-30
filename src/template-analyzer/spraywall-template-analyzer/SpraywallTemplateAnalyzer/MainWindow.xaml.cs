@@ -24,10 +24,47 @@ namespace SpraywallTemplateAnalyzer {
       private TemplateProcessor _processor;
       private SKBitmap _bitmap;
       private ObservableCollection<SelectableRotatedRect> _selectableEllipses = new ObservableCollection<SelectableRotatedRect>();
+      private Template _importedTemplate;
+      private Random _rand = new Random();
+      private List<System.Drawing.PointF> _addEllipseBuffer = new List<System.Drawing.PointF>();
 
+      private uint _maxSize = 400;
+      private uint _minArea = 164;
+      private uint _maxRatio = 4;
+
+      private uint _centerOffset = 5;
+      private uint _sizeThreshold = 10;
 
       public MainWindow() {
          InitializeComponent();
+      }
+
+      private void _modelTuneWindow_Deduplicate(object? sender, EventArgs e) {
+         ReLoadEllipses();
+      }
+
+      private void _modelTuneWindow_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e) {
+         if (null != _processor && sender is ModelTuneWindow w) {
+            if (e.PropertyName == nameof(ModelTuneWindow.MaxSize)) {
+               _maxSize = w.MaxSize;
+               _processor.MaxSize = w.MaxSize;
+            } else if (e.PropertyName == nameof(ModelTuneWindow.MinArea)) {
+               _minArea = w.MinArea;
+               _processor.MinArea = w.MinArea;
+            } else if (e.PropertyName == nameof(ModelTuneWindow.MaxRatio)) {
+               _maxRatio = w.MaxRatio;
+               _processor.MaxRatio = w.MaxRatio;
+            } else if (e.PropertyName == nameof(ModelTuneWindow.CenterOffset)) {
+               _centerOffset = w.CenterOffset;
+               _processor.CenterOffset = w.CenterOffset;
+            } else if (e.PropertyName == nameof(ModelTuneWindow.SizeThreshold)) {
+               _sizeThreshold = w.SizeThreshold;
+               _processor.SizeThreshold = w.SizeThreshold;
+            }
+
+            img.InvalidateVisual();
+            ReLoadEllipses();
+         }
       }
 
       private void btnExport_Click(object sender, RoutedEventArgs e) {
@@ -35,6 +72,17 @@ namespace SpraywallTemplateAnalyzer {
          if (!string.IsNullOrEmpty(imgLocation) && File.Exists(imgLocation) && null != _selectableEllipses) {
             var imgBytes = File.ReadAllBytes(imgLocation);
             result.EncodedImage = Convert.ToBase64String(imgBytes);
+            result.MaxSize = _processor.MaxSize;
+            result.MinArea = _processor.MinArea;
+            result.MaxRatio = _processor.MaxRatio;
+
+            result.Elllipses = _processor.Ellipses.OrderByDescending(e => e.Size.Width * e.Size.Height).
+               Select(e => new SelectableRotatedRect() {
+                  RotatedRect = e,
+                  IsSelected = _selectableEllipses.Any(ee => ee.IsSelected && ee.RotatedRect.Equals(e))
+               }).ToArray();
+         } else if(_importedTemplate != null) {
+            result.EncodedImage = _importedTemplate.EncodedImage;
             result.MaxSize = _processor.MaxSize;
             result.MinArea = _processor.MinArea;
             result.MaxRatio = _processor.MaxRatio;
@@ -69,13 +117,14 @@ namespace SpraywallTemplateAnalyzer {
          if (dialog.ShowDialog() ?? false) {
             imgLocation = dialog.FileName;
             _processor = TemplateProcessor.Process(imgLocation);
-            slArea.Value = _processor.MinArea;
-            slRatio.Value = _processor.MaxRatio;
-            slSize.Value = _processor.MaxSize;
+            _minArea = _processor.MinArea;
+            _maxRatio = _processor.MaxRatio;
+            _maxSize = _processor.MaxSize;
 
             _bitmap = SKBitmap.Decode(File.OpenRead(imgLocation));
             img.Width = _bitmap.Width;
             img.Height = _bitmap.Height;
+
             img.InvalidateVisual();
             ReLoadEllipses();
          }
@@ -88,26 +137,26 @@ namespace SpraywallTemplateAnalyzer {
          dialog.Filter = "JSON (*.json)|*.json"; // Filter files by extension
 
          if (dialog.ShowDialog() ?? false) {
-            var template = JsonConvert.DeserializeObject<Template>(File.ReadAllText(dialog.FileName));
+            _importedTemplate = JsonConvert.DeserializeObject<Template>(File.ReadAllText(dialog.FileName));
 
             _processor = TemplateProcessor.Import(
-               template.Elllipses.Select(e => e.RotatedRect), 
-               template.MaxSize, 
-               template.MinArea, 
-               template.MaxRatio);
+               _importedTemplate.Elllipses.Select(e => e.RotatedRect),
+               _importedTemplate.MaxSize,
+               _importedTemplate.MinArea,
+               _importedTemplate.MaxRatio);
 
-            slArea.Value = _processor.MinArea;
-            slRatio.Value = _processor.MaxRatio;
-            slSize.Value = _processor.MaxSize;
+            _minArea = _processor.MinArea;
+            _maxRatio = _processor.MaxRatio;
+            _maxSize = _processor.MaxSize;
 
-            _bitmap = SKBitmap.Decode(Convert.FromBase64String(template.EncodedImage));
+            _bitmap = SKBitmap.Decode(Convert.FromBase64String(_importedTemplate.EncodedImage));
             img.Width = _bitmap.Width;
             img.Height = _bitmap.Height;
             img.InvalidateVisual();
             ReLoadEllipses();
 
             foreach(var el in _selectableEllipses) {
-               if (template.Elllipses.Any(e => e.IsSelected && e.RotatedRect.Equals(el.RotatedRect))) {
+               if (_importedTemplate.Elllipses.Any(e => e.IsSelected && e.RotatedRect.Equals(el.RotatedRect))) {
                   el.IsSelected = true;
                }
             }
@@ -121,16 +170,31 @@ namespace SpraywallTemplateAnalyzer {
          foreach(var el in _processor?.FilteredEllipses.OrderByDescending(e => e.Size.Width * e.Size.Height) ?? Enumerable.Empty<RotatedRect>()) {
             var elItem = new SelectableRotatedRect() {
                RotatedRect = el,
-               IsSelected = false
+               IsSelected = false,
+               Color = RandomColor()
             };
             _selectableEllipses.Add(elItem);
          }
 
          lstEllipses.ItemsSource = _selectableEllipses;
+         txtAddedPoints.Text = $"{_addEllipseBuffer.Count} / {_selectableEllipses.Count}";
+      }
+
+      private System.Windows.Media.Color RandomColor() {
+         return new System.Windows.Media.Color() {
+            A = 255,
+            R = (byte) _rand.Next(0, 255),
+            G = (byte) _rand.Next(0, 255),
+            B = (byte) _rand.Next(0, 255),
+         };
       }
 
       private void img_PaintSurface(object sender, SkiaSharp.Views.Desktop.SKPaintSurfaceEventArgs e) {
          if (_bitmap != null) {
+            if (sender is SKElement img) {
+               img.Width = _bitmap.Width;
+               img.Height = _bitmap.Height;
+            }
             var canvas = e.Surface.Canvas;
             using (var paint = new SKPaint()) {
                paint.Color = SKColors.Yellow;
@@ -154,7 +218,9 @@ namespace SpraywallTemplateAnalyzer {
                   foreach (var elItem in _selectableEllipses.Where(e => e.IsSelected)) {
                      var el = elItem.RotatedRect;
                      canvas.RotateDegrees(el.Angle, el.Center.X, el.Center.Y);
+                     paint.Color = ConvertColor(elItem.Color);
                      canvas.DrawOval(el.Center.X, el.Center.Y, el.Size.Width / 2, el.Size.Height / 2, paint);
+
                      canvas.RotateDegrees(-el.Angle, el.Center.X, el.Center.Y);
                   }
                }
@@ -168,36 +234,12 @@ namespace SpraywallTemplateAnalyzer {
          }
       }
 
-      private void slSize_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) {
-         if (null != _processor) {
-            _processor.MaxSize = (uint) e.NewValue;
-            img.InvalidateVisual();
-            ReLoadEllipses();
-         }
-      }
-
-      private void slArea_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) {
-         if (null != _processor) {
-            _processor.MinArea = (uint) e.NewValue;
-            img.InvalidateVisual();
-            ReLoadEllipses();
-         }
-      }
-
-      private void slRatio_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) {
-         if (null != _processor) {
-            _processor.MaxRatio = (uint) e.NewValue;
-            img.InvalidateVisual();
-            ReLoadEllipses();
-         }
+      private SKColor ConvertColor(System.Windows.Media.Color c) {
+         return new SKColor(c.R, c.G, c.B);
       }
 
       private void CheckBox_Checked(object sender, RoutedEventArgs e) {
          img.InvalidateVisual();
-      }
-
-      private void btnAdd_Click(object sender, RoutedEventArgs e) {
-
       }
 
       private void btnRemoveItem_Click(object sender, RoutedEventArgs e) {
@@ -207,9 +249,10 @@ namespace SpraywallTemplateAnalyzer {
             _selectableEllipses.Remove(item);
             img.InvalidateVisual();
          }
+
+         txtAddedPoints.Text = $"{_addEllipseBuffer.Count} / {_selectableEllipses.Count}";
       }
 
-      private List<System.Drawing.PointF> _addEllipseBuffer = new List<System.Drawing.PointF>();
 
       private void img_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e) {
          var mainWindow = Application.Current.MainWindow;
@@ -224,7 +267,7 @@ namespace SpraywallTemplateAnalyzer {
 
          _addEllipseBuffer.Add(scaledPixelPosition);
 
-         txtAddedPoints.Text = _addEllipseBuffer.Count.ToString();
+         txtAddedPoints.Text = $"{_addEllipseBuffer.Count} / {_selectableEllipses.Count}";
 
          img.InvalidateVisual();
       }
@@ -258,7 +301,7 @@ namespace SpraywallTemplateAnalyzer {
       }
 
       private void StackPanel_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e) {
-         if (sender is StackPanel sp) {
+         if (sender is StackPanel sp && !IsCheckboxChildChecked(sp)) {
             if (sp.DataContext is SelectableRotatedRect rr) {
                rr.IsSelected = !rr.IsSelected;
                img.InvalidateVisual();
@@ -267,12 +310,35 @@ namespace SpraywallTemplateAnalyzer {
       }
 
       private void StackPanel_MouseLeave(object sender, System.Windows.Input.MouseEventArgs e) {
-         if (sender is StackPanel sp) {
-            if (sp.DataContext is SelectableRotatedRect rr) {
-               rr.IsSelected = !rr.IsSelected;
-               img.InvalidateVisual();
-            } 
+         //if (sender is StackPanel sp && !IsCheckboxChildChecked(sp)) {
+         //   if (sp.DataContext is SelectableRotatedRect rr) {
+         //      rr.IsSelected = !rr.IsSelected;
+         //      img.InvalidateVisual();
+         //   } 
+         //}
+      }
+
+      private static bool IsCheckboxChildChecked(StackPanel sp) {
+         for(int i = 0; i < sp.Children.Count; i++) {
+            if (sp.Children[i] is CheckBox c && (c.IsChecked ?? false)) {
+               return true;
+            }
          }
+         return false;
+      }
+
+      private void btnTuneModel_Click(object sender, RoutedEventArgs e) {
+         var w = new ModelTuneWindow();
+         w.MaxSize = _maxSize;
+         w.MinArea = _minArea;
+         w.MaxRatio = _maxRatio;
+         w.CenterOffset = _centerOffset;
+         w.SizeThreshold = _sizeThreshold;
+         
+         w.PropertyChanged += _modelTuneWindow_PropertyChanged;
+         w.Deactivated += _modelTuneWindow_Deduplicate;
+
+         w.Show();
       }
    }
 }

@@ -2,8 +2,8 @@ import { Injectable } from '@angular/core';
 import { WallTemplate } from './wall-template';
 import { HttpClient } from '@angular/common/http';
 
-const TEMPLATE_REMOTE_URI: string = "https://storage.googleapis.com/spraywall/balkan/20240313_184427.jpg";
-const TEMPLATES_PATH: string = 'templates/spraywall-template.jpg';
+const TEMPLATE_REMOTE_URI: string = "https://storage.googleapis.com/spraywall/balkan/template-draft-2.json";
+const TEMPLATES_PATH: string = 'templates/template.json';
 
 @Injectable({
   providedIn: 'root'

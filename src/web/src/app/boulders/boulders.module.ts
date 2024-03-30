@@ -9,13 +9,15 @@ import { BouldersPageRoutingModule } from './boulders-routing.module';
 import { BoulderPage } from './boulder.page';
 import { AddBoulderPage } from './add-boulder.page';
 import { ListBouldersPage } from './list-boulders.page';
+import { PinchZoomModule } from '@meddv/ngx-pinch-zoom';
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
-    BouldersPageRoutingModule
+    BouldersPageRoutingModule,
+    PinchZoomModule
   ],
   declarations: [BoulderPage,AddBoulderPage,ListBouldersPage]
 })

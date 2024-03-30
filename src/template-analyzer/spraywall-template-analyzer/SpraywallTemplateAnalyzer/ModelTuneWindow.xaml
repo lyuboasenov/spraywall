@@ -1,0 +1,74 @@
+﻿<Window x:Class="SpraywallTemplateAnalyzer.ModelTuneWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="ModelTuneWindow" Height="450" Width="800">
+    <StackPanel>
+        <Grid Grid.ColumnSpan="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <Slider x:Name="slSize" 
+                    Grid.Column="1" 
+                    Grid.Row="0" 
+                    Minimum="10" 
+                    Maximum="1000" 
+                    Value="{Binding MaxSize}" />
+            <Slider x:Name="slArea" 
+                    Grid.Column="1" 
+                    Grid.Row="1" 
+                    Minimum="10" 
+                    Maximum="500" 
+                    Value="{Binding MinArea}" />
+            <Slider x:Name="slRatio" 
+                    Grid.Column="1" 
+                    Grid.Row="2" 
+                    Minimum="1" 
+                    Maximum="20" 
+                    Value="{Binding MaxRatio}" />
+            
+            <TextBlock Text="{Binding ElementName=slSize, Path=Value}" Grid.Row="0" />
+            <TextBlock Text="{Binding ElementName=slArea, Path=Value}" Grid.Row="1" />
+            <TextBlock Text="{Binding ElementName=slRatio, Path=Value}" Grid.Row="2" />
+        </Grid>
+
+        <Line Stroke="Black"></Line>
+
+        <Grid Grid.ColumnSpan="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <Slider x:Name="lsOffset" 
+                    Grid.Column="1" 
+                    Grid.Row="0" 
+                    Minimum="0" 
+                    Maximum="20" 
+                    Value="{Binding CenterOffset}" />
+            <Slider x:Name="lsSizeTh" 
+                    Grid.Column="1" 
+                    Grid.Row="1" 
+                    Minimum="0" 
+                    Maximum="50" 
+                    Value="{Binding SizeThreshold}" />
+
+            <TextBlock Text="{Binding ElementName=lsOffset, Path=Value}" Grid.Row="0" />
+            <TextBlock Text="{Binding ElementName=lsSizeTh, Path=Value}" Grid.Row="1" />
+        </Grid>
+        <Button x:Name="btnDeduplicate" Click="btnDeduplicate_Click" Content="Deduplicate" />
+    </StackPanel>
+</Window>
