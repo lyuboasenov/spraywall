@@ -4,6 +4,7 @@ using SkiaSharp;
 using SkiaSharp.Views.WPF;
 using SpraywallTemplateAnalyzer.ImageProcessing;
 using SpraywallTemplateAnalyzer.Models;
+using SpraywallTemplateAnalyzer.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -67,7 +68,7 @@ namespace SpraywallTemplateAnalyzer {
          }
       }
 
-      private void btnExport_Click(object sender, RoutedEventArgs e) {
+      private void btnSave_Click(object sender, RoutedEventArgs e) {
          var result = new Template();
          if (!string.IsNullOrEmpty(imgLocation) && File.Exists(imgLocation) && null != _selectableEllipses) {
             var imgBytes = File.ReadAllBytes(imgLocation);
@@ -105,8 +106,41 @@ namespace SpraywallTemplateAnalyzer {
             File.WriteAllText(
                dialog.FileName, 
                JsonConvert.SerializeObject(
-                  result, 
-                  new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore }));
+                  result,
+                  new SizeJsonConverter()));
+         }
+      }
+
+      private void btnExport_Click(object sender, RoutedEventArgs e) {
+         var result = new ExportTemplate();
+         if (!string.IsNullOrEmpty(imgLocation) && File.Exists(imgLocation) && null != _selectableEllipses) {
+            var imgBytes = File.ReadAllBytes(imgLocation);
+            result.EncodedImage = Convert.ToBase64String(imgBytes);
+
+            result.Elllipses = _processor.FilteredEllipses.
+               OrderBy(e => e.Size.Width / 2 + e.Center.X).
+               ThenBy(e => e.Size.Height / 2 + e.Center.Y).
+               ToArray();
+         } else if (_importedTemplate != null) {
+            result.EncodedImage = _importedTemplate.EncodedImage;
+
+            result.Elllipses = _processor.FilteredEllipses.
+               OrderBy(e => e.Size.Width / 2 + e.Center.X).
+               ThenBy(e => e.Size.Height / 2 + e.Center.Y).
+               ToArray();
+         }
+
+         var dialog = new Microsoft.Win32.SaveFileDialog();
+         dialog.FileName = "template"; // Default file name
+         dialog.DefaultExt = ".json"; // Default file extension
+         dialog.Filter = "JSON (*.json)|*.json"; // Filter files by extension
+
+         if (dialog.ShowDialog() ?? false) {
+            File.WriteAllText(
+               dialog.FileName,
+               JsonConvert.SerializeObject(
+                  result,
+                  new SizeJsonConverter()));
          }
       }
 
@@ -132,14 +166,16 @@ namespace SpraywallTemplateAnalyzer {
          }
       }
 
-      private void btnImport_Click(object sender, RoutedEventArgs e) {
+      private void btnLoad_Click(object sender, RoutedEventArgs e) {
          var dialog = new Microsoft.Win32.OpenFileDialog();
          dialog.FileName = "template-draft"; // Default file name
          dialog.DefaultExt = ".json"; // Default file extension
          dialog.Filter = "JSON (*.json)|*.json"; // Filter files by extension
 
          if (dialog.ShowDialog() ?? false) {
-            _importedTemplate = JsonConvert.DeserializeObject<Template>(File.ReadAllText(dialog.FileName));
+            _importedTemplate = JsonConvert.DeserializeObject<Template>(
+               File.ReadAllText(dialog.FileName), 
+               new SizeJsonConverter());
 
             _processor = TemplateProcessor.Import(
                _importedTemplate.Elllipses.Select(e => e.RotatedRect),

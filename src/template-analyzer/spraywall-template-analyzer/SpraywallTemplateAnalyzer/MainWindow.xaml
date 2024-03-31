@@ -19,7 +19,8 @@
         <Menu>
             <MenuItem Header="_File">
                 <MenuItem Header="_Brawse" Click="btnBrawses_Click" />
-                <MenuItem Header="_Import" Click="btnImport_Click" />
+                <MenuItem Header="_Load" Click="btnLoad_Click" />
+                <MenuItem Header="_Save" Click="btnSave_Click" />
                 <MenuItem Header="_Export" Click="btnExport_Click" />
             </MenuItem>
             <MenuItem Header="_Tune model" Click="btnTuneModel_Click" />

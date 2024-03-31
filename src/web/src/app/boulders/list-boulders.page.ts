@@ -1,4 +1,6 @@
 import { Component } from '@angular/core';
+import { BouldersService } from '../boulders.service';
+import { Boulder } from '../boulder';
 
 @Component({
   selector: 'app-list-boulders',
@@ -6,5 +8,16 @@ import { Component } from '@angular/core';
   styleUrls: ['./list-boulders.page.scss'],
 })
 export class ListBouldersPage {
-  constructor() {}
+  public boulders: Boulder[] = [];
+  public selectedBoulder?: Boulder;
+
+  constructor(private bouldersService: BouldersService) {
+    this.bouldersService.getAll().then((boulders: Boulder[]) => {
+      this.boulders = boulders;
+    });
+  }
+
+  onSelect(b: Boulder) {
+    this.selectedBoulder = b;
+  }
 }

@@ -3,7 +3,7 @@
     <ion-buttons slot="start">
       <ion-menu-button></ion-menu-button>
     </ion-buttons>
-    <ion-title></ion-title>
+    <ion-title>Routes</ion-title>
   </ion-toolbar>
 </ion-header>
 
@@ -16,6 +16,14 @@
 
   <div id="container">
     <strong class="capitalize"></strong>
-    <p>Explore <a target="_blank" rel="noopener noreferrer" href="https://ionicframework.com/docs/components">UI Components</a></p>
+    <ul class="boulders">
+      <li *ngFor="let b of boulders">
+        <button [class.selected]="b === selectedBoulder" type="button" (click)="onSelect(b)" [routerLink]="[ '/boulders/' + b.Id ]">
+          <span class="badge">{{b.Difficulty}}</span>
+          <span class="name">{{b.Name}}</span>
+          <span class="angle">{{b.Angle}}&deg;</span>
+        </button>
+      </li>
+    </ul>
   </div>
 </ion-content>
