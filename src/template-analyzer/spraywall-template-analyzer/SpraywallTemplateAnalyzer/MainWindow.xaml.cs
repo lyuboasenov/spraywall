@@ -76,7 +76,9 @@ namespace SpraywallTemplateAnalyzer {
             result.MinArea = _processor.MinArea;
             result.MaxRatio = _processor.MaxRatio;
 
-            result.Elllipses = _processor.Ellipses.OrderByDescending(e => e.Size.Width * e.Size.Height).
+            result.Elllipses = _processor.Ellipses.
+               OrderBy(e => e.Size.Width / 2 + e.Center.X).
+               ThenBy(e => e.Size.Height / 2 + e.Center.Y).
                Select(e => new SelectableRotatedRect() {
                   RotatedRect = e,
                   IsSelected = _selectableEllipses.Any(ee => ee.IsSelected && ee.RotatedRect.Equals(e))
@@ -167,7 +169,9 @@ namespace SpraywallTemplateAnalyzer {
          lstEllipses.ItemsSource = null;
          _selectableEllipses.Clear();
          
-         foreach(var el in _processor?.FilteredEllipses.OrderByDescending(e => e.Size.Width * e.Size.Height) ?? Enumerable.Empty<RotatedRect>()) {
+         foreach(var el in _processor?.
+            FilteredEllipses.
+            OrderBy(e => e.Center.Y) ?? Enumerable.Empty<RotatedRect>()) {
             var elItem = new SelectableRotatedRect() {
                RotatedRect = el,
                IsSelected = false,
