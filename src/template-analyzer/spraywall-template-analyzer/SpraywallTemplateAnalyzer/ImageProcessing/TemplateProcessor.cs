@@ -14,36 +14,22 @@ namespace SpraywallTemplateAnalyzer.ImageProcessing {
       private const int MIN_SIZE = 10;
       private List<Hold> _holds = new List<Hold>();
 
-      public uint MaxSize { get; set; } = 400;
-      public uint MinArea { get; set; } = 164;
-      public uint MaxRatio { get; set; } = 4;
-
-      public uint CenterOffset { get; set; } = 5;
-      public uint SizeThreshold { get; set; } = 10;
-      
-      public uint AngleOffset { get; set; } = 5;
+      public uint MaxSize { get; set; } = 5000;
+      public uint MinArea { get; set; } = 10;
+      public uint MaxRatio { get; set; } = 30;
+      public double CannyThreshold { get; set; } = 180;
+      public double CircleAccumulatorThreshold { get; set; } = 120;
 
       public IEnumerable<Hold> Holds { get {  return _holds; } }
       public IEnumerable<Hold> FilteredHolds { 
          get {
             var result = new List<Hold>();
             foreach (var rect in _holds.Where(h => IsValid(h.Ellipse))) {
-               //if (!result.Any(r => IsSimilar(r.Ellipse, rect.Ellipse))) {
-               //   result.Add(rect);
-               //}
+               
                result.Add(rect);
             }
             return result;
          } 
-      }
-
-      private bool IsSimilar(RotatedRect x, RotatedRect y) {
-         return
-            Math.Abs(x.Center.X - y.Center.X) <= CenterOffset &&
-            Math.Abs(x.Center.Y - y.Center.Y) <= CenterOffset &&
-            Math.Abs(x.Size.Width - y.Size.Width) <= SizeThreshold &&
-            Math.Abs(x.Size.Height - y.Size.Height) <= SizeThreshold &&
-            Math.Abs(x.Angle - y.Angle) <= AngleOffset;
       }
 
       private TemplateProcessor() {
@@ -78,7 +64,7 @@ namespace SpraywallTemplateAnalyzer.ImageProcessing {
       public Hold Add(IEnumerable<PointF> points) {
          var rect = CvInvoke.MinAreaRect(points.ToArray());
          var hold = new Hold() {
-            Contour = points.Select(p => new Point((int) p.X, (int) p.Y)).ToArray(),
+            Contour = points.Select(p => new System.Drawing.Point((int) p.X, (int) p.Y)).ToArray(),
             Ellipse = rect,
             MinRect = rect
          };
@@ -116,27 +102,28 @@ namespace SpraywallTemplateAnalyzer.ImageProcessing {
             CvInvoke.CvtColor(img, gray, ColorConversion.Bgr2Gray);
 
             //Remove noise
-            CvInvoke.GaussianBlur(gray, gray, new Size(3, 3), 1);
+            CvInvoke.GaussianBlur(gray, gray, new System.Drawing.Size(3, 3), 1);
 
-            double cannyThreshold = 180.0;
-            double circleAccumulatorThreshold = 120;
+            CvInvoke.Canny(gray, cannyEdges, CannyThreshold, CircleAccumulatorThreshold);
 
-            CvInvoke.Canny(gray, cannyEdges, cannyThreshold, circleAccumulatorThreshold);
-
-            CvInvoke.FindContours(cannyEdges, contours, null, RetrType.Tree, ChainApproxMethod.ChainApproxSimple);
+            CvInvoke.FindContours(cannyEdges, contours, null, RetrType.List, ChainApproxMethod.ChainApproxSimple);
 
             int count = contours.Size;
             for (int i = 0; i < count; i++) {
-               using (VectorOfPoint contour = contours[i]) {
-                  RotatedRect rect = CvInvoke.MinAreaRect(contour);
+               using (VectorOfPoint contour = contours[i])
+               using (VectorOfPoint approxContour = new VectorOfPoint()) {
 
+                  CvInvoke.ApproxPolyDP(contour, approxContour, CvInvoke.ArcLength(contour, true) * 0.005, true);
+                  RotatedRect rect = CvInvoke.MinAreaRect(approxContour);
+                  var points = approxContour.ToArray();
                   if (rect.Size.Width > MIN_SIZE && rect.Size.Height > MIN_SIZE) {
-                     if (contour.Length > 4) {
+
+                     if (points.Length > 5) {
 
                         _holds.Add(new Hold() {
-                           Ellipse = CvInvoke.FitEllipse(contour),
+                           Ellipse = CvInvoke.FitEllipse(approxContour),
                            MinRect = rect,
-                           Contour = contour.ToArray()
+                           Contour = points
                         });
                      }
                   }

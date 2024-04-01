@@ -30,15 +30,22 @@ namespace SpraywallTemplateAnalyzer {
       private Random _rand = new Random();
       private List<PointF> _addEllipseBuffer = new List<PointF>();
 
-      private uint _maxSize = 400;
-      private uint _minArea = 164;
-      private uint _maxRatio = 4;
+      private uint _maxSize = 5000;
+      private uint _minArea = 0;
+      private uint _maxRatio = 30;
+      private double _cannyThreshold = 180;
+      private double _accThreshold = 120;
 
-      private uint _centerOffset = 5;
-      private uint _sizeThreshold = 10;
+      private uint _point = 0;
+
+      List<System.Windows.Media.Color> _colors = new List<System.Windows.Media.Color>();
 
       public MainWindow() {
          InitializeComponent();
+
+         for (int i = 0; i < 3000; i++) {
+            _colors.Add(RandomColor());
+         }
       }
 
       private void _modelTuneWindow_Deduplicate(object? sender, EventArgs e) {
@@ -56,12 +63,14 @@ namespace SpraywallTemplateAnalyzer {
             } else if (e.PropertyName == nameof(ModelTuneWindow.MaxRatio)) {
                _maxRatio = w.MaxRatio;
                _processor.MaxRatio = w.MaxRatio;
-            } else if (e.PropertyName == nameof(ModelTuneWindow.CenterOffset)) {
-               _centerOffset = w.CenterOffset;
-               _processor.CenterOffset = w.CenterOffset;
-            } else if (e.PropertyName == nameof(ModelTuneWindow.SizeThreshold)) {
-               _sizeThreshold = w.SizeThreshold;
-               _processor.SizeThreshold = w.SizeThreshold;
+            } else if (e.PropertyName == nameof(ModelTuneWindow.Point)) {
+               _point = w.Point;
+            } else if (e.PropertyName == nameof(ModelTuneWindow.CannyThreshold)) {
+               _cannyThreshold = w.CannyThreshold;
+               _processor.CannyThreshold = w.CannyThreshold;
+            } else if (e.PropertyName == nameof(ModelTuneWindow.AccThreshold)) {
+               _accThreshold = w.AccThreshold;
+               _processor.CircleAccumulatorThreshold = w.AccThreshold;
             }
 
             img.InvalidateVisual();
@@ -205,14 +214,15 @@ namespace SpraywallTemplateAnalyzer {
       private void ReLoadEllipses() {
          lstEllipses.ItemsSource = null;
          _selectableHolds.Clear();
-         
+
+         int i = 0;
          foreach(var el in _processor?.
             FilteredHolds.
             OrderBy(e => e.Ellipse.Center.Y) ?? Enumerable.Empty<Hold>()) {
             var elItem = new SelectableHold() {
                Hold = el,
-               IsSelected = false,
-               Color = RandomColor()
+               IsSelected = true,
+               Color = _colors[i++],
             };
             _selectableHolds.Add(elItem);
          }
@@ -237,10 +247,25 @@ namespace SpraywallTemplateAnalyzer {
                img.Height = _bitmap.Height;
             }
             var canvas = e.Surface.Canvas;
+            using (var selpaint = new SKPaint())
+            using (var spaint = new SKPaint())
+            using (var epaint = new SKPaint())
             using (var paint = new SKPaint()) {
                paint.Color = SKColors.Yellow;
                paint.StrokeWidth = 5;
-               paint.Style = SKPaintStyle.Stroke;
+               paint.Style = SKPaintStyle.Fill;
+
+               spaint.Color = SKColors.Green;
+               spaint.StrokeWidth = 10;
+               spaint.Style = SKPaintStyle.Stroke;
+
+               selpaint.Color = SKColors.DeepPink;
+               selpaint.StrokeWidth = 10;
+               selpaint.Style = SKPaintStyle.Stroke;
+               
+               epaint.Color = SKColors.Red;
+               epaint.StrokeWidth = 10;
+               epaint.Style = SKPaintStyle.Stroke;
 
                using var imgpaint = new SKPaint();
 
@@ -259,13 +284,23 @@ namespace SpraywallTemplateAnalyzer {
                   foreach (var elItem in _selectableHolds.Where(e => e.IsSelected)) {
                      var el = elItem.Hold.Ellipse;
                      paint.Color = ConvertColor(elItem.Color);
+                     var points = ToSkPoints(elItem.Hold.Contour);
 
                      using (var path  = new SKPath()) {
-                        path.AddPoly(ToSkPoints(elItem.Hold.Contour), true);
 
-                        canvas.DrawPath(
-                           path,
-                           paint);
+
+                        path.AddPoly(points, true);
+
+                        canvas.DrawPath(path, paint);
+
+                        //canvas.DrawPoints(SKPointMode.Polygon, points, paint);
+
+                        canvas.DrawPoint(points[0], spaint);
+                        canvas.DrawPoint(points[points.Length-1], epaint);
+                        if (_point < points.Length) {
+
+                           canvas.DrawPoint(points[_point], selpaint);
+                        }
                      }
                   }
                }
@@ -386,13 +421,18 @@ namespace SpraywallTemplateAnalyzer {
          w.MaxSize = _maxSize;
          w.MinArea = _minArea;
          w.MaxRatio = _maxRatio;
-         w.CenterOffset = _centerOffset;
-         w.SizeThreshold = _sizeThreshold;
+         w.Point = _point;
+         w.CannyThreshold = _cannyThreshold;
+         w.AccThreshold = _accThreshold;
          
          w.PropertyChanged += _modelTuneWindow_PropertyChanged;
          w.Deactivated += _modelTuneWindow_Deduplicate;
 
          w.Show();
+      }
+
+      private void btnEditItem_Click(object sender, RoutedEventArgs e) {
+
       }
    }
 }

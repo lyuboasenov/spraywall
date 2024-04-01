@@ -42,7 +42,7 @@
                       PaintSurface="img_PaintSurface"  />
             </ScrollViewer>
 
-            <Grid Grid.Column="1" Width="70">
+            <Grid Grid.Column="1" Width="110">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="*" />
@@ -57,11 +57,20 @@
                                     MouseEnter="StackPanel_MouseEnter" 
                                     MouseLeave="StackPanel_MouseLeave"
                                     Background="{Binding Color, Converter={StaticResource ColorToSolidColorBrushConverter}}">
-                                <CheckBox Width="20" Height="20" IsChecked="{Binding Path=IsSelected}" Click="CheckBox_Checked"></CheckBox>
+                                <CheckBox IsChecked="{Binding Path=IsSelected}" 
+                                          Click="CheckBox_Checked" 
+                                          VerticalAlignment="Center" 
+                                          Margin="5"/>
+                                <Button x:Name="btnEditItem" 
+                                    Click="btnEditItem_Click"
+                                        Padding="5"
+                                        Margin="5"
+                                    Content="E" />
                                 <Button x:Name="btnRemoveItem" 
                                     Click="btnRemoveItem_Click"
-                                    Background="{Binding Color, Converter={StaticResource ColorToSolidColorBrushConverter}}"
-                                    Content=" - " />
+                                        Padding="5"
+                                        Margin="5"
+                                    Content="R" />
 
                             </StackPanel>
                         </DataTemplate>

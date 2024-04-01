@@ -9,66 +9,79 @@
         <Grid Grid.ColumnSpan="2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
-
-            <Slider x:Name="slSize" 
-                    Grid.Column="1" 
-                    Grid.Row="0" 
-                    Minimum="10" 
-                    Maximum="1000" 
-                    Value="{Binding MaxSize}" />
-            <Slider x:Name="slArea" 
-                    Grid.Column="1" 
-                    Grid.Row="1" 
-                    Minimum="10" 
-                    Maximum="500" 
-                    Value="{Binding MinArea}" />
-            <Slider x:Name="slRatio" 
-                    Grid.Column="1" 
-                    Grid.Row="2" 
-                    Minimum="1" 
-                    Maximum="20" 
-                    Value="{Binding MaxRatio}" />
-            
-            <TextBlock Text="{Binding ElementName=slSize, Path=Value}" Grid.Row="0" />
-            <TextBlock Text="{Binding ElementName=slArea, Path=Value}" Grid.Row="1" />
-            <TextBlock Text="{Binding ElementName=slRatio, Path=Value}" Grid.Row="2" />
-        </Grid>
-
-        <Line Stroke="Black"></Line>
-
-        <Grid Grid.ColumnSpan="2">
-            <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
-            <Slider x:Name="lsOffset" 
-                    Grid.Column="1" 
+            <Slider x:Name="slSize" 
+                    Grid.Column="2" 
                     Grid.Row="0" 
-                    Minimum="0" 
-                    Maximum="20" 
-                    Value="{Binding CenterOffset}" />
-            <Slider x:Name="lsSizeTh" 
-                    Grid.Column="1" 
+                    Minimum="10" 
+                    Maximum="1000" 
+                    Value="{Binding MaxSize}" />
+            <Slider x:Name="slArea" 
+                    Grid.Column="2" 
                     Grid.Row="1" 
+                    Minimum="10" 
+                    Maximum="500" 
+                    Value="{Binding MinArea}" />
+            <Slider x:Name="slRatio" 
+                    Grid.Column="2" 
+                    Grid.Row="2" 
+                    Minimum="1" 
+                    Maximum="20" 
+                    Value="{Binding MaxRatio}" />
+            <Slider x:Name="slMaxFirstLast" 
+                    Grid.Column="2" 
+                    Grid.Row="3" 
+                    Minimum="1" 
+                    Maximum="20" 
+                    Value="{Binding MaxFirstLastDistance}" />
+            <Slider x:Name="slMovePoint" 
+                    Grid.Column="2" 
+                    Grid.Row="4" 
                     Minimum="0" 
-                    Maximum="50" 
-                    Value="{Binding SizeThreshold}" />
+                    Maximum="2000" 
+                    Value="{Binding Point}" />            
+            <Slider x:Name="slCannyThreshold" 
+                    Grid.Column="2" 
+                    Grid.Row="5" 
+                    Minimum="0" 
+                    Maximum="300" 
+                    Value="{Binding CannyThreshold}" />            
+            <Slider x:Name="slAccThreshold" 
+                    Grid.Column="2" 
+                    Grid.Row="6" 
+                    Minimum="0" 
+                    Maximum="300" 
+                    Value="{Binding AccThreshold}" />
+            
+            <TextBlock Text="{Binding ElementName=slSize, Path=Value}" Grid.Column="1" Grid.Row="0" />
+            <TextBlock Text="{Binding ElementName=slArea, Path=Value}" Grid.Column="1" Grid.Row="1" />
+            <TextBlock Text="{Binding ElementName=slRatio, Path=Value}" Grid.Column="1" Grid.Row="2" />
+            <TextBlock Text="{Binding ElementName=slMaxFirstLast, Path=Value}" Grid.Column="1" Grid.Row="3" />
+            <TextBlock Text="{Binding ElementName=slMovePoint, Path=Value}" Grid.Column="1" Grid.Row="4" />
+            <TextBlock Text="{Binding ElementName=slCannyThreshold, Path=Value}" Grid.Column="1" Grid.Row="5" />
+            <TextBlock Text="{Binding ElementName=slAccThreshold, Path=Value}" Grid.Column="1" Grid.Row="6" />
 
-            <TextBlock Text="{Binding ElementName=lsOffset, Path=Value}" Grid.Row="0" />
-            <TextBlock Text="{Binding ElementName=lsSizeTh, Path=Value}" Grid.Row="1" />
+            <TextBlock Text="Max size" Grid.Column="0" Grid.Row="0" />
+            <TextBlock Text="Min area" Grid.Column="0" Grid.Row="1" />
+            <TextBlock Text="Max ratio" Grid.Column="0" Grid.Row="2" />
+            <TextBlock Text="Max first-last" Grid.Column="0" Grid.Row="3" />
+            <TextBlock Text="Point" Grid.Column="0" Grid.Row="4" />
+            <TextBlock Text="Canny threshold" Grid.Column="0" Grid.Row="5" />
+            <TextBlock Text="Acc threshold" Grid.Column="0" Grid.Row="6" />
         </Grid>
+
         <Button x:Name="btnDeduplicate" Click="btnDeduplicate_Click" Content="Deduplicate" />
     </StackPanel>
 </Window>

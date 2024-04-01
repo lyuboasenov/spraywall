@@ -10,8 +10,9 @@ namespace SpraywallTemplateAnalyzer {
       private uint maxSize = 400;
       private uint minArea = 164;
       private uint maxRatio = 4;
-      private uint centerOffset = 5;
-      private uint sizeThreshold = 10;
+      private uint point = 0;
+      private double cannyThreshold = 180;
+      private double accThreshold = 120;
 
       public uint MaxSize { 
          get => maxSize;
@@ -40,21 +41,30 @@ namespace SpraywallTemplateAnalyzer {
             }
          }
       }
-      public uint CenterOffset {
-         get => centerOffset;
+      public uint Point {
+         get => point;
          set {
-            if (centerOffset != value) {
-               centerOffset = value;
-               PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CenterOffset)));
+            if (point != value) {
+               point = value;
+               PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Point)));
             }
          }
       }
-      public uint SizeThreshold {
-         get => sizeThreshold;
+      public double CannyThreshold {
+         get => cannyThreshold;
          set {
-            if (sizeThreshold != value) {
-               sizeThreshold = value;
-               PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SizeThreshold)));
+            if (cannyThreshold != value) {
+               cannyThreshold = value;
+               PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CannyThreshold)));
+            }
+         }
+      }
+      public double AccThreshold {
+         get => accThreshold;
+         set {
+            if (accThreshold != value) {
+               accThreshold = value;
+               PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(AccThreshold)));
             }
          }
       }
