@@ -9,9 +9,10 @@ using System;
 
 namespace SpraywallTemplateAnalyzer.ImageProcessing {
    internal class TemplateProcessor {
+
       private string _imgLocation;
       private const int MIN_SIZE = 10;
-      private List<RotatedRect> _ellipses = new List<RotatedRect>();
+      private List<Hold> _holds = new List<Hold>();
 
       public uint MaxSize { get; set; } = 400;
       public uint MinArea { get; set; } = 164;
@@ -22,14 +23,15 @@ namespace SpraywallTemplateAnalyzer.ImageProcessing {
       
       public uint AngleOffset { get; set; } = 5;
 
-      public IEnumerable<RotatedRect> Ellipses { get {  return _ellipses; } }
-      public IEnumerable<RotatedRect> FilteredEllipses { 
+      public IEnumerable<Hold> Holds { get {  return _holds; } }
+      public IEnumerable<Hold> FilteredEllipses { 
          get {
-            var result = new List<RotatedRect>();
-            foreach (var rect in _ellipses.Where(IsValid)) {
-               if (!result.Any(r => IsSimilar(r, rect))) {
-                  result.Add(rect);
-               }
+            var result = new List<Hold>();
+            foreach (var rect in _holds.Where(h => IsValid(h.Ellipse))) {
+               //if (!result.Any(r => IsSimilar(r.Ellipse, rect.Ellipse))) {
+               //   result.Add(rect);
+               //}
+               result.Add(rect);
             }
             return result;
          } 
@@ -59,9 +61,9 @@ namespace SpraywallTemplateAnalyzer.ImageProcessing {
          return processor;
       }
 
-      public static TemplateProcessor Import(IEnumerable<RotatedRect> enumerable, uint maxSize, uint minArea, uint maxRatio) {
+      public static TemplateProcessor Import(IEnumerable<Hold> enumerable, uint maxSize, uint minArea, uint maxRatio) {
          var processor = new TemplateProcessor();
-         processor._ellipses.AddRange(enumerable);
+         processor._holds.AddRange(enumerable);
          processor.MaxSize = maxSize;
          processor.MinArea = minArea;
          processor.MaxRatio = maxRatio;
@@ -69,15 +71,20 @@ namespace SpraywallTemplateAnalyzer.ImageProcessing {
          return processor;
       }
 
-      public void Remove(RotatedRect rect) {
-         _ellipses.Remove(rect);
+      public void Remove(Hold rect) {
+         _holds.Remove(rect);
       }
 
-      public RotatedRect Add(IEnumerable<PointF> points) {
+      public Hold Add(IEnumerable<PointF> points) {
          var rect = CvInvoke.MinAreaRect(points.ToArray());
-         _ellipses.Insert(0, rect);
+         var hold = new Hold() {
+            Contour = points.Select(p => new Point((int) p.X, (int) p.Y)).ToArray(),
+            Ellipse = rect,
+            MinRect = rect
+         };
+         _holds.Insert(0, hold);
 
-         return rect;
+         return hold;
       }
 
       public bool IsValidSize(RotatedRect r) {
@@ -109,7 +116,7 @@ namespace SpraywallTemplateAnalyzer.ImageProcessing {
             CvInvoke.CvtColor(img, gray, ColorConversion.Bgr2Gray);
 
             //Remove noise
-            CvInvoke.GaussianBlur(gray, gray, new System.Drawing.Size(3, 3), 1);
+            CvInvoke.GaussianBlur(gray, gray, new Size(3, 3), 1);
 
             double cannyThreshold = 180.0;
             double circleAccumulatorThreshold = 120;
@@ -125,7 +132,12 @@ namespace SpraywallTemplateAnalyzer.ImageProcessing {
 
                   if (rect.Size.Width > MIN_SIZE && rect.Size.Height > MIN_SIZE) {
                      if (contour.Length > 4) {
-                        _ellipses.Add(CvInvoke.FitEllipse(contour));
+
+                        _holds.Add(new Hold() {
+                           Ellipse = CvInvoke.FitEllipse(contour),
+                           MinRect = rect,
+                           Contour = contour.ToArray()
+                        });
                      }
                   }
                }

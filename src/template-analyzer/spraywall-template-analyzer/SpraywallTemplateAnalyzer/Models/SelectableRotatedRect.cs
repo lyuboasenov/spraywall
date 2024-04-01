@@ -1,4 +1,5 @@
 ﻿using Emgu.CV.Structure;
+using SpraywallTemplateAnalyzer.ImageProcessing;
 using System.ComponentModel;
 using System.Windows.Media;
 
@@ -7,7 +8,7 @@ namespace SpraywallTemplateAnalyzer.Models {
       private bool isSelected;
       private Color color;
 
-      public RotatedRect RotatedRect { get; set; }
+      public Hold Hold { get; set; }
 
       public bool IsSelected { 
          get => isSelected; 

@@ -1,17 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace SpraywallTemplateAnalyzer {
    /// <summary>
@@ -27,36 +16,46 @@ namespace SpraywallTemplateAnalyzer {
       public uint MaxSize { 
          get => maxSize;
          set {
-            maxSize = value;
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(MaxSize)));
+            if (maxSize != value) {
+               maxSize = value;
+               PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(MaxSize)));
+            }
          }
       }
       public uint MinArea { 
          get => minArea;
          set {
-            minArea = value;
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(MinArea)));
+            if (minArea != value) {
+               minArea = value;
+               PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(MinArea)));
+            }
          }
       }
       public uint MaxRatio { 
          get => maxRatio;
          set {
-            maxRatio = value;
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(MaxRatio)));
+            if (maxRatio != value) {
+               maxRatio = value;
+               PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(MaxRatio)));
+            }
          }
       }
       public uint CenterOffset {
          get => centerOffset;
          set {
-            centerOffset = value;
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CenterOffset)));
+            if (centerOffset != value) {
+               centerOffset = value;
+               PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CenterOffset)));
+            }
          }
       }
       public uint SizeThreshold {
          get => sizeThreshold;
          set {
-            sizeThreshold = value;
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SizeThreshold)));
+            if (sizeThreshold != value) {
+               sizeThreshold = value;
+               PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SizeThreshold)));
+            }
          }
       }
 
