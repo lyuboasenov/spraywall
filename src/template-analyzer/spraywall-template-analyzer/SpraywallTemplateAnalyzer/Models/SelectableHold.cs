@@ -4,7 +4,7 @@ using System.ComponentModel;
 using System.Windows.Media;
 
 namespace SpraywallTemplateAnalyzer.Models {
-   public class SelectableRotatedRect : INotifyPropertyChanged {
+   public class SelectableHold : INotifyPropertyChanged {
       private bool isSelected;
       private Color color;
 

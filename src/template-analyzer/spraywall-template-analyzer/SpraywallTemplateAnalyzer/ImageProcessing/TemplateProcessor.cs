@@ -24,7 +24,7 @@ namespace SpraywallTemplateAnalyzer.ImageProcessing {
       public uint AngleOffset { get; set; } = 5;
 
       public IEnumerable<Hold> Holds { get {  return _holds; } }
-      public IEnumerable<Hold> FilteredEllipses { 
+      public IEnumerable<Hold> FilteredHolds { 
          get {
             var result = new List<Hold>();
             foreach (var rect in _holds.Where(h => IsValid(h.Ellipse))) {

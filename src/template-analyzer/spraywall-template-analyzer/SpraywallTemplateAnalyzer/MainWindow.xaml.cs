@@ -25,7 +25,7 @@ namespace SpraywallTemplateAnalyzer {
       private string imgLocation;
       private TemplateProcessor _processor;
       private SKBitmap _bitmap;
-      private ObservableCollection<SelectableRotatedRect> _selectableHolds = new ObservableCollection<SelectableRotatedRect>();
+      private ObservableCollection<SelectableHold> _selectableHolds = new ObservableCollection<SelectableHold>();
       private Template _importedTemplate;
       private Random _rand = new Random();
       private List<PointF> _addEllipseBuffer = new List<PointF>();
@@ -70,79 +70,79 @@ namespace SpraywallTemplateAnalyzer {
       }
 
       private void btnSave_Click(object sender, RoutedEventArgs e) {
-         //var result = new Template();
-         //if (!string.IsNullOrEmpty(imgLocation) && File.Exists(imgLocation) && null != _selectableEllipses) {
-         //   var imgBytes = File.ReadAllBytes(imgLocation);
-         //   result.EncodedImage = Convert.ToBase64String(imgBytes);
-         //   result.MaxSize = _processor.MaxSize;
-         //   result.MinArea = _processor.MinArea;
-         //   result.MaxRatio = _processor.MaxRatio;
+         var result = new Template();
+         if (!string.IsNullOrEmpty(imgLocation) && File.Exists(imgLocation) && null != _selectableHolds) {
+            var imgBytes = File.ReadAllBytes(imgLocation);
+            result.EncodedImage = Convert.ToBase64String(imgBytes);
+            result.MaxSize = _processor.MaxSize;
+            result.MinArea = _processor.MinArea;
+            result.MaxRatio = _processor.MaxRatio;
 
-         //   result.Elllipses = _processor.Ellipses.
-         //      OrderBy(e => e.Size.Width / 2 + e.Center.X).
-         //      ThenBy(e => e.Size.Height / 2 + e.Center.Y).
-         //      Select(e => new SelectableRotatedRect() {
-         //         RotatedRect = e,
-         //         IsSelected = _selectableEllipses.Any(ee => ee.IsSelected && ee.RotatedRect.Equals(e))
-         //      }).ToArray();
-         //} else if(_importedTemplate != null) {
-         //   result.EncodedImage = _importedTemplate.EncodedImage;
-         //   result.MaxSize = _processor.MaxSize;
-         //   result.MinArea = _processor.MinArea;
-         //   result.MaxRatio = _processor.MaxRatio;
+            result.Holds = _processor.Holds.
+               OrderBy(e => e.Ellipse.Size.Width / 2 + e.Ellipse.Center.X).
+               ThenBy(e => e.Ellipse.Size.Height / 2 + e.Ellipse.Center.Y).
+               Select(e => new SelectableHold() {
+                  Hold = e,
+                  IsSelected = _selectableHolds.Any(ee => ee.IsSelected && ee.Hold.Equals(e))
+               }).ToArray();
+         } else if (_importedTemplate != null) {
+            result.EncodedImage = _importedTemplate.EncodedImage;
+            result.MaxSize = _processor.MaxSize;
+            result.MinArea = _processor.MinArea;
+            result.MaxRatio = _processor.MaxRatio;
 
-         //   result.Elllipses = _processor.Ellipses.OrderByDescending(e => e.Size.Width * e.Size.Height).
-         //      Select(e => new SelectableRotatedRect() {
-         //         RotatedRect = e,
-         //         IsSelected = _selectableEllipses.Any(ee => ee.IsSelected && ee.RotatedRect.Equals(e))
-         //      }).ToArray();
-         //}
+            result.Holds = _processor.Holds.OrderByDescending(e => e.Ellipse.Size.Width * e.Ellipse.Size.Height).
+               Select(e => new SelectableHold() {
+                  Hold = e,
+                  IsSelected = _selectableHolds.Any(ee => ee.IsSelected && ee.Hold.Equals(e))
+               }).ToArray();
+         }
 
-         //var dialog = new Microsoft.Win32.SaveFileDialog();
-         //dialog.FileName = "template-draft"; // Default file name
-         //dialog.DefaultExt = ".json"; // Default file extension
-         //dialog.Filter = "JSON (*.json)|*.json"; // Filter files by extension
+         var dialog = new Microsoft.Win32.SaveFileDialog();
+         dialog.FileName = "template-draft"; // Default file name
+         dialog.DefaultExt = ".json"; // Default file extension
+         dialog.Filter = "JSON (*.json)|*.json"; // Filter files by extension
 
-         //if (dialog.ShowDialog() ?? false) {
-         //   File.WriteAllText(
-         //      dialog.FileName, 
-         //      JsonConvert.SerializeObject(
-         //         result,
-         //         new SizeJsonConverter()));
-         //}
+         if (dialog.ShowDialog() ?? false) {
+            File.WriteAllText(
+               dialog.FileName,
+               JsonConvert.SerializeObject(
+                  result,
+                  new SizeJsonConverter()));
+         }
       }
 
       private void btnExport_Click(object sender, RoutedEventArgs e) {
-         //var result = new ExportTemplate();
-         //if (!string.IsNullOrEmpty(imgLocation) && File.Exists(imgLocation) && null != _selectableEllipses) {
-         //   var imgBytes = File.ReadAllBytes(imgLocation);
-         //   result.EncodedImage = Convert.ToBase64String(imgBytes);
+         var result = new ExportTemplate();
+         if (!string.IsNullOrEmpty(imgLocation) && File.Exists(imgLocation) && null != _selectableHolds) {
+            var imgBytes = File.ReadAllBytes(imgLocation);
+            result.EncodedImage = Convert.ToBase64String(imgBytes);
 
-         //   result.Elllipses = _processor.FilteredEllipses.
-         //      OrderBy(e => e.Size.Width / 2 + e.Center.X).
-         //      ThenBy(e => e.Size.Height / 2 + e.Center.Y).
-         //      ToArray();
-         //} else if (_importedTemplate != null) {
-         //   result.EncodedImage = _importedTemplate.EncodedImage;
+            result.Holds = _processor.FilteredHolds.
+               OrderBy(e => e.Ellipse.Size.Width / 2 + e.Ellipse.Center.X).
+               ThenBy(e => e.Ellipse.Size.Height / 2 + e.Ellipse.Center.Y).
+               ToArray();
+         } else if (_importedTemplate != null) {
+            result.EncodedImage = _importedTemplate.EncodedImage;
 
-         //   result.Elllipses = _processor.FilteredEllipses.
-         //      OrderBy(e => e.Size.Width / 2 + e.Center.X).
-         //      ThenBy(e => e.Size.Height / 2 + e.Center.Y).
-         //      ToArray();
-         //}
+            result.Holds = _processor.FilteredHolds.
+               OrderBy(e => e.Ellipse.Size.Width / 2 + e.Ellipse.Center.X).
+               ThenBy(e => e.Ellipse.Size.Height / 2 + e.Ellipse.Center.Y).
+               ToArray();
+         }
 
-         //var dialog = new Microsoft.Win32.SaveFileDialog();
-         //dialog.FileName = "template"; // Default file name
-         //dialog.DefaultExt = ".json"; // Default file extension
-         //dialog.Filter = "JSON (*.json)|*.json"; // Filter files by extension
+         var dialog = new Microsoft.Win32.SaveFileDialog();
+         dialog.FileName = "template"; // Default file name
+         dialog.DefaultExt = ".json"; // Default file extension
+         dialog.Filter = "JSON (*.json)|*.json"; // Filter files by extension
 
-         //if (dialog.ShowDialog() ?? false) {
-         //   File.WriteAllText(
-         //      dialog.FileName,
-         //      JsonConvert.SerializeObject(
-         //         result,
-         //         new SizeJsonConverter()));
-         //}
+         if (dialog.ShowDialog() ?? false) {
+            File.WriteAllText(
+               dialog.FileName,
+               JsonConvert.SerializeObject(
+                  result,
+                  new SizeJsonConverter()));
+         }
       }
 
       private void btnBrawses_Click(object sender, RoutedEventArgs e) {
@@ -168,38 +168,38 @@ namespace SpraywallTemplateAnalyzer {
       }
 
       private void btnLoad_Click(object sender, RoutedEventArgs e) {
-         //var dialog = new Microsoft.Win32.OpenFileDialog();
-         //dialog.FileName = "template-draft"; // Default file name
-         //dialog.DefaultExt = ".json"; // Default file extension
-         //dialog.Filter = "JSON (*.json)|*.json"; // Filter files by extension
+         var dialog = new Microsoft.Win32.OpenFileDialog();
+         dialog.FileName = "template-draft"; // Default file name
+         dialog.DefaultExt = ".json"; // Default file extension
+         dialog.Filter = "JSON (*.json)|*.json"; // Filter files by extension
 
-         //if (dialog.ShowDialog() ?? false) {
-         //   _importedTemplate = JsonConvert.DeserializeObject<Template>(
-         //      File.ReadAllText(dialog.FileName), 
-         //      new SizeJsonConverter());
+         if (dialog.ShowDialog() ?? false) {
+            _importedTemplate = JsonConvert.DeserializeObject<Template>(
+               File.ReadAllText(dialog.FileName),
+               new SizeJsonConverter());
 
-         //   _processor = TemplateProcessor.Import(
-         //      _importedTemplate.Elllipses.Select(e => e.RotatedRect),
-         //      _importedTemplate.MaxSize,
-         //      _importedTemplate.MinArea,
-         //      _importedTemplate.MaxRatio);
+            _processor = TemplateProcessor.Import(
+               _importedTemplate.Holds.Select(e => e.Hold),
+               _importedTemplate.MaxSize,
+               _importedTemplate.MinArea,
+               _importedTemplate.MaxRatio);
 
-         //   _minArea = _processor.MinArea;
-         //   _maxRatio = _processor.MaxRatio;
-         //   _maxSize = _processor.MaxSize;
+            _minArea = _processor.MinArea;
+            _maxRatio = _processor.MaxRatio;
+            _maxSize = _processor.MaxSize;
 
-         //   _bitmap = SKBitmap.Decode(Convert.FromBase64String(_importedTemplate.EncodedImage));
-         //   img.Width = _bitmap.Width;
-         //   img.Height = _bitmap.Height;
-         //   img.InvalidateVisual();
-         //   ReLoadEllipses();
+            _bitmap = SKBitmap.Decode(Convert.FromBase64String(_importedTemplate.EncodedImage));
+            img.Width = _bitmap.Width;
+            img.Height = _bitmap.Height;
+            img.InvalidateVisual();
+            ReLoadEllipses();
 
-         //   foreach(var el in _selectableHolds) {
-         //      if (_importedTemplate.Elllipses.Any(e => e.IsSelected && e.RotatedRect.Equals(el.RotatedRect))) {
-         //         el.IsSelected = true;
-         //      }
-         //   }
-         //}
+            foreach (var el in _selectableHolds) {
+               if (_importedTemplate.Holds.Any(e => e.IsSelected && e.Hold.Equals(el.Hold))) {
+                  el.IsSelected = true;
+               }
+            }
+         }
       }
 
       private void ReLoadEllipses() {
@@ -207,9 +207,9 @@ namespace SpraywallTemplateAnalyzer {
          _selectableHolds.Clear();
          
          foreach(var el in _processor?.
-            FilteredEllipses.
+            FilteredHolds.
             OrderBy(e => e.Ellipse.Center.Y) ?? Enumerable.Empty<Hold>()) {
-            var elItem = new SelectableRotatedRect() {
+            var elItem = new SelectableHold() {
                Hold = el,
                IsSelected = false,
                Color = RandomColor()
@@ -298,7 +298,7 @@ namespace SpraywallTemplateAnalyzer {
       }
 
       private void btnRemoveItem_Click(object sender, RoutedEventArgs e) {
-         var item = ((Button) sender).DataContext as SelectableRotatedRect;
+         var item = ((Button) sender).DataContext as SelectableHold;
          if (item != null) {
             _processor.Remove(item.Hold);
             _selectableHolds.Remove(item);
@@ -331,7 +331,7 @@ namespace SpraywallTemplateAnalyzer {
             var hold = _processor.Add(_addEllipseBuffer);
             _addEllipseBuffer.Clear();
 
-            _selectableHolds.Insert(0, new SelectableRotatedRect() {
+            _selectableHolds.Insert(0, new SelectableHold() {
                Hold = hold,
                IsSelected = true
             });
@@ -356,7 +356,7 @@ namespace SpraywallTemplateAnalyzer {
 
       private void StackPanel_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e) {
          if (sender is StackPanel sp && !IsCheckboxChildChecked(sp)) {
-            if (sp.DataContext is SelectableRotatedRect rr) {
+            if (sp.DataContext is SelectableHold rr) {
                rr.IsSelected = !rr.IsSelected;
                img.InvalidateVisual();
             }
