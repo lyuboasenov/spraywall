@@ -16,7 +16,7 @@
 
   <div id="container">
     <strong class="capitalize"></strong>
-    <pinch-zoom>
+    <pinch-zoom #zoom [limit-zoom]=max_zoom>
       <canvas
         #canvas
         style="border: 1px solid"

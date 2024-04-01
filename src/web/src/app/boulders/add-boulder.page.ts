@@ -2,6 +2,7 @@ import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { WallTemplateService } from '../wall-template.service';
 import { RawImage } from '../raw-image';
 import { RotatedRect, WallTemplate } from '../wall-template';
+import { PinchZoomComponent } from '@meddv/ngx-pinch-zoom';
 
 @Component({
   selector: 'app-add-boulder',
@@ -10,11 +11,13 @@ import { RotatedRect, WallTemplate } from '../wall-template';
 })
 export class AddBoulderPage implements OnInit {
   @ViewChild('canvas', { static: true }) canvas!: ElementRef;
+  @ViewChild('zoom', { static: true }) zoom!: ElementRef;
 
   public template: WallTemplate | null = null;
   private img = new Image();
   private rawImg?: RawImage;
   private selectedRegions: RotatedRect[] = [];
+  public max_zoom = 10;
 
   constructor(private wallTemplateService: WallTemplateService) {
     this.wallTemplateService.load().then((template: WallTemplate) => {
@@ -70,6 +73,8 @@ export class AddBoulderPage implements OnInit {
 
   ngOnInit() {
     console.log("OnInit");
+    // console.log(this.zoom);
+    // this.zoom_height = this.zoom.nativeElement.offsetWidth;
   }
 
   templateClick(event: any) {

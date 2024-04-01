@@ -16,14 +16,14 @@
 
   <div id="container">
     <strong class="capitalize"></strong>
-    <ul class="boulders">
-      <li *ngFor="let b of boulders">
+    <ion-list class="boulders">
+      <ion-item *ngFor="let b of boulders">
         <button [class.selected]="b === selectedBoulder" type="button" (click)="onSelect(b)" [routerLink]="[ '/boulders/' + b.Id ]">
           <span class="badge">{{b.Difficulty}}</span>
           <span class="name">{{b.Name}}</span>
           <span class="angle">{{b.Angle}}&deg;</span>
         </button>
-      </li>
-    </ul>
+      </ion-item>
+    </ion-list>
   </div>
 </ion-content>

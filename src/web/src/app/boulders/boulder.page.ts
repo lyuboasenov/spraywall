@@ -20,6 +20,7 @@ export class BoulderPage implements OnInit {
   private activatedRoute = inject(ActivatedRoute);
   private img = new Image();
   public rating = new Array(0);
+  public max_zoom = 10;
 
   constructor(private bouldersService: BouldersService, private wallTemplateService: WallTemplateService) {
     this.bouldersService.getAll().then((boulders: Boulder[]) => {
