@@ -30,6 +30,8 @@ namespace SpraywallTemplateAnalyzer {
       private Template _importedTemplate;
       private Random _rand = new Random();
       private List<PointF> _addEllipseBuffer = new List<PointF>();
+      private SelectableHold _selectableHold;
+
 
       private uint _maxSize = 5000;
       private uint _minArea = 0;
@@ -39,7 +41,7 @@ namespace SpraywallTemplateAnalyzer {
 
       private uint _point = 0;
 
-      List<System.Windows.Media.Color> _colors = new List<System.Windows.Media.Color>();
+      private List<System.Windows.Media.Color> _colors = new List<System.Windows.Media.Color>();
 
       public MainWindow() {
          InitializeComponent();
@@ -300,8 +302,6 @@ namespace SpraywallTemplateAnalyzer {
 
                         canvas.DrawPath(path, paint);
 
-                        //canvas.DrawPoints(SKPointMode.Polygon, points, paint);
-
                         canvas.DrawPoint(points[0], spaint);
                         canvas.DrawPoint(points[points.Length-1], epaint);
                         if (_point < points.Length) {
@@ -315,6 +315,24 @@ namespace SpraywallTemplateAnalyzer {
                if (_addEllipseBuffer.Any()) {
                   foreach (var p in _addEllipseBuffer) {
                      canvas.DrawCircle(new SKPoint(p.X, p.Y), 2, paint);
+                  }
+               }
+            }
+
+            if (null != _selectableHold) {
+               var avgPoint = new SKPoint {
+                  X = (int) Math.Round(_selectableHold.Hold.Contour.Average(p => p.X)),
+                  Y = (int) Math.Round(_selectableHold.Hold.Contour.Average(p => p.Y))
+               };
+
+               using (var paint = new SKPaint()) {
+                  paint.Color = SKColors.Cyan;
+                  paint.Style = SKPaintStyle.Stroke;
+
+                  for(int i = 1; i <= 3; i++) {
+                     paint.StrokeWidth = 4 * i;
+
+                     canvas.DrawCircle(avgPoint, i * 120, paint);
                   }
                }
             }
@@ -398,21 +416,28 @@ namespace SpraywallTemplateAnalyzer {
       }
 
       private void StackPanel_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e) {
-         if (sender is StackPanel sp && !IsCheckboxChildChecked(sp)) {
+         if (sender is StackPanel sp) {
             if (sp.DataContext is SelectableHold rr) {
-               rr.IsSelected = !rr.IsSelected;
+               _selectableHold = rr;
+
+               if (!IsCheckboxChildChecked(sp)) {
+                  rr.IsSelected = !rr.IsSelected;
+               }
                img.InvalidateVisual();
             }
          }
       }
 
       private void StackPanel_MouseLeave(object sender, System.Windows.Input.MouseEventArgs e) {
-         //if (sender is StackPanel sp && !IsCheckboxChildChecked(sp)) {
-         //   if (sp.DataContext is SelectableRotatedRect rr) {
-         //      rr.IsSelected = !rr.IsSelected;
-         //      img.InvalidateVisual();
-         //   } 
-         //}
+         if (sender is StackPanel sp && !IsCheckboxChildChecked(sp)) {
+            if (sp.DataContext is SelectableHold rr) {
+               _selectableHold = null;
+
+               //rr.IsSelected = !rr.IsSelected;
+               
+               img.InvalidateVisual();
+            }
+         }
       }
 
       private static bool IsCheckboxChildChecked(StackPanel sp) {
