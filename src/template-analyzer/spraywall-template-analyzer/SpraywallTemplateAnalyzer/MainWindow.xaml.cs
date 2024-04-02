@@ -9,6 +9,7 @@ using SpraywallTemplateAnalyzer.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -42,10 +43,16 @@ namespace SpraywallTemplateAnalyzer {
 
       public MainWindow() {
          InitializeComponent();
+         this.DataContext = this;
 
          for (int i = 0; i < 3000; i++) {
             _colors.Add(RandomColor());
          }
+      }
+
+      private void _modelTuneWindow_Apply(object? sender, EventArgs e) {
+         _processor?.ProcessImage();
+         ReLoadEllipses();
       }
 
       private void _modelTuneWindow_Deduplicate(object? sender, EventArgs e) {
@@ -103,14 +110,14 @@ namespace SpraywallTemplateAnalyzer {
             result.Holds = _processor.Holds.OrderByDescending(e => e.Ellipse.Size.Width * e.Ellipse.Size.Height).
                Select(e => new SelectableHold() {
                   Hold = e,
-                  IsSelected = _selectableHolds.Any(ee => ee.IsSelected && ee.Hold.Equals(e))
+                  IsSelected = _selectableHolds?.Any(ee => ee.IsSelected && ee.Hold.Equals(e)) ?? false
                }).ToArray();
          }
 
          var dialog = new Microsoft.Win32.SaveFileDialog();
-         dialog.FileName = "template-draft"; // Default file name
-         dialog.DefaultExt = ".json"; // Default file extension
-         dialog.Filter = "JSON (*.json)|*.json"; // Filter files by extension
+         dialog.FileName = "template-draft";       // Default file name
+         dialog.DefaultExt = ".json";              // Default file extension
+         dialog.Filter = "JSON (*.json)|*.json";   // Filter files by extension
 
          if (dialog.ShowDialog() ?? false) {
             File.WriteAllText(
@@ -141,9 +148,9 @@ namespace SpraywallTemplateAnalyzer {
          }
 
          var dialog = new Microsoft.Win32.SaveFileDialog();
-         dialog.FileName = "template"; // Default file name
-         dialog.DefaultExt = ".json"; // Default file extension
-         dialog.Filter = "JSON (*.json)|*.json"; // Filter files by extension
+         dialog.FileName = "template";             // Default file name
+         dialog.DefaultExt = ".json";              // Default file extension
+         dialog.Filter = "JSON (*.json)|*.json";   // Filter files by extension
 
          if (dialog.ShowDialog() ?? false) {
             File.WriteAllText(
@@ -156,9 +163,9 @@ namespace SpraywallTemplateAnalyzer {
 
       private void btnBrawses_Click(object sender, RoutedEventArgs e) {
          var dialog = new Microsoft.Win32.OpenFileDialog();
-         dialog.FileName = "template"; // Default file name
-         dialog.DefaultExt = ".jpg"; // Default file extension
-         dialog.Filter = "Images (*.jpg)|*.jpg|Images (*.jpeg)|*.jpeg"; // Filter files by extension
+         dialog.FileName = "template";                                     // Default file name
+         dialog.DefaultExt = ".jpg";                                       // Default file extension
+         dialog.Filter = "Images (*.jpg)|*.jpg|Images (*.jpeg)|*.jpeg";    // Filter files by extension
 
          if (dialog.ShowDialog() ?? false) {
             imgLocation = dialog.FileName;
@@ -178,9 +185,9 @@ namespace SpraywallTemplateAnalyzer {
 
       private void btnLoad_Click(object sender, RoutedEventArgs e) {
          var dialog = new Microsoft.Win32.OpenFileDialog();
-         dialog.FileName = "template-draft"; // Default file name
-         dialog.DefaultExt = ".json"; // Default file extension
-         dialog.Filter = "JSON (*.json)|*.json"; // Filter files by extension
+         dialog.FileName = "template-draft";          // Default file name
+         dialog.DefaultExt = ".json";                 // Default file extension
+         dialog.Filter = "JSON (*.json)|*.json";      // Filter files by extension
 
          if (dialog.ShowDialog() ?? false) {
             _importedTemplate = JsonConvert.DeserializeObject<Template>(
@@ -222,7 +229,7 @@ namespace SpraywallTemplateAnalyzer {
             var elItem = new SelectableHold() {
                Hold = el,
                IsSelected = true,
-               Color = _colors[i++],
+               Color = _colors[(i++) % 3000],
             };
             _selectableHolds.Add(elItem);
          }
@@ -368,7 +375,8 @@ namespace SpraywallTemplateAnalyzer {
 
             _selectableHolds.Insert(0, new SelectableHold() {
                Hold = hold,
-               IsSelected = true
+               IsSelected = true,
+               Color = RandomColor()
             });
 
             img.InvalidateVisual();
@@ -427,6 +435,7 @@ namespace SpraywallTemplateAnalyzer {
          
          w.PropertyChanged += _modelTuneWindow_PropertyChanged;
          w.Deactivated += _modelTuneWindow_Deduplicate;
+         w.Apply += _modelTuneWindow_Apply;
 
          w.Show();
       }

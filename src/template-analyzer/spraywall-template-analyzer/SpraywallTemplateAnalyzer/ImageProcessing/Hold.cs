@@ -1,5 +1,4 @@
 ﻿using Emgu.CV.Structure;
-using Emgu.CV.Util;
 using System.Drawing;
 
 namespace SpraywallTemplateAnalyzer.ImageProcessing {

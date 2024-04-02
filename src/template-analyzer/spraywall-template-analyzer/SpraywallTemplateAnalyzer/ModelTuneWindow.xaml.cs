@@ -14,7 +14,7 @@ namespace SpraywallTemplateAnalyzer {
       private double cannyThreshold = 180;
       private double accThreshold = 120;
 
-      public uint MaxSize { 
+      public uint MaxSize {
          get => maxSize;
          set {
             if (maxSize != value) {
@@ -23,7 +23,7 @@ namespace SpraywallTemplateAnalyzer {
             }
          }
       }
-      public uint MinArea { 
+      public uint MinArea {
          get => minArea;
          set {
             if (minArea != value) {
@@ -32,7 +32,7 @@ namespace SpraywallTemplateAnalyzer {
             }
          }
       }
-      public uint MaxRatio { 
+      public uint MaxRatio {
          get => maxRatio;
          set {
             if (maxRatio != value) {
@@ -75,10 +75,15 @@ namespace SpraywallTemplateAnalyzer {
       }
 
       private void btnDeduplicate_Click(object sender, RoutedEventArgs e) {
-         Deduplicate?.Invoke(this, new EventArgs());  
+         Deduplicate?.Invoke(this, new EventArgs());
       }
 
       public event PropertyChangedEventHandler? PropertyChanged;
       public event EventHandler Deduplicate;
+      public event EventHandler Apply;
+
+      private void btnApply_Click(object sender, RoutedEventArgs e) {
+         Apply?.Invoke(this, new EventArgs());
+      }
    }
 }

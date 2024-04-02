@@ -25,7 +25,19 @@ namespace SpraywallTemplateAnalyzer.ImageProcessing {
          get {
             var result = new List<Hold>();
             foreach (var rect in _holds.Where(h => IsValid(h.Ellipse))) {
+               //int x = 0, y = 0;
+               //for(var i = 1; i < rect.Contour.Length; i++) {
+               //   x += rect.Contour[i - 1].X * rect.Contour[i].Y;
+               //   y += rect.Contour[i - 1].Y * rect.Contour[i].X;
+               //}
+
+               //var area = (x - y) / 2;
                
+               //if (area > MinArea) {
+               //   result.Add(rect);
+               //}
+
+
                result.Add(rect);
             }
             return result;
@@ -64,7 +76,7 @@ namespace SpraywallTemplateAnalyzer.ImageProcessing {
       public Hold Add(IEnumerable<PointF> points) {
          var rect = CvInvoke.MinAreaRect(points.ToArray());
          var hold = new Hold() {
-            Contour = points.Select(p => new System.Drawing.Point((int) p.X, (int) p.Y)).ToArray(),
+            Contour = points.Select(p => new Point((int) p.X, (int) p.Y)).ToArray(),
             Ellipse = rect,
             MinRect = rect
          };
@@ -93,7 +105,9 @@ namespace SpraywallTemplateAnalyzer.ImageProcessing {
          return IsValidSize(r) && IsValidArea(r) && IsValidRatio(r);
       }
 
-      private void ProcessImage() {
+      public void ProcessImage() {
+         _holds.Clear();
+
          using (Mat img = new Mat(_imgLocation))
          using (UMat gray = new UMat())
          using (UMat cannyEdges = new UMat())
@@ -102,7 +116,7 @@ namespace SpraywallTemplateAnalyzer.ImageProcessing {
             CvInvoke.CvtColor(img, gray, ColorConversion.Bgr2Gray);
 
             //Remove noise
-            CvInvoke.GaussianBlur(gray, gray, new System.Drawing.Size(3, 3), 1);
+            CvInvoke.GaussianBlur(gray, gray, new Size(3, 3), 1);
 
             CvInvoke.Canny(gray, cannyEdges, CannyThreshold, CircleAccumulatorThreshold);
 
@@ -113,15 +127,18 @@ namespace SpraywallTemplateAnalyzer.ImageProcessing {
                using (VectorOfPoint contour = contours[i])
                using (VectorOfPoint approxContour = new VectorOfPoint()) {
 
+                  var points = contour.ToArray();
+                  points = RearrangeContour(points);
+
                   CvInvoke.ApproxPolyDP(contour, approxContour, CvInvoke.ArcLength(contour, true) * 0.005, true);
                   RotatedRect rect = CvInvoke.MinAreaRect(approxContour);
-                  var points = approxContour.ToArray();
+                  // var points = approxContour.ToArray();
                   if (rect.Size.Width > MIN_SIZE && rect.Size.Height > MIN_SIZE) {
 
                      if (points.Length > 5) {
 
                         _holds.Add(new Hold() {
-                           Ellipse = CvInvoke.FitEllipse(approxContour),
+                           Ellipse = CvInvoke.FitEllipse(contour),
                            MinRect = rect,
                            Contour = points
                         });
@@ -130,6 +147,30 @@ namespace SpraywallTemplateAnalyzer.ImageProcessing {
                }
             }
          }
+      }
+
+      private Point[] RearrangeContour(Point[] points) {
+         var source = new List<Point>(points);
+         var result = new List<Point>();
+
+         var first = source[0];
+         var last = first;
+         result.Add(last);
+         source.Remove(last);
+
+         while(source.Any()) {
+            var minDistanceSquared = source.Min(p => Math.Pow(p.X - last.X, 2) + Math.Pow(p.Y - last.Y, 2));
+            var distanceToStartSquared = Math.Pow(first.X - last.X, 2) + Math.Pow(first.Y - last.Y, 2);
+            if (source.Count < result.Count && minDistanceSquared > distanceToStartSquared) {
+               break;
+            }
+            last = source.First(p => Math.Pow(p.X - last.X, 2) + Math.Pow(p.Y - last.Y, 2) == minDistanceSquared);
+
+            source.Remove(last);
+            result.Add(last);
+         }
+
+         return result.ToArray();
       }
    }
 }
