@@ -29,7 +29,7 @@ namespace SpraywallTemplateAnalyzer {
       private ObservableCollection<SelectableHold> _selectableHolds = new ObservableCollection<SelectableHold>();
       private Template _importedTemplate;
       private Random _rand = new Random();
-      private List<PointF> _addEllipseBuffer = new List<PointF>();
+      private List<System.Drawing.Point> _addEllipseBuffer = new List<System.Drawing.Point>();
       private SelectableHold _selectableHold;
 
 
@@ -227,7 +227,7 @@ namespace SpraywallTemplateAnalyzer {
          int i = 0;
          foreach(var el in _processor?.
             FilteredHolds.
-            OrderBy(e => e.Ellipse.Center.Y) ?? Enumerable.Empty<Hold>()) {
+            OrderBy(MidPointY) ?? Enumerable.Empty<Hold>()) {
             var elItem = new SelectableHold() {
                Hold = el,
                IsSelected = true,
@@ -238,6 +238,10 @@ namespace SpraywallTemplateAnalyzer {
 
          lstEllipses.ItemsSource = _selectableHolds;
          txtAddedPoints.Text = $"{_addEllipseBuffer.Count} / {_selectableHolds.Count}";
+      }
+
+      private double MidPointY(Hold hold) {
+         return hold.Contour.Average(p => p.Y);
       }
 
       private System.Windows.Media.Color RandomColor() {
@@ -390,9 +394,14 @@ namespace SpraywallTemplateAnalyzer {
 
          
          var pixelPosition = e.GetPosition(sender as SKElement);
-         var scaledPixelPosition = new System.Drawing.PointF((float) (pixelPosition.X * dpiScaleX), (float) (pixelPosition.Y * dpiScaleY));
+         var scaledPixelPosition = new System.Drawing.Point((int)(pixelPosition.X * dpiScaleX), (int) (pixelPosition.Y * dpiScaleY));
 
          _addEllipseBuffer.Add(scaledPixelPosition);
+         if (_addEllipseBuffer.Count > 4 ) {
+            var points = _addEllipseBuffer.ToArray();
+            _addEllipseBuffer.Clear();
+            _addEllipseBuffer.AddRange(TemplateProcessor.RearrangeContour(points));
+         }
 
          txtAddedPoints.Text = $"{_addEllipseBuffer.Count} / {_selectableHolds.Count}";
 
@@ -403,7 +412,9 @@ namespace SpraywallTemplateAnalyzer {
          if (_addEllipseBuffer.Count > 3) {
 
             if (_editHold != null) {
-               _editHold.Hold.Contour = _addEllipseBuffer.Select(p => new System.Drawing.Point((int)p.X, (int)p.Y)).ToArray();
+               _editHold.Hold.Contour = _addEllipseBuffer.ToArray();
+               _editHold = null;
+               _addEllipseBuffer.Clear();
             } else {
                var hold = _processor.Add(_addEllipseBuffer);
                _addEllipseBuffer.Clear();
@@ -414,8 +425,6 @@ namespace SpraywallTemplateAnalyzer {
                   Color = RandomColor()
                });
             }
-
-            
 
             img.InvalidateVisual();
          }
@@ -492,7 +501,7 @@ namespace SpraywallTemplateAnalyzer {
          if (item != null) {
             _editHold = item;
             _addEllipseBuffer.Clear();
-            _addEllipseBuffer.AddRange(item.Hold.Contour.Select(p => new PointF(p.X, p.Y)));
+            _addEllipseBuffer.AddRange(item.Hold.Contour);
             img.InvalidateVisual();
          }
       }

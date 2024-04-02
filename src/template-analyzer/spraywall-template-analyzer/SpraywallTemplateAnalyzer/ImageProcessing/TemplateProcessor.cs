@@ -73,10 +73,10 @@ namespace SpraywallTemplateAnalyzer.ImageProcessing {
          _holds.Remove(rect);
       }
 
-      public Hold Add(IEnumerable<PointF> points) {
-         var rect = CvInvoke.MinAreaRect(points.ToArray());
+      public Hold Add(IEnumerable<Point> points) {
+         var rect = CvInvoke.MinAreaRect(points.Select(p => new PointF(p.X, p.Y)).ToArray());
          var hold = new Hold() {
-            Contour = points.Select(p => new Point((int) p.X, (int) p.Y)).ToArray(),
+            Contour = points.ToArray(),
             Ellipse = rect,
             MinRect = rect
          };
@@ -149,7 +149,7 @@ namespace SpraywallTemplateAnalyzer.ImageProcessing {
          }
       }
 
-      private Point[] RearrangeContour(Point[] points) {
+      public static  Point[] RearrangeContour(Point[] points) {
          var source = new List<Point>(points);
          var result = new List<Point>();
 
