@@ -261,7 +261,6 @@ namespace SpraywallTemplateAnalyzer {
             using (var epaint = new SKPaint())
             using (var paint = new SKPaint()) {
                paint.Color = SKColors.Yellow;
-               paint.StrokeWidth = 5;
                paint.Style = SKPaintStyle.Fill;
 
                spaint.Color = SKColors.Green;
@@ -291,31 +290,45 @@ namespace SpraywallTemplateAnalyzer {
                canvas.DrawImage(SKImage.FromBitmap(_bitmap), 0, 0, imgpaint);
                if (_selectableHolds.Any()) {
                   foreach (var elItem in _selectableHolds.Where(e => e.IsSelected)) {
-                     var el = elItem.Hold.Ellipse;
-                     paint.Color = ConvertColor(elItem.Color);
-                     var points = ToSkPoints(elItem.Hold.Contour);
+                     if (elItem != _editHold) {
+                        var el = elItem.Hold.Ellipse;
+                        paint.Color = ConvertColor(elItem.Color);
+                        var points = ToSkPoints(elItem.Hold.Contour);
 
-                     using (var path  = new SKPath()) {
+                        using (var path = new SKPath()) {
 
 
-                        path.AddPoly(points, true);
+                           path.AddPoly(points, true);
 
-                        canvas.DrawPath(path, paint);
+                           canvas.DrawPath(path, paint);
 
-                        canvas.DrawPoint(points[0], spaint);
-                        canvas.DrawPoint(points[points.Length-1], epaint);
-                        if (_point < points.Length) {
+                           canvas.DrawPoint(points[0], spaint);
+                           canvas.DrawPoint(points[points.Length - 1], epaint);
+                           if (_point < points.Length) {
 
-                           canvas.DrawPoint(points[_point], selpaint);
+                              canvas.DrawPoint(points[_point], selpaint);
+                           }
                         }
                      }
                   }
                }
 
                if (_addEllipseBuffer.Any()) {
+                  paint.StrokeWidth = 3;
                   foreach (var p in _addEllipseBuffer) {
-                     canvas.DrawCircle(new SKPoint(p.X, p.Y), 2, paint);
+                     canvas.DrawPoint(new SKPoint(p.X, p.Y), paint);
                   }
+                  paint.StrokeWidth = 10;
+                  paint.Color = SKColors.Green;
+
+                  var f = _addEllipseBuffer.First();
+                  canvas.DrawPoint(new SKPoint(f.X, f.Y), paint);
+
+                  paint.StrokeWidth = 10;
+                  paint.Color = SKColors.Red;
+
+                  var l = _addEllipseBuffer.Last();
+                  canvas.DrawPoint(new SKPoint(l.X, l.Y), paint);
                }
             }
 
@@ -388,14 +401,21 @@ namespace SpraywallTemplateAnalyzer {
 
       private void img_MouseRightButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e) {
          if (_addEllipseBuffer.Count > 3) {
-            var hold = _processor.Add(_addEllipseBuffer);
-            _addEllipseBuffer.Clear();
 
-            _selectableHolds.Insert(0, new SelectableHold() {
-               Hold = hold,
-               IsSelected = true,
-               Color = RandomColor()
-            });
+            if (_editHold != null) {
+               _editHold.Hold.Contour = _addEllipseBuffer.Select(p => new System.Drawing.Point((int)p.X, (int)p.Y)).ToArray();
+            } else {
+               var hold = _processor.Add(_addEllipseBuffer);
+               _addEllipseBuffer.Clear();
+
+               _selectableHolds.Insert(0, new SelectableHold() {
+                  Hold = hold,
+                  IsSelected = true,
+                  Color = RandomColor()
+               });
+            }
+
+            
 
             img.InvalidateVisual();
          }
@@ -465,8 +485,16 @@ namespace SpraywallTemplateAnalyzer {
          w.Show();
       }
 
-      private void btnEditItem_Click(object sender, RoutedEventArgs e) {
+      private SelectableHold _editHold;
 
+      private void btnEditItem_Click(object sender, RoutedEventArgs e) {
+         var item = ((Button) sender).DataContext as SelectableHold;
+         if (item != null) {
+            _editHold = item;
+            _addEllipseBuffer.Clear();
+            _addEllipseBuffer.AddRange(item.Hold.Contour.Select(p => new PointF(p.X, p.Y)));
+            img.InvalidateVisual();
+         }
       }
    }
 }
