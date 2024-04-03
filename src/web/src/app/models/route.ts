@@ -4,7 +4,7 @@ export interface Point {
   Y: number;
 }
 
-export interface Boulder {
+export interface Route {
   Id: string;
   Name: string;
   Description: string;

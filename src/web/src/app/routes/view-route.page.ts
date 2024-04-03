@@ -1,30 +1,30 @@
 import { Component, ElementRef, inject, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { BouldersService } from '../services/boulders.service';
-import { Boulder } from '../models/boulder';
+import { RouteService } from '../services/route.service';
+import { Route } from '../models/route';
 import { WallTemplateService } from '../services/wall-template.service';
-import { Hold, RotatedRect, WallTemplate } from '../models/wall-template';
+import { Hold, WallTemplate } from '../models/wall-template';
 
 @Component({
-  selector: 'app-boulder',
-  templateUrl: './boulder.page.html',
-  styleUrls: ['./boulder.page.scss'],
+  selector: 'app-view-route',
+  templateUrl: './view-route.page.html',
+  styleUrls: ['./view-route.page.scss'],
 })
-export class BoulderPage implements OnInit {
+export class ViewRoutePage implements OnInit {
   @ViewChild('canvas', { static: true }) canvas!: ElementRef;
 
   public id!: string;
-  public boulders: Boulder[] = [];
-  public boulder?: Boulder;
+  public routes: Route[] = [];
+  public route?: Route;
   private activatedRoute = inject(ActivatedRoute);
 
   public rating = new Array(0);
   public max_zoom = 10;
 
-  constructor(private bouldersService: BouldersService, private wallTemplateService: WallTemplateService) {
-    this.bouldersService.getAll().then((boulders: Boulder[]) => {
-      this.boulders = boulders;
-      this.selectBoulder();
+  constructor(private routeService: RouteService, private wallTemplateService: WallTemplateService) {
+    this.routeService.getAll().then((routes: Route[]) => {
+      this.routes = routes;
+      this.selectRoute();
     });
 
     this.wallTemplateService.getTemplate().then((template: WallTemplate | null) => {
@@ -32,20 +32,20 @@ export class BoulderPage implements OnInit {
 
       this.wallTemplateService.drawTemplateBackdrop(canvas).then(() => {
          this.markHolds();
-      })
+      });
     });
   }
 
   ngOnInit() {
     this.id = this.activatedRoute.snapshot.paramMap.get('id') as string;
-    this.selectBoulder();
+    this.selectRoute();
   }
 
-  async selectBoulder() {
-    if (this.id && this.boulders) {
-      for (const b of this.boulders) {
+  async selectRoute() {
+    if (this.id && this.routes) {
+      for (const b of this.routes) {
         if(this.id === b.Id) {
-          this.boulder = b;
+          this.route = b;
           this.rating = new Array(b.Rating);
           await this.markHolds();
         }
@@ -55,7 +55,7 @@ export class BoulderPage implements OnInit {
 
   private async markHolds() {
     let holds: Hold[] = [];
-    for(const h of this.boulder?.Holds ?? []) {
+    for(const h of this.route?.Holds ?? []) {
       const r = await this.wallTemplateService.findHold(h.X, h.Y);
       if (r) {
         holds.push(r);

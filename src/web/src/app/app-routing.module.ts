@@ -4,7 +4,7 @@ import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
 const routes: Routes = [
   {
     path: '',
-    redirectTo: 'boulders',
+    redirectTo: 'routes',
     pathMatch: 'full'
   },
   {
@@ -12,8 +12,8 @@ const routes: Routes = [
     loadChildren: () => import('./folder/folder.module').then( m => m.FolderPageModule)
   },
   {
-    path: 'boulders',
-    loadChildren: () => import('./boulders/boulders.module').then( m => m.BouldersModule)
+    path: 'routes',
+    loadChildren: () => import('./routes/routes.module').then( m => m.RoutesModule)
   }
 ];
 

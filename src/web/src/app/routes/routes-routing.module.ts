@@ -1,22 +1,22 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 
-import { BoulderPage } from './boulder.page';
-import { ListBouldersPage } from './list-boulders.page';
-import { AddBoulderPage } from './add-boulder.page';
+import { ViewRoutePage } from './view-route.page';
+import { ListRoutesPage } from './list-routes.page';
+import { AddRoutePage } from './add-route.page';
 
 const routes: Routes = [
   {
     path: '',
-    component: ListBouldersPage
+    component: ListRoutesPage
   },
   {
     path: 'add',
-    component: AddBoulderPage
+    component: AddRoutePage
   },
   {
     path: ':id',
-    component: BoulderPage
+    component: ViewRoutePage
   }
 ];
 
@@ -24,4 +24,4 @@ const routes: Routes = [
   imports: [RouterModule.forChild(routes)],
   exports: [RouterModule],
 })
-export class BouldersPageRoutingModule {}
+export class RoutesPageRoutingModule {}

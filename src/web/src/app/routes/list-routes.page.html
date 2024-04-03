@@ -16,9 +16,9 @@
 
   <div id="container">
     <strong class="capitalize"></strong>
-    <ion-list class="boulders">
-      <ion-item *ngFor="let b of boulders">
-        <button [class.selected]="b === selectedBoulder" type="button" (click)="onSelect(b)" [routerLink]="[ '/boulders/' + b.Id ]">
+    <ion-list class="routes">
+      <ion-item *ngFor="let b of routes">
+        <button [class.selected]="b === selectedRoute" type="button" (click)="onSelect(b)" [routerLink]="[ '/routes/' + b.Id ]">
           <span class="badge">{{b.Difficulty}}</span>
           <span class="name">{{b.Name}}</span>
           <span class="angle">{{b.Angle}}&deg;</span>
