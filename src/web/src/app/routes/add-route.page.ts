@@ -1,6 +1,6 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { WallTemplateService } from '../services/wall-template.service';
-import { Hold, WallTemplate } from '../models/wall-template';
+import { Hold, HoldType, WallTemplate } from '../models/wall-template';
 import { PinchZoomComponent } from '@meddv/ngx-pinch-zoom';
 import { RouteService } from '../services/route.service';
 
@@ -14,7 +14,7 @@ export class AddRoutePage implements OnInit {
   @ViewChild('zoom', { static: true }) zoom!: PinchZoomComponent;
 
   public template: WallTemplate | null = null;
-  private holds: Hold[] = [];
+  public holds: Hold[] = [];
 
   constructor(private routeService: RouteService, private wallTemplateService: WallTemplateService) {
   }
@@ -27,13 +27,20 @@ export class AddRoutePage implements OnInit {
 
   async templateClick(event: any) {
     let ratio = Math.min(this.wallTemplateService.width / event.target.offsetWidth, this.wallTemplateService.height / event.target.offsetHeight);
-    let holds = await this.wallTemplateService.findHold(event.layerX * ratio, event.layerY * ratio);
+    let hold = await this.wallTemplateService.findHold(event.layerX * ratio, event.layerY * ratio);
 
-    if (holds) {
-      if (!this.holds.includes(holds)) {
-        this.holds.push(holds);
+    if (hold) {
+
+      if (this.holds.length == 0) {
+        hold.Type = HoldType.StartingHold;
       } else {
-        let index = this.holds.indexOf(holds);
+        hold.Type = HoldType.Hold;
+      }
+
+      if (!this.holds.includes(hold)) {
+        this.holds.push(hold);
+      } else {
+        let index = this.holds.indexOf(hold);
         this.holds.splice(index, 1);
       }
     }

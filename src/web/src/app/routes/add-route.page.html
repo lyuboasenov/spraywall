@@ -54,8 +54,26 @@
         </pinch-zoom>
       </ion-item>
 
-      <ion-list>
-
+      <ion-list [inset]="true">
+        <ion-item-sliding *ngFor="let h of holds">
+          <ion-item [button]="true">
+            <ion-label>{{h.Type}}</ion-label>
+          </ion-item>
+          <ion-item-options>
+            <ion-item-option color="success">
+              Starting hold
+            </ion-item-option>
+            <ion-item-option color="danger">
+              Finishing hold
+            </ion-item-option>
+            <ion-item-option color="warning">
+              Foot hold
+            </ion-item-option>
+            <ion-item-option color="light" expandable="true">
+              Regular hold
+            </ion-item-option>
+          </ion-item-options>
+        </ion-item-sliding>
       </ion-list>
 
     </ion-list>
