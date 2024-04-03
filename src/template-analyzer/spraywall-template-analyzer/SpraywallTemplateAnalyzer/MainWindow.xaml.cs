@@ -508,9 +508,9 @@ namespace SpraywallTemplateAnalyzer {
       private void img_MouseWheel(object sender, MouseWheelEventArgs e) {
          if (Keyboard.IsKeyDown(Key.LeftCtrl)) {
             if (e.Delta > 0) {
-               slZoom.Value += 0.25;
+               slZoom.Value += 0.05;
             } else {
-               slZoom.Value -= 0.25;
+               slZoom.Value -= 0.05;
             }
             e.Handled = true;
          }
