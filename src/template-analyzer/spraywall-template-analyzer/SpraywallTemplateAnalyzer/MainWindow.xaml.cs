@@ -153,8 +153,11 @@ namespace SpraywallTemplateAnalyzer {
          dialog.Filter = "JSON (*.json)|*.json";   // Filter files by extension
 
          if (dialog.ShowDialog() ?? false) {
+            var fi = new FileInfo(dialog.FileName);
+            var newName = fi.Name + DateTime.UtcNow.ToString("yyyy-MM-ddTHH-mm-ss") + fi.Extension;
+
             File.WriteAllText(
-               dialog.FileName,
+               Path.Combine(fi.Directory.FullName, newName),
                JsonConvert.SerializeObject(
                   result,
                   new SizeJsonConverter()));
