@@ -1,6 +1,4 @@
-﻿using Emgu.CV.Structure;
-using Emgu.CV.Util;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using SkiaSharp;
 using SkiaSharp.Views.WPF;
 using SpraywallTemplateAnalyzer.ImageProcessing;
@@ -9,12 +7,11 @@ using SpraywallTemplateAnalyzer.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 
 namespace SpraywallTemplateAnalyzer {
@@ -29,8 +26,9 @@ namespace SpraywallTemplateAnalyzer {
       private ObservableCollection<SelectableHold> _selectableHolds = new ObservableCollection<SelectableHold>();
       private Template _importedTemplate;
       private Random _rand = new Random();
-      private List<System.Drawing.Point> _addEllipseBuffer = new List<System.Drawing.Point>();
-      private SelectableHold _selectableHold;
+      private List<System.Drawing.Point> _addHoldBuffer = new List<System.Drawing.Point>();
+      private SelectableHold _hoveredHold;
+      private SelectableHold _editHold;
 
 
       private uint _maxSize = 5000;
@@ -97,8 +95,8 @@ namespace SpraywallTemplateAnalyzer {
             result.MaxRatio = _processor.MaxRatio;
 
             result.Holds = _processor.Holds.
-               OrderBy(e => e.Ellipse.Size.Width / 2 + e.Ellipse.Center.X).
-               ThenBy(e => e.Ellipse.Size.Height / 2 + e.Ellipse.Center.Y).
+               OrderBy(e => e.MinRect.Size.Width / 2 + e.MinRect.Center.X).
+               ThenBy(e => e.MinRect.Size.Height / 2 + e.MinRect.Center.Y).
                Select(e => new SelectableHold() {
                   Hold = e,
                   IsSelected = _selectableHolds.Any(ee => ee.IsSelected && ee.Hold.Equals(e))
@@ -109,7 +107,7 @@ namespace SpraywallTemplateAnalyzer {
             result.MinArea = _processor.MinArea;
             result.MaxRatio = _processor.MaxRatio;
 
-            result.Holds = _processor.Holds.OrderByDescending(e => e.Ellipse.Size.Width * e.Ellipse.Size.Height).
+            result.Holds = _processor.Holds.OrderByDescending(e => e.MinRect.Size.Width * e.MinRect.Size.Height).
                Select(e => new SelectableHold() {
                   Hold = e,
                   IsSelected = _selectableHolds?.Any(ee => ee.IsSelected && ee.Hold.Equals(e)) ?? false
@@ -137,15 +135,15 @@ namespace SpraywallTemplateAnalyzer {
             result.EncodedImage = Convert.ToBase64String(imgBytes);
 
             result.Holds = _processor.FilteredHolds.
-               OrderBy(e => e.Ellipse.Size.Width / 2 + e.Ellipse.Center.X).
-               ThenBy(e => e.Ellipse.Size.Height / 2 + e.Ellipse.Center.Y).
+               OrderBy(e => e.MinRect.Size.Width / 2 + e.MinRect.Center.X).
+               ThenBy(e => e.MinRect.Size.Height / 2 + e.MinRect.Center.Y).
                ToArray();
          } else if (_importedTemplate != null) {
             result.EncodedImage = _importedTemplate.EncodedImage;
 
             result.Holds = _processor.FilteredHolds.
-               OrderBy(e => e.Ellipse.Size.Width / 2 + e.Ellipse.Center.X).
-               ThenBy(e => e.Ellipse.Size.Height / 2 + e.Ellipse.Center.Y).
+               OrderBy(e => e.MinRect.Size.Width / 2 + e.MinRect.Center.X).
+               ThenBy(e => e.MinRect.Size.Height / 2 + e.MinRect.Center.Y).
                ToArray();
          }
 
@@ -237,7 +235,7 @@ namespace SpraywallTemplateAnalyzer {
          }
 
          lstEllipses.ItemsSource = _selectableHolds;
-         txtAddedPoints.Text = $"{_addEllipseBuffer.Count} / {_selectableHolds.Count}";
+         txtAddedPoints.Text = $"{_addHoldBuffer.Count} / {_selectableHolds.Count}";
       }
 
       private double MidPointY(Hold hold) {
@@ -292,54 +290,59 @@ namespace SpraywallTemplateAnalyzer {
 
                // redraw the image using the color filter
                canvas.DrawImage(SKImage.FromBitmap(_bitmap), 0, 0, imgpaint);
-               if (_selectableHolds.Any()) {
-                  foreach (var elItem in _selectableHolds.Where(e => e.IsSelected)) {
-                     if (elItem != _editHold) {
-                        var el = elItem.Hold.Ellipse;
-                        paint.Color = ConvertColor(elItem.Color);
-                        var points = ToSkPoints(elItem.Hold.Contour);
 
-                        using (var path = new SKPath()) {
+               if (_addHoldBuffer.Any()) {
+                  paint.StrokeWidth = 3;
+                  paint.Color = SKColors.LightGreen;
+
+                  foreach (var p in _addHoldBuffer) {
+                     canvas.DrawPoint(new SKPoint(p.X, p.Y), paint);
+                  }
+                  paint.StrokeWidth = 10;
+                  paint.Color = SKColors.Green;
+                  paint.Style = SKPaintStyle.Fill;
+
+                  var f = _addHoldBuffer.First();
+                  canvas.DrawCircle(new SKPoint(f.X, f.Y), 5, paint);
+
+                  paint.StrokeWidth = 5;
+                  paint.Color = SKColors.Red;
+                  paint.Style = SKPaintStyle.Stroke;
+
+                  var l = _addHoldBuffer.Last();
+                  canvas.DrawPoint(new SKPoint(l.X, l.Y), paint);
+               } else {
+                  if (_selectableHolds.Any()) {
+                     foreach (var elItem in _selectableHolds.Where(e => e.IsSelected)) {
+                        if (elItem != _editHold) {
+                           var el = elItem.Hold.MinRect;
+                           paint.Color = ConvertColor(elItem.Color);
+                           var points = ToSkPoints(elItem.Hold.Contour);
+
+                           using (var path = new SKPath()) {
 
 
-                           path.AddPoly(points, true);
+                              path.AddPoly(points, true);
 
-                           canvas.DrawPath(path, paint);
+                              canvas.DrawPath(path, paint);
 
-                           canvas.DrawPoint(points[0], spaint);
-                           canvas.DrawPoint(points[points.Length - 1], epaint);
-                           if (_point < points.Length) {
+                              canvas.DrawPoint(points[0], spaint);
+                              canvas.DrawPoint(points[points.Length - 1], epaint);
+                              if (_point < points.Length) {
 
-                              canvas.DrawPoint(points[_point], selpaint);
+                                 canvas.DrawPoint(points[_point], selpaint);
+                              }
                            }
                         }
                      }
                   }
                }
-
-               if (_addEllipseBuffer.Any()) {
-                  paint.StrokeWidth = 3;
-                  foreach (var p in _addEllipseBuffer) {
-                     canvas.DrawPoint(new SKPoint(p.X, p.Y), paint);
-                  }
-                  paint.StrokeWidth = 10;
-                  paint.Color = SKColors.Green;
-
-                  var f = _addEllipseBuffer.First();
-                  canvas.DrawPoint(new SKPoint(f.X, f.Y), paint);
-
-                  paint.StrokeWidth = 10;
-                  paint.Color = SKColors.Red;
-
-                  var l = _addEllipseBuffer.Last();
-                  canvas.DrawPoint(new SKPoint(l.X, l.Y), paint);
-               }
             }
 
-            if (null != _selectableHold) {
+            if (null != _hoveredHold) {
                var avgPoint = new SKPoint {
-                  X = (int) Math.Round(_selectableHold.Hold.Contour.Average(p => p.X)),
-                  Y = (int) Math.Round(_selectableHold.Hold.Contour.Average(p => p.Y))
+                  X = (int) Math.Round(_hoveredHold.Hold.Contour.Average(p => p.X)),
+                  Y = (int) Math.Round(_hoveredHold.Hold.Contour.Average(p => p.Y))
                };
 
                using (var paint = new SKPaint()) {
@@ -382,7 +385,7 @@ namespace SpraywallTemplateAnalyzer {
             img.InvalidateVisual();
          }
 
-         txtAddedPoints.Text = $"{_addEllipseBuffer.Count} / {_selectableHolds.Count}";
+         txtAddedPoints.Text = $"{_addHoldBuffer.Count} / {_selectableHolds.Count}";
       }
 
       private void img_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e) {
@@ -396,28 +399,28 @@ namespace SpraywallTemplateAnalyzer {
          var pixelPosition = e.GetPosition(sender as SKElement);
          var scaledPixelPosition = new System.Drawing.Point((int)(pixelPosition.X * dpiScaleX), (int) (pixelPosition.Y * dpiScaleY));
 
-         _addEllipseBuffer.Add(scaledPixelPosition);
-         if (_addEllipseBuffer.Count > 4 ) {
-            var points = _addEllipseBuffer.ToArray();
-            _addEllipseBuffer.Clear();
-            _addEllipseBuffer.AddRange(TemplateProcessor.RearrangeContour(points));
+         _addHoldBuffer.Add(scaledPixelPosition);
+         if (_addHoldBuffer.Count > 4 ) {
+            var points = _addHoldBuffer.ToArray();
+            _addHoldBuffer.Clear();
+            _addHoldBuffer.AddRange(TemplateProcessor.RearrangeContour(points));
          }
 
-         txtAddedPoints.Text = $"{_addEllipseBuffer.Count} / {_selectableHolds.Count}";
+         txtAddedPoints.Text = $"{_addHoldBuffer.Count} / {_selectableHolds.Count}";
 
          img.InvalidateVisual();
       }
 
       private void img_MouseRightButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e) {
-         if (_addEllipseBuffer.Count > 3) {
+         if (_addHoldBuffer.Count > 3) {
 
             if (_editHold != null) {
-               _editHold.Hold.Contour = _addEllipseBuffer.ToArray();
+               _editHold.Hold.Contour = _addHoldBuffer.ToArray();
                _editHold = null;
-               _addEllipseBuffer.Clear();
+               _addHoldBuffer.Clear();
             } else {
-               var hold = _processor.Add(_addEllipseBuffer);
-               _addEllipseBuffer.Clear();
+               var hold = _processor.Add(_addHoldBuffer);
+               _addHoldBuffer.Clear();
 
                _selectableHolds.Insert(0, new SelectableHold() {
                   Hold = hold,
@@ -447,7 +450,7 @@ namespace SpraywallTemplateAnalyzer {
       private void StackPanel_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e) {
          if (sender is StackPanel sp) {
             if (sp.DataContext is SelectableHold rr) {
-               _selectableHold = rr;
+               _hoveredHold = rr;
 
                if (!IsCheckboxChildChecked(sp)) {
                   rr.IsSelected = !rr.IsSelected;
@@ -460,10 +463,8 @@ namespace SpraywallTemplateAnalyzer {
       private void StackPanel_MouseLeave(object sender, System.Windows.Input.MouseEventArgs e) {
          if (sender is StackPanel sp && !IsCheckboxChildChecked(sp)) {
             if (sp.DataContext is SelectableHold rr) {
-               _selectableHold = null;
+               _hoveredHold = null;
 
-               //rr.IsSelected = !rr.IsSelected;
-               
                img.InvalidateVisual();
             }
          }
@@ -494,15 +495,50 @@ namespace SpraywallTemplateAnalyzer {
          w.Show();
       }
 
-      private SelectableHold _editHold;
-
       private void btnEditItem_Click(object sender, RoutedEventArgs e) {
          var item = ((Button) sender).DataContext as SelectableHold;
          if (item != null) {
             _editHold = item;
-            _addEllipseBuffer.Clear();
-            _addEllipseBuffer.AddRange(item.Hold.Contour);
+            _addHoldBuffer.Clear();
+            _addHoldBuffer.AddRange(item.Hold.Contour);
             img.InvalidateVisual();
+         }
+      }
+
+      private void img_MouseWheel(object sender, MouseWheelEventArgs e) {
+         if (Keyboard.IsKeyDown(Key.LeftCtrl)) {
+            if (e.Delta > 0) {
+               slZoom.Value += 0.25;
+            } else {
+               slZoom.Value -= 0.25;
+            }
+            e.Handled = true;
+         }
+      }
+
+      private Point _imgPanStartPosition;
+      private void img_MouseDown(object sender, MouseButtonEventArgs e) {
+         if (e.ChangedButton == MouseButton.Middle) {
+            _imgPanStartPosition = e.GetPosition(sender as SKElement);
+            e.MouseDevice.SetCursor(Cursors.ScrollAll);
+         }
+      }
+
+      private void img_MouseMove(object sender, MouseEventArgs e) {
+         if (e.MouseDevice.MiddleButton == MouseButtonState.Pressed) {
+            e.MouseDevice.SetCursor(Cursors.ScrollAll);
+            var pos = e.GetPosition(sender as SKElement);
+
+            svScroll.ScrollToVerticalOffset(svScroll.VerticalOffset +  _imgPanStartPosition.Y - pos.Y);
+            svScroll.ScrollToHorizontalOffset(svScroll.HorizontalOffset + _imgPanStartPosition.X - pos.X);
+
+            e.Handled = true;
+         }
+      }
+
+      private void img_MouseUp(object sender, MouseButtonEventArgs e) {
+         if (e.ChangedButton == MouseButton.Middle) {
+            e.MouseDevice.SetCursor(Cursors.Arrow);
          }
       }
    }

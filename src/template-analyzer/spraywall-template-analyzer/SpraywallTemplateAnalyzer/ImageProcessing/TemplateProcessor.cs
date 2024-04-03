@@ -24,20 +24,7 @@ namespace SpraywallTemplateAnalyzer.ImageProcessing {
       public IEnumerable<Hold> FilteredHolds { 
          get {
             var result = new List<Hold>();
-            foreach (var rect in _holds.Where(h => IsValid(h.Ellipse))) {
-               //int x = 0, y = 0;
-               //for(var i = 1; i < rect.Contour.Length; i++) {
-               //   x += rect.Contour[i - 1].X * rect.Contour[i].Y;
-               //   y += rect.Contour[i - 1].Y * rect.Contour[i].X;
-               //}
-
-               //var area = (x - y) / 2;
-               
-               //if (area > MinArea) {
-               //   result.Add(rect);
-               //}
-
-
+            foreach (var rect in _holds.Where(h => IsValid(h.MinRect))) {
                result.Add(rect);
             }
             return result;
@@ -77,7 +64,6 @@ namespace SpraywallTemplateAnalyzer.ImageProcessing {
          var rect = CvInvoke.MinAreaRect(points.Select(p => new PointF(p.X, p.Y)).ToArray());
          var hold = new Hold() {
             Contour = points.ToArray(),
-            Ellipse = rect,
             MinRect = rect
          };
          _holds.Insert(0, hold);
@@ -132,15 +118,20 @@ namespace SpraywallTemplateAnalyzer.ImageProcessing {
 
                   CvInvoke.ApproxPolyDP(contour, approxContour, CvInvoke.ArcLength(contour, true) * 0.005, true);
                   RotatedRect rect = CvInvoke.MinAreaRect(approxContour);
-                  // var points = approxContour.ToArray();
-                  if (rect.Size.Width > MIN_SIZE && rect.Size.Height > MIN_SIZE) {
 
+                  if (rect.Size.Width > MIN_SIZE && rect.Size.Height > MIN_SIZE) {
                      if (points.Length > 5) {
+                        var center = new Point() {
+                           X = (int) points.Average(p => p.X),
+                           Y = (int) points.Average(p => p.Y)
+                        };
+;                        var radiusSq = points.Max(p => Math.Pow(center.X - p.X, 2) + Math.Pow(center.Y - p.Y, 2));
 
                         _holds.Add(new Hold() {
-                           Ellipse = CvInvoke.FitEllipse(contour),
                            MinRect = rect,
-                           Contour = points
+                           Contour = points,
+                           Center = center,
+                           Radius = (uint) Math.Sqrt(radiusSq)
                         });
                      }
                   }

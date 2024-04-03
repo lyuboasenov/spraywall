@@ -49,12 +49,16 @@
             <ColumnDefinition Width="Auto" />
          </Grid.ColumnDefinitions>
 
-         <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+            <ScrollViewer x:Name="svScroll" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
             <skia:SKElement
                Name="img"
                MouseLeftButtonDown="img_MouseLeftButtonDown"
                MouseRightButtonDown="img_MouseRightButtonDown"
-               PaintSurface="img_PaintSurface">
+               PaintSurface="img_PaintSurface"
+                MouseWheel="img_MouseWheel"
+                MouseMove="img_MouseMove"
+                MouseDown="img_MouseDown"
+                MouseUp="img_MouseUp">
                <skia:SKElement.LayoutTransform>
                   <ScaleTransform ScaleX="{Binding ElementName=slZoom, Path=Value}" ScaleY="{Binding ElementName=slZoom, Path=Value}" />
                </skia:SKElement.LayoutTransform>

@@ -1,5 +1,4 @@
-﻿using Emgu.CV.Structure;
-using SpraywallTemplateAnalyzer.ImageProcessing;
+﻿using SpraywallTemplateAnalyzer.ImageProcessing;
 using System.ComponentModel;
 using System.Windows.Media;
 
