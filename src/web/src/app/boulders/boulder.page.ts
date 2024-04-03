@@ -30,8 +30,9 @@ export class BoulderPage implements OnInit {
     this.wallTemplateService.getTemplate().then((template: WallTemplate | null) => {
       const canvas: HTMLCanvasElement = this.canvas.nativeElement;
 
-      this.wallTemplateService.drawTemplateBackdrop(canvas);
-      this.markHolds();
+      this.wallTemplateService.drawTemplateBackdrop(canvas).then(() => {
+         this.markHolds();
+      })
     });
   }
 

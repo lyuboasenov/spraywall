@@ -37,25 +37,37 @@ export class WallTemplateService {
 
   public markHolds(holds: Hold[] | null, canvas: HTMLCanvasElement) {
     let ctx = canvas.getContext("2d");
-    if (ctx) {
-      for (const r of holds ?? []) {
+    if (ctx && holds) {
+      for (let i = 0; i < holds.length; i++) {
+        const r = holds[i];
 
         ctx.save();
-
-        console.log(r);
         ctx.beginPath();
-        ctx.ellipse(
-          r.Center.X,
-          r.Center.Y,
-          r.MinRect.Size.Width / 2,
-          r.MinRect.Size.Height / 2,
-          r.MinRect.Angle * (Math.PI / 180),
-          0,
-          2 * Math.PI);
+        ctx.moveTo(r.Contour[0].X, r.Contour[0].Y);
+        for (let j = 1; j < r.Contour.length; j++) {
+          ctx.lineTo(r.Contour[j].X, r.Contour[j].Y);
+        }
+        ctx.lineTo(r.Contour[0].X, r.Contour[0].Y);
         ctx.closePath();
 
         ctx.clip();
         ctx.drawImage(this._img, 0, 0);
+        ctx.restore();
+
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(r.Center.X, r.Center.Y, r.Radius + 10, 0, Math.PI * 2, true); // Outer circle
+        ctx.closePath();
+
+        ctx.lineWidth = 5;
+        if (i == 0) {
+          ctx.strokeStyle = '#00FF00';
+        } else if (i == holds.length - 1) {
+          ctx.strokeStyle = '#FF0000';
+        } else {
+          ctx.strokeStyle = '#00FFFF';
+        }
+        ctx.stroke();
         ctx.restore();
       }
     }
