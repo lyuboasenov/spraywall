@@ -21,3 +21,21 @@ ion-menu-button {
 #container a {
   text-decoration: none;
 }
+
+#container #schema{
+height: 50em;
+}
+#container #schema pinch-zoom{
+height: 50em;
+}
+#container #rating{
+   float: right;
+}
+#container #info{
+text-align: left;
+padding: 1em;
+}
+
+.author {
+   font-size: .8em;
+}
