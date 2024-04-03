@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Boulder } from './boulder';
+import { Boulder } from '../models/boulder';
 
 const BOULDERS_REMOTE_URI: string = "https://storage.googleapis.com/spraywall/balkan/boulders-3.json";
 
@@ -7,8 +7,14 @@ const BOULDERS_REMOTE_URI: string = "https://storage.googleapis.com/spraywall/ba
   providedIn: 'root'
 })
 export class BouldersService {
+  private boulders?: Boulder[];
+
   public async getAll() : Promise<Boulder[]> {
-    const data = await fetch(BOULDERS_REMOTE_URI);
-    return await data.json() ?? null;
+    if (!this.boulders) {
+      const data = await fetch(BOULDERS_REMOTE_URI);
+      this.boulders = await data.json();
+    }
+
+    return this.boulders ?? [];
   }
 }

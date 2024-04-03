@@ -1,7 +1,6 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import { WallTemplateService } from '../wall-template.service';
-import { RawImage } from '../raw-image';
-import { RotatedRect, WallTemplate } from '../wall-template';
+import { WallTemplateService } from '../services/wall-template.service';
+import { Hold, RotatedRect, WallTemplate } from '../models/wall-template';
 import { PinchZoomComponent } from '@meddv/ngx-pinch-zoom';
 
 @Component({
@@ -15,12 +14,11 @@ export class AddBoulderPage implements OnInit {
 
   public template: WallTemplate | null = null;
   private img = new Image();
-  private rawImg?: RawImage;
-  private selectedRegions: RotatedRect[] = [];
+  private selectedHolds: Hold[] = [];
   public max_zoom = 10;
 
   constructor(private wallTemplateService: WallTemplateService) {
-    this.wallTemplateService.load().then((template: WallTemplate) => {
+    this.wallTemplateService.getTemplate().then((template: WallTemplate | null) => {
       this.template = template;
       var _this = this;
       this.img.onload = function() {
@@ -77,16 +75,16 @@ export class AddBoulderPage implements OnInit {
     // this.zoom_height = this.zoom.nativeElement.offsetWidth;
   }
 
-  templateClick(event: any) {
+  async templateClick(event: any) {
     let ratio = Math.min(this.img.width / event.target.offsetWidth, this.img.height / event.target.offsetHeight);
-    let region = this.findSmallestClickedRegion(event.layerX * ratio, event.layerY * ratio);
+    let region = await this.wallTemplateService.findHold(event.layerX * ratio, event.layerY * ratio);
 
     if (region) {
-      if (!this.selectedRegions.includes(region)) {
-        this.selectedRegions.push(region);
+      if (!this.selectedHolds.includes(region)) {
+        this.selectedHolds.push(region);
       } else {
-        let index = this.selectedRegions.indexOf(region);
-        this.selectedRegions.splice(index, 1);
+        let index = this.selectedHolds.indexOf(region);
+        this.selectedHolds.splice(index, 1);
       }
     }
 
@@ -95,18 +93,16 @@ export class AddBoulderPage implements OnInit {
     const canvas: HTMLCanvasElement = this.canvas.nativeElement;
     let ctx = canvas.getContext("2d");
     if (ctx) {
-      for (const r of this.selectedRegions) {
-
+      for (const r of this.selectedHolds) {
         ctx.save();
-
         console.log(r);
         ctx.beginPath();
         ctx.ellipse(
           r.Center.X,
           r.Center.Y,
-          r.Size.Width / 2,
-          r.Size.Height / 2,
-          r.Angle * (Math.PI / 180),
+          r.MinRect.Size.Width / 2,
+          r.MinRect.Size.Height / 2,
+          r.MinRect.Angle * (Math.PI / 180),
           0,
           2 * Math.PI);
         ctx.closePath();
@@ -117,37 +113,6 @@ export class AddBoulderPage implements OnInit {
       }
     }
 
-    console.log(this.selectedRegions);
-  }
-
-  findSmallestClickedRegion(x: number, y:number): RotatedRect | null {
-    if (this.template?.Elllipses != null) {
-      let arr = this.template.Elllipses;
-
-      let selectedRegion: RotatedRect | null = null;
-      let selectedRegionArea: number | null;
-
-      arr.forEach(r => {
-        if (this.regionMatch(x, y, r)) {
-          if (null == selectedRegionArea || selectedRegionArea > r.Size.Width * r.Size.Height) {
-            selectedRegion = r;
-          }
-        }
-      });
-
-      return selectedRegion;
-    }
-
-    return null;
-  }
-
-  regionMatch(x: number, y: number, r: RotatedRect) {
-    let r1 = r.Size.Width / 2;
-    let r2 = r.Size.Height / 2;
-
-    return (r.Center.X - r1 < x) &&
-      (r.Center.X + r1 > x) &&
-      (r.Center.Y - r2 < y) &&
-      (r.Center.Y + r2 > y);
+    console.log(this.selectedHolds);
   }
 }

@@ -15,7 +15,14 @@ export interface RotatedRect {
   Angle: number;
 }
 
+export interface Hold {
+  MinRect: RotatedRect;
+  Contour: Point[];
+  Center: Point;
+  Radius: number;
+}
+
 export interface WallTemplate {
-  Elllipses: RotatedRect[];
   EncodedImage: string;
+  Holds: Hold[]
 }

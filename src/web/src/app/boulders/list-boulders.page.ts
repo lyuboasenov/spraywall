@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
-import { BouldersService } from '../boulders.service';
-import { Boulder } from '../boulder';
+import { BouldersService } from '../services/boulders.service';
+import { Boulder } from '../models/boulder';
 
 @Component({
   selector: 'app-list-boulders',
