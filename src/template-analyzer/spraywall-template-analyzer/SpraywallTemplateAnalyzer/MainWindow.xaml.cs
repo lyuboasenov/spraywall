@@ -124,7 +124,7 @@ namespace SpraywallTemplateAnalyzer {
                dialog.FileName,
                JsonConvert.SerializeObject(
                   result,
-                  new SizeJsonConverter()));
+                  new SizeJsonConverter(), new PointJsonConverter()));
          }
       }
 
@@ -160,7 +160,8 @@ namespace SpraywallTemplateAnalyzer {
                Path.Combine(fi.Directory.FullName, newName),
                JsonConvert.SerializeObject(
                   result,
-                  new SizeJsonConverter()));
+                  new SizeJsonConverter(),
+                  new PointJsonConverter()));
          }
       }
 
@@ -195,7 +196,7 @@ namespace SpraywallTemplateAnalyzer {
          if (dialog.ShowDialog() ?? false) {
             _importedTemplate = JsonConvert.DeserializeObject<Template>(
                File.ReadAllText(dialog.FileName),
-               new SizeJsonConverter());
+               new SizeJsonConverter(), new PointJsonConverter());
 
             _processor = TemplateProcessor.Import(
                _importedTemplate.Holds.Select(e => e.Hold),
