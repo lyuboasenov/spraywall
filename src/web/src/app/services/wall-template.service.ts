@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
-import { Hold, RotatedRect, WallTemplate } from '../models/wall-template';
+import { Hold, HoldType, RotatedRect, WallTemplate } from '../models/wall-template';
+import { environment } from 'src/environments/environment';
 
-const TEMPLATE_REMOTE_URI: string = "https://storage.googleapis.com/spraywall/balkan/template.json2024-04-03T03-15-35.json";
+const TEMPLATE_REMOTE_URI: string = environment.api_base_uri + "template.json2024-04-03T03-15-35.json";
 const TEMPLATES_PATH: string = 'templates/template.json';
 
 @Injectable({
@@ -11,6 +12,7 @@ export class WallTemplateService {
   private _template?: WallTemplate;
   private _img = new Image;
   private _imgLoaded = false;
+  private _templateLoaded = false;
   public width: number = 0;
   public height: number = 0;
 
@@ -60,10 +62,12 @@ export class WallTemplateService {
         ctx.closePath();
 
         ctx.lineWidth = 5;
-        if (i == 0) {
+        if (r.Type == HoldType.StartingHold) {
           ctx.strokeStyle = '#00FF00';
-        } else if (i == holds.length - 1) {
+        } else if (r.Type == HoldType.FinishingHold) {
           ctx.strokeStyle = '#FF0000';
+        } else if(r.Type == HoldType.FootHold) {
+          ctx.strokeStyle = '#ffe066';
         } else {
           ctx.strokeStyle = '#00FFFF';
         }
@@ -75,7 +79,12 @@ export class WallTemplateService {
 
   public async drawTemplateBackdrop(canvas: HTMLCanvasElement): Promise<void> {
 
+    if (!this._templateLoaded) {
+      await this.getTemplate();
+    }
+
     while(!this._imgLoaded) {
+      // Poor man's sleep
       await new Promise(f => setTimeout(f, 500));
     }
 

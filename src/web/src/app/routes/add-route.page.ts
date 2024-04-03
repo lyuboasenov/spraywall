@@ -11,23 +11,18 @@ import { RouteService } from '../services/route.service';
 })
 export class AddRoutePage implements OnInit {
   @ViewChild('canvas', { static: true }) canvas!: ElementRef;
-  @ViewChild('zoom', { static: true }) zoom!: ElementRef;
+  @ViewChild('zoom', { static: true }) zoom!: PinchZoomComponent;
 
   public template: WallTemplate | null = null;
-  private selectedHolds: Hold[] = [];
-  public max_zoom = 10;
+  private holds: Hold[] = [];
 
   constructor(private routeService: RouteService, private wallTemplateService: WallTemplateService) {
-    this.wallTemplateService.getTemplate().then((template: WallTemplate | null) => {
-      const canvas: HTMLCanvasElement = this.canvas.nativeElement;
-      this.wallTemplateService.drawTemplateBackdrop(canvas);
-    });
   }
 
   ngOnInit() {
     console.log("OnInit");
-    // console.log(this.zoom);
-    // this.zoom_height = this.zoom.nativeElement.offsetWidth;
+    const canvas: HTMLCanvasElement = this.canvas.nativeElement;
+    this.wallTemplateService.drawTemplateBackdrop(canvas);
   }
 
   async templateClick(event: any) {
@@ -35,16 +30,16 @@ export class AddRoutePage implements OnInit {
     let holds = await this.wallTemplateService.findHold(event.layerX * ratio, event.layerY * ratio);
 
     if (holds) {
-      if (!this.selectedHolds.includes(holds)) {
-        this.selectedHolds.push(holds);
+      if (!this.holds.includes(holds)) {
+        this.holds.push(holds);
       } else {
-        let index = this.selectedHolds.indexOf(holds);
-        this.selectedHolds.splice(index, 1);
+        let index = this.holds.indexOf(holds);
+        this.holds.splice(index, 1);
       }
     }
 
     const canvas: HTMLCanvasElement = this.canvas.nativeElement;
     await this.wallTemplateService.drawTemplateBackdrop(canvas);
-    await this.wallTemplateService.markHolds(this.selectedHolds, canvas);
+    await this.wallTemplateService.markHolds(this.holds, canvas);
   }
 }

@@ -22,11 +22,8 @@ ion-menu-button {
   text-decoration: none;
 }
 
-#container #schema{
-height: 50em;
-}
-#container #schema pinch-zoom{
-height: 50em;
+#container #zoomContainer pinch-zoom{
+  height:50em;
 }
 #container #rating{
    float: right;

@@ -1,4 +1,6 @@
 import { Component } from '@angular/core';
+import { environment } from 'src/environments/environment';
+
 @Component({
   selector: 'app-root',
   templateUrl: 'app.component.html',
@@ -10,5 +12,6 @@ export class AppComponent {
     { title: 'Add route', url: '/routes/add', icon: 'add' },
   ];
   public labels = ['Feet follow', 'Open feet', 'No matches'];
+  public environment = environment;
   constructor() {}
 }

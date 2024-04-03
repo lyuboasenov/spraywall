@@ -3,7 +3,7 @@
     <ion-buttons slot="start">
       <ion-menu-button></ion-menu-button>
     </ion-buttons>
-    <ion-title>Add route</ion-title>
+    <ion-title>Add new route</ion-title>
   </ion-toolbar>
 </ion-header>
 
@@ -13,51 +13,56 @@
       <ion-title size="large"></ion-title>
     </ion-toolbar>
   </ion-header>
-
   <div id="container">
     <strong class="capitalize"></strong>
-    <pinch-zoom #zoom [limit-zoom]=max_zoom>
-      <canvas
-        #canvas
-        style="border: 1px solid"
-        width="1500"
-        height="700"
-        (click)="templateClick($event)">
-          Not supported on this browser
-      </canvas>
-   </pinch-zoom>
+    <ion-list>
+      <ion-item>
+        <ion-input label="Name" placeholder="Enter route name"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-textarea label="Description" placeholder="Enter route description"></ion-textarea>
+      </ion-item>
+
+      <ion-item>
+        <ion-select label="Difficulty" placeholder="Select route difficulty" interface="action-sheet">
+          <ion-select-option value="5A">5A</ion-select-option>
+          <ion-select-option value="6A">6A</ion-select-option>
+          <ion-select-option value="7A">7A</ion-select-option>
+          <ion-select-option value="8A">8A</ion-select-option>
+          <ion-select-option value="9A">9A</ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <ion-item>
+        <ion-select label="Angle" placeholder="Select board angle" interface="action-sheet">
+          <ion-select-option value="0">0&deg;</ion-select-option>
+          <ion-select-option value="10">10&deg;</ion-select-option>
+          <ion-select-option value="20">20&deg;</ion-select-option>
+          <ion-select-option value="30">30&deg;</ion-select-option>
+          <ion-select-option value="40">40&deg;</ion-select-option>
+          <ion-select-option value="50">50&deg;</ion-select-option>
+          <ion-select-option value="60">60&deg;</ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <ion-item>
+        <pinch-zoom #zoom [limit-zoom]=20>
+          <canvas #canvas width="1500" height="700" (click)="templateClick($event)">
+            Not supported on this browser
+          </canvas>
+        </pinch-zoom>
+      </ion-item>
+
+      <ion-list>
+
+      </ion-list>
+
+    </ion-list>
+
+
+
   </div>
 
-  <ion-list>
-    <ion-item>
-      <ion-input label="Name" placeholder="Enter route name"></ion-input>
-    </ion-item>
 
-    <ion-item>
-      <ion-textarea label="Description" placeholder="Enter route description"></ion-textarea>
-    </ion-item>
-
-    <ion-item>
-      <ion-select label="Difficulty" placeholder="Select route difficulty" interface="action-sheet">
-        <ion-select-option value="5A">5A</ion-select-option>
-        <ion-select-option value="6A">6A</ion-select-option>
-        <ion-select-option value="7A">7A</ion-select-option>
-        <ion-select-option value="8A">8A</ion-select-option>
-        <ion-select-option value="9A">9A</ion-select-option>
-      </ion-select>
-    </ion-item>
-
-    <ion-item>
-      <ion-select label="Angle" placeholder="Select board angle" interface="action-sheet">
-        <ion-select-option value="0">0&deg;</ion-select-option>
-        <ion-select-option value="10">10&deg;</ion-select-option>
-        <ion-select-option value="20">20&deg;</ion-select-option>
-        <ion-select-option value="30">30&deg;</ion-select-option>
-        <ion-select-option value="40">40&deg;</ion-select-option>
-        <ion-select-option value="50">50&deg;</ion-select-option>
-        <ion-select-option value="60">60&deg;</ion-select-option>
-      </ion-select>
-    </ion-item>
-
-  </ion-list>
 </ion-content>

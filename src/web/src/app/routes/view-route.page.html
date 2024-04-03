@@ -15,9 +15,9 @@
    </ion-header>
 
    <div id="container">
-      <div id="schema">
-         <pinch-zoom [limit-zoom]=max_zoom>
-            <canvas #canvas style="border: 1px solid" width="1500" height="700">
+      <div id="zoomContainer" #zoomContainer>
+         <pinch-zoom #zoom [limit-zoom]=20 [style.width]=schemaSize [style.height]=schemaSize>
+            <canvas #canvas width="1500" height="700">
                Not supported on this browser
             </canvas>
          </pinch-zoom>

@@ -1,8 +1,5 @@
+import { Hold } from "./wall-template";
 
-export interface Point {
-  X: number;
-  Y: number;
-}
 
 export interface Route {
   Id: string;
@@ -12,5 +9,5 @@ export interface Route {
   Rating: number;
   Difficulty: string;
   Autor: string;
-  Holds: Point[];
+  Holds: Hold[];
 }

@@ -3,5 +3,7 @@
   "integrations": {
     "capacitor": {}
   },
-  "type": "angular"
+  "type": "angular",
+  "app-icon": "http://balkanclimbing.com/themes/custom/css/images/logo.svg",
+  "api-base-uri": "https://storage.googleapis.com/spraywall/balkan/"
 }
