@@ -17,7 +17,7 @@ import { PinchZoomModule } from '@meddv/ngx-pinch-zoom';
     FormsModule,
     IonicModule,
     RoutesPageRoutingModule,
-    PinchZoomModule
+    PinchZoomModule,
   ],
   declarations: [ViewRoutePage,AddRoutePage,ListRoutesPage]
 })

@@ -1,8 +1,10 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { WallTemplateService } from '../services/wall-template.service';
 import { Hold, HoldType, WallTemplate } from '../models/wall-template';
 import { PinchZoomComponent } from '@meddv/ngx-pinch-zoom';
 import { RouteService } from '../services/route.service';
+import { RouteStyle, RouteType } from '../models/route'
+import { AbstractControl, FormBuilder, FormGroup, ValidatorFn, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-add-route',
@@ -13,17 +15,60 @@ export class AddRoutePage implements OnInit {
   @ViewChild('canvas', { static: true }) canvas!: ElementRef;
   @ViewChild('zoom', { static: true }) zoom!: PinchZoomComponent;
 
+  formGroup!: FormGroup; // declare it here
+
   public template: WallTemplate | null = null;
-  public holds: Hold[] = [];
+  @Output() public holds: Hold[] = [];
   private _selectedHold: Hold | null = null;
 
-  constructor(private routeService: RouteService, private wallTemplateService: WallTemplateService) {
+  @Output() public routeStyles: RouteStyle[] = [ RouteStyle.FeetFollow, RouteStyle.OpenFeet, RouteStyle.NoMatches ];
+  @Output() public routeTypes: RouteType[] = [ RouteType.Boulder, RouteType.Route ];
+  @Output() public difficulties: Map<number, string> = new Map<number, string>();
+  // @Output() public canSave: boolean = false;
+
+  @Input() public routeStyle: RouteStyle = RouteStyle.FeetFollow;
+  @Input() public angle: number = 40;
+  @Input() public name?: string;
+  @Input() public description?: string;
+  @Input() public routeType: RouteType = RouteType.Boulder;
+  @Input() public selectedDifficulty?: number;
+
+  constructor(private routeService: RouteService, private wallTemplateService: WallTemplateService, private formBuilder: FormBuilder) {
+    this.setDifficulty(routeService.boulderDifficulty);
   }
 
-  ngOnInit() {
-    console.log("OnInit");
+  async ngOnInit() {
     const canvas: HTMLCanvasElement = this.canvas.nativeElement;
     this.wallTemplateService.drawTemplateBackdrop(canvas);
+
+    this.template = await this.wallTemplateService.getTemplate();
+    if (this.template?.Angles.length ?? 0 > 1) {
+      this.angle = this.template?.Angles[this.template.Angles.length / 2] ?? 40;
+    }
+
+    this.formGroup = this.formBuilder.group({
+      name: ["", Validators.required]
+    });
+  }
+
+  async isSaveDisabled() {
+    console.log(this.name != undefined && this.name != '');
+    return this.name != undefined && this.name != '';
+  }
+
+  async onSave() {
+    console.log(
+      {
+        routeStyle: this.routeStyle,
+        angle: this.angle,
+        name: this.name,
+        description: this.description,
+        selectedDifficulty: this.selectedDifficulty,
+        routeType: this.routeType,
+        holds: this.holds
+
+      }
+    );
   }
 
   async selectHold(hold: Hold) {
@@ -32,6 +77,29 @@ export class AddRoutePage implements OnInit {
     const canvas: HTMLCanvasElement = this.canvas.nativeElement;
     await this.wallTemplateService.drawTemplateBackdrop(canvas);
     await this.wallTemplateService.markHolds(this.holds, this._selectedHold, canvas);
+  }
+
+  async changeRouteType(event: any) {
+    this.routeType = event.detail.value;
+
+    let temp = this.selectedDifficulty;
+    this.selectedDifficulty = undefined;
+
+    if (this.routeType === RouteType.Route) {
+      this.setDifficulty(this.routeService.routeDifficulty);
+    } else if (this.routeType === RouteType.Boulder) {
+      this.setDifficulty(this.routeService.boulderDifficulty);
+    }
+
+    this.selectedDifficulty = temp;
+  }
+
+  async setDifficulty(source: Map<number, string>) {
+    this.difficulties.clear();
+
+    for (let [key, value] of source) {
+      this.difficulties.set(key, value);
+    }
   }
 
   async changeTypeStartingHold(hold: Hold) {

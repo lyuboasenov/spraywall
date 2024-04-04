@@ -32,5 +32,6 @@ export interface Hold {
 
 export interface WallTemplate {
   EncodedImage: string;
-  Holds: Hold[]
+  Holds: Hold[],
+  Angles: number[]
 }

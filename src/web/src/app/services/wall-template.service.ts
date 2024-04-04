@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Hold, HoldType, RotatedRect, WallTemplate } from '../models/wall-template';
 import { environment } from 'src/environments/environment';
 
-const TEMPLATE_REMOTE_URI: string = environment.api_base_uri + "template.json2024-04-03T03-15-35.json";
+const TEMPLATE_REMOTE_URI: string = environment.api_base_uri + "template.json2024-04-04T19-44-35.json";
 const TEMPLATES_PATH: string = 'templates/template.json';
 
 @Injectable({

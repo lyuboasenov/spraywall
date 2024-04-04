@@ -1,5 +1,15 @@
 import { Hold } from "./wall-template";
 
+export enum RouteType {
+  Boulder = <any>"Boulder",
+  Route = <any>"Route"
+}
+
+export enum RouteStyle {
+  FeetFollow = <any>"FeetFollow",
+  OpenFeet = <any>"OpenFeet",
+  NoMatches = <any>"NoMatches"
+}
 
 export interface Route {
   Id: string;
@@ -10,4 +20,5 @@ export interface Route {
   Difficulty: string;
   Autor: string;
   Holds: Hold[];
+  RouteStyle: RouteStyle;
 }
