@@ -37,7 +37,7 @@ export class WallTemplateService {
     return this._template ?? null;
   }
 
-  public markHolds(holds: Hold[] | null, canvas: HTMLCanvasElement) {
+  public markHolds(holds: Hold[] | null, selectedHold: Hold | null, canvas: HTMLCanvasElement) {
     let ctx = canvas.getContext("2d");
     if (ctx && holds) {
       for (let i = 0; i < holds.length; i++) {
@@ -73,6 +73,26 @@ export class WallTemplateService {
         }
         ctx.stroke();
         ctx.restore();
+
+        if (r == selectedHold) {
+          ctx.save();
+        ctx.beginPath();
+        ctx.arc(r.Center.X, r.Center.Y, r.Radius + 20, 0, Math.PI * 2, true); // Outer circle
+        ctx.closePath();
+
+        ctx.lineWidth = 5;
+        if (r.Type == HoldType.StartingHold) {
+          ctx.strokeStyle = '#00FF00';
+        } else if (r.Type == HoldType.FinishingHold) {
+          ctx.strokeStyle = '#FF0000';
+        } else if(r.Type == HoldType.FootHold) {
+          ctx.strokeStyle = '#ffe066';
+        } else {
+          ctx.strokeStyle = '#00FFFF';
+        }
+        ctx.stroke();
+        ctx.restore();
+        }
       }
     }
   }

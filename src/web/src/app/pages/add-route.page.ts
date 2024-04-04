@@ -15,6 +15,7 @@ export class AddRoutePage implements OnInit {
 
   public template: WallTemplate | null = null;
   public holds: Hold[] = [];
+  private _selectedHold: Hold | null = null;
 
   constructor(private routeService: RouteService, private wallTemplateService: WallTemplateService) {
   }
@@ -23,6 +24,34 @@ export class AddRoutePage implements OnInit {
     console.log("OnInit");
     const canvas: HTMLCanvasElement = this.canvas.nativeElement;
     this.wallTemplateService.drawTemplateBackdrop(canvas);
+  }
+
+  async selectHold(hold: Hold) {
+    this._selectedHold = hold;
+
+    const canvas: HTMLCanvasElement = this.canvas.nativeElement;
+    await this.wallTemplateService.drawTemplateBackdrop(canvas);
+    await this.wallTemplateService.markHolds(this.holds, this._selectedHold, canvas);
+  }
+
+  async changeTypeStartingHold(hold: Hold) {
+    await this.changeType(hold, HoldType.StartingHold);
+  }
+  async changeTypeFinishingHold(hold: Hold) {
+    await this.changeType(hold, HoldType.FinishingHold);
+  }
+  async changeTypeFootHold(hold: Hold) {
+    await this.changeType(hold, HoldType.FootHold);
+  }
+  async changeTypeRegularHold(hold: Hold) {
+    await this.changeType(hold, HoldType.Hold);
+  }
+  async changeType(hold: Hold, type: HoldType) {
+    hold.Type = type;
+
+    const canvas: HTMLCanvasElement = this.canvas.nativeElement;
+    await this.wallTemplateService.drawTemplateBackdrop(canvas);
+    await this.wallTemplateService.markHolds(this.holds, this._selectedHold, canvas);
   }
 
   async templateClick(event: any) {
@@ -50,6 +79,6 @@ export class AddRoutePage implements OnInit {
 
     const canvas: HTMLCanvasElement = this.canvas.nativeElement;
     await this.wallTemplateService.drawTemplateBackdrop(canvas);
-    await this.wallTemplateService.markHolds(this.holds, canvas);
+    await this.wallTemplateService.markHolds(this.holds, this._selectedHold, canvas);
   }
 }

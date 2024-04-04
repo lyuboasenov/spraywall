@@ -100,6 +100,6 @@ export class ViewRoutePage implements OnInit {
     }
 
     const canvas: HTMLCanvasElement = this.canvas.nativeElement;
-    this.wallTemplateService.markHolds(this._discoveredHolds, canvas);
+    this.wallTemplateService.markHolds(this._discoveredHolds, null, canvas);
   }
 }

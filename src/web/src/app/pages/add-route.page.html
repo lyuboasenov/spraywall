@@ -55,21 +55,23 @@
       </ion-item>
 
       <ion-list [inset]="true">
-        <ion-item-sliding *ngFor="let h of holds">
+        <ion-list-header *ngIf="holds.length > 0">Marked holds</ion-list-header>
+        <ion-item-sliding *ngFor="let h of holds" (click)="selectHold(h)">
           <ion-item [button]="true">
             <ion-label>{{h.Type}}</ion-label>
+            <ion-icon name="chevron-back-outline" slot="end"></ion-icon>
           </ion-item>
           <ion-item-options>
-            <ion-item-option color="success">
+            <ion-item-option color="success" (click)="changeTypeStartingHold(h)">
               Starting hold
             </ion-item-option>
-            <ion-item-option color="danger">
+            <ion-item-option color="danger" (click)="changeTypeFinishingHold(h)">
               Finishing hold
             </ion-item-option>
-            <ion-item-option color="warning">
+            <ion-item-option color="warning" (click)="changeTypeFootHold(h)">
               Foot hold
             </ion-item-option>
-            <ion-item-option color="light" expandable="true">
+            <ion-item-option color="light" expandable="true" (click)="changeTypeRegularHold(h)">
               Regular hold
             </ion-item-option>
           </ion-item-options>
