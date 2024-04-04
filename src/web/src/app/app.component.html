@@ -3,9 +3,9 @@
     <ion-menu contentId="main-content" type="overlay">
       <ion-content>
         <ion-img id="menu-app-icon" [src]="environment.app_icon"></ion-img>
-        <ion-list id="inbox-list">
+        <ion-list id="inbox-list" *ngIf="user?.value">
           <ion-list-header>SprayWall</ion-list-header>
-          <ion-note>hi&#64;Balkan</ion-note>
+          <ion-note *ngIf="user?.value">hi {{user?.value?.name}}</ion-note>
 
           <ion-menu-toggle auto-hide="false" *ngFor="let p of appPages; let i = index">
             <ion-item routerDirection="root" [routerLink]="[p.url]" lines="none" detail="false" routerLinkActive="selected">
@@ -15,7 +15,7 @@
           </ion-menu-toggle>
         </ion-list>
 
-        <ion-list id="labels-list">
+        <ion-list id="labels-list" *ngIf="user?.value">
           <ion-list-header>Labels</ion-list-header>
 
           <ion-item *ngFor="let label of labels" lines="none">
@@ -23,6 +23,23 @@
             <ion-label>{{ label }}</ion-label>
           </ion-item>
         </ion-list>
+
+        <ion-list id="labels-list">
+         <ion-list-header>Profile</ion-list-header>
+
+         <ion-item lines="none" *ngIf="!user?.value" [routerLink]="['/']">
+            <ion-icon aria-hidden="true" slot="start" ios="bookmark-outline" md="bookmark-sharp"></ion-icon>
+            <ion-label>Login</ion-label>
+         </ion-item>
+         <ion-item lines="none" *ngIf="user?.value" [routerLink]="['/profile']">
+            <ion-icon aria-hidden="true" slot="start" ios="bookmark-outline" md="bookmark-sharp"></ion-icon>
+            <ion-label>Profile</ion-label>
+          </ion-item>
+         <ion-item lines="none" *ngIf="user?.value" [routerLink]="['/logout']">
+            <ion-icon aria-hidden="true" slot="start" ios="bookmark-outline" md="bookmark-sharp"></ion-icon>
+            <ion-label>Logout</ion-label>
+          </ion-item>
+       </ion-list>
 
       </ion-content>
     </ion-menu>

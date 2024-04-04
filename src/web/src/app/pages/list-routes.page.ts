@@ -1,23 +1,30 @@
 import { Component } from '@angular/core';
 import { RouteService } from '../services/route.service';
 import { Route } from '../models/route';
+import { AuthService } from '../services/auth.service';
 
 @Component({
-  selector: 'app-list-routes',
-  templateUrl: './list-routes.page.html',
-  styleUrls: ['./list-routes.page.scss'],
+   selector: 'app-list-routes',
+   templateUrl: './list-routes.page.html',
+   styleUrls: ['./list-routes.page.scss'],
 })
 export class ListRoutesPage {
-  public routes: Route[] = [];
-  public selectedRoute?: Route;
+   public routes: Route[] = [];
+   public selectedRoute?: Route;
 
-  constructor(private routeService: RouteService) {
-    this.routeService.getAll().then((routes: Route[]) => {
-      this.routes = routes;
-    });
-  }
+   private _user = this.authService.getUser();
 
-  onSelect(b: Route) {
-    this.selectedRoute = b;
-  }
+   constructor(private routeService: RouteService, private authService: AuthService) {
+      this.routeService.getAll().then((routes: Route[]) => {
+         this.routes = routes;
+      });
+   }
+
+   onSelect(b: Route) {
+      this.selectedRoute = b;
+   }
+
+   logout() {
+      this.authService.logout();
+   }
 }
