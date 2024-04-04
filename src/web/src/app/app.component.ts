@@ -9,7 +9,7 @@ import { BehaviorSubject, Observable } from 'rxjs';
   styleUrls: ['app.component.scss'],
 })
 export class AppComponent implements OnInit {
-   @Input() user?: BehaviorSubject<null | User>;
+   @Input() user: null | User = null;
 
    public appPages = [
     { title: 'Routes', url: '/routes', icon: 'reorder-four' },
@@ -20,9 +20,8 @@ export class AppComponent implements OnInit {
 
   constructor(private auth: AuthService) { }
    async ngOnInit() {
-      this.user = this.auth.getUser();
-      this.user.subscribe((u) => {
-         console.log(u);
+      this.auth.getUser().subscribe(next => {
+        this.user = next;
       });
    }
 }

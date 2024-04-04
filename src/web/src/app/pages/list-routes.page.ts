@@ -12,9 +12,7 @@ export class ListRoutesPage {
    public routes: Route[] = [];
    public selectedRoute?: Route;
 
-   private _user = this.authService.getUser();
-
-   constructor(private routeService: RouteService, private authService: AuthService) {
+   constructor(private routeService: RouteService) {
       this.routeService.getAll().then((routes: Route[]) => {
          this.routes = routes;
       });
@@ -22,9 +20,5 @@ export class ListRoutesPage {
 
    onSelect(b: Route) {
       this.selectedRoute = b;
-   }
-
-   logout() {
-      this.authService.logout();
    }
 }
