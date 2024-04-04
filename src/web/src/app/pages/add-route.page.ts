@@ -26,8 +26,11 @@ export class AddRoutePage implements OnInit {
   }
 
   async templateClick(event: any) {
-    let ratio = Math.min(this.wallTemplateService.width / event.target.offsetWidth, this.wallTemplateService.height / event.target.offsetHeight);
-    let hold = await this.wallTemplateService.findHold(event.layerX * ratio, event.layerY * ratio);
+    const ratio = Math.min(this.wallTemplateService.width / event.target.offsetWidth, this.wallTemplateService.height / event.target.offsetHeight);
+
+    const x = (event.layerX + (event.target.offsetWidth - event.target.parentElement.clientWidth) / 2) * ratio;
+    const y = (event.layerY + (event.target.offsetHeight - event.target.parentElement.clientHeight) / 2) * ratio
+    const hold = await this.wallTemplateService.findHold(x, y);
 
     if (hold) {
 
