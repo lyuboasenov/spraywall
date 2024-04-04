@@ -19,7 +19,7 @@
           <ion-list-header>Labels</ion-list-header>
 
           <ion-item *ngFor="let label of labels" lines="none">
-            <ion-icon aria-hidden="true" slot="start" ios="bookmark-outline" md="bookmark-sharp"></ion-icon>
+            <ion-icon aria-hidden="true" slot="start" name="color-filter-outline"></ion-icon>
             <ion-label>{{ label }}</ion-label>
           </ion-item>
         </ion-list>
@@ -28,15 +28,15 @@
          <ion-list-header>Profile</ion-list-header>
 
          <ion-item lines="none" *ngIf="!user" [routerLink]="['/']">
-            <ion-icon aria-hidden="true" slot="start" ios="bookmark-outline" md="bookmark-sharp"></ion-icon>
+            <ion-icon name="log-in-outline" aria-hidden="true" slot="start"></ion-icon>
             <ion-label>Login</ion-label>
          </ion-item>
-         <ion-item lines="none" *ngIf="user" [routerLink]="['/profile']">
-            <ion-icon aria-hidden="true" slot="start" ios="bookmark-outline" md="bookmark-sharp"></ion-icon>
+         <ion-item lines="none" *ngIf="user" [routerLink]="['/profile']" appDisableRole disableForRole="SERVICE_USER">
+            <ion-icon aria-hidden="true" slot="start" name="person-circle-outline"></ion-icon>
             <ion-label>Profile</ion-label>
           </ion-item>
          <ion-item lines="none" *ngIf="user" [routerLink]="['/logout']">
-            <ion-icon aria-hidden="true" slot="start" ios="bookmark-outline" md="bookmark-sharp"></ion-icon>
+            <ion-icon aria-hidden="true" slot="start" name="log-out-outline"></ion-icon>
             <ion-label>Logout</ion-label>
           </ion-item>
        </ion-list>

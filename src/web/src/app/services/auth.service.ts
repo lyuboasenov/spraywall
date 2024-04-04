@@ -50,7 +50,13 @@ export class AuthService {
             role: 'ADMIN',
             permissions: ['read', 'write']
          };
-      }
+      } else if (name === 'service') {
+        userObj = {
+           name: 'Service Account',
+           role: 'SERVICE_USER',
+           permissions: ['read']
+        };
+     }
 
       if (userObj) {
          await this.storageProxy.storage.set(TOKEN_KEY, JSON.stringify(userObj));
