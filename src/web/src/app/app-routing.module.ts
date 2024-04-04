@@ -23,6 +23,14 @@ const routes: Routes = [
    {
      path: 'logout',
      loadChildren: () => import('./pages/logout/logout.module').then( m => m.LogoutPageModule)
+   },
+   {
+     path: 'signup',
+     loadChildren: () => import('./pages/signup/signup.module').then( m => m.SignupPageModule)
+   },
+   {
+     path: 'not-found',
+     loadChildren: () => import('./pages/not-found/not-found.module').then( m => m.NotFoundPageModule)
    }
 ];
 

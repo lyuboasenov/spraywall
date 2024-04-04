@@ -1,6 +1,18 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>signup</ion-title>
+    <ion-buttons slot="primary">
+      <ion-button fill="solid" routerLink="/signup">
+        <ion-icon name="person-add-outline"></ion-icon>
+        SIGNUP
+      </ion-button>
+    </ion-buttons>
+    <ion-buttons slot="primary">
+      <ion-button fill="solid" [disabled]="!formGroup.valid" form="form" type="submit">
+        <ion-icon name="log-in-outline"></ion-icon>
+        SAVE
+      </ion-button>
+    </ion-buttons>
+    <ion-title>SIGNUP</ion-title>
   </ion-toolbar>
 </ion-header>
 
@@ -10,4 +22,13 @@
       <ion-title size="large">signup</ion-title>
     </ion-toolbar>
   </ion-header>
+
+  <form id="form" [formGroup]="formGroup" (ngSubmit)="onSubmit(formGroup.value)">
+    <div class="loginForm">
+      <ion-input formControlName="username" type="email" label="Email"></ion-input>
+      <ion-input formControlName="password" type="password" label="Password"></ion-input>
+      <ion-input formControlName="confpassword" type="password" label="Confirm Password"></ion-input>
+    </div>
+  </form>
+
 </ion-content>
