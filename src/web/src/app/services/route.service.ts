@@ -9,8 +9,8 @@ const ROUTES_REMOTE_URI: string = environment.api_base_uri + "boulders-5.json";
 })
 export class RouteService {
   private routes?: Route[];
-  public routeDifficulty = new Map<number, string>();
-  public boulderDifficulty = new Map<number, string>();
+  public routeDifficulty: Map<number, string> = new Map<number, string>();
+  public boulderDifficulty: Map<number, string> = new Map<number, string>();
 
   constructor() {
     this.boulderDifficulty.set(20, "3");
