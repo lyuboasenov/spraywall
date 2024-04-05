@@ -1,13 +1,26 @@
 <ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>list-routes</ion-title>
-  </ion-toolbar>
-</ion-header>
+   <ion-toolbar>
+     <ion-buttons slot="start">
+       <ion-menu-button></ion-menu-button>
+     </ion-buttons>
+     <ion-title>Routes</ion-title>
+   </ion-toolbar>
+ </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">list-routes</ion-title>
-    </ion-toolbar>
-  </ion-header>
-</ion-content>
+ <ion-content [fullscreen]="true">
+   <ion-header collapse="condense">
+     <ion-toolbar>
+       <ion-title size="large"></ion-title>
+     </ion-toolbar>
+   </ion-header>
+
+   <div id="container">
+     <strong class="capitalize"></strong>
+     <ion-list class="routes">
+       <ion-item *ngFor="let b of routes" [button]="true" [routerLink]="[ '/routes/' + b.Id ]">
+         <ion-label>{{b.Name}}</ion-label>
+         <ion-note>{{b.Difficulty}} &#64; {{b.Angle}}&deg;</ion-note>
+       </ion-item>
+     </ion-list>
+   </div>
+ </ion-content>

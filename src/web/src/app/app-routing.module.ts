@@ -8,11 +8,6 @@ const routes: Routes = [
       loadChildren: () => import('./pages/login/login.module').then(m => m.LoginPageModule)
    },
    {
-      path: 'routes',
-      loadChildren: () => import('./pages/routes.module').then(m => m.RoutesModule),
-      canActivate: [AuthGuard]
-   },
-   {
       path: 'profile',
       loadChildren: () => import('./pages/profile/profile.module').then(m => m.ProfilePageModule),
       canActivate: [AuthGuard],
@@ -31,6 +26,26 @@ const routes: Routes = [
    {
      path: 'not-found',
      loadChildren: () => import('./pages/not-found/not-found.module').then( m => m.NotFoundPageModule)
+   },
+   {
+     path: 'routes',
+     loadChildren: () => import('./pages/list-routes/list-routes.module').then( m => m.ListRoutesPageModule),
+     canActivate: [AuthGuard]
+   },
+   {
+     path: 'routes/add',
+     loadChildren: () => import('./pages/add-route/add-route.module').then( m => m.AddRoutePageModule),
+     canActivate: [AuthGuard]
+   },
+   {
+     path: 'routes/:id',
+     loadChildren: () => import('./pages/view-route/view-route.module').then( m => m.ViewRoutePageModule),
+     canActivate: [AuthGuard]
+   },
+   {
+     path: 'walls',
+     loadChildren: () => import('./pages/list-walls/list-walls.module').then( m => m.ListWallsPageModule),
+     canActivate: [AuthGuard]
    }
 ];
 

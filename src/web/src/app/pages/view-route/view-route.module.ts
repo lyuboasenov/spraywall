@@ -7,13 +7,15 @@ import { IonicModule } from '@ionic/angular';
 import { ViewRoutePageRoutingModule } from './view-route-routing.module';
 
 import { ViewRoutePage } from './view-route.page';
+import { PinchZoomModule } from '@meddv/ngx-pinch-zoom';
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
-    ViewRoutePageRoutingModule
+    ViewRoutePageRoutingModule,
+    PinchZoomModule
   ],
   declarations: [ViewRoutePage]
 })
