@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { ActivatedRouteSnapshot, CanActivateFn, Router, RouterStateSnapshot } from '@angular/router';
-import { AuthService, User } from '../services/auth.service';
+import { AuthService } from '../services/auth.service';
 import { AlertController } from '@ionic/angular';
 
 @Injectable({
@@ -13,7 +13,7 @@ import { AlertController } from '@ionic/angular';
    canActivate(next: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean {
      // Get the potentially required role from the route
     const expectedRole = next.data?.['role'] || null;
-    const user = this.authService.getUser();
+    const user = this.authService.user;
 
     if (!user.value) {
       this.showAlert();
@@ -36,7 +36,9 @@ import { AlertController } from '@ionic/angular';
       message: 'You are not authorized to visit that page!',
       buttons: ['OK']
     });
-    alert.present();
+    await alert.present();
+
+    this.router.navigateByUrl('/');
   }
  }
 

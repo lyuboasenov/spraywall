@@ -1,98 +1,75 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { StorageProxyService } from './storage-proxy.service'
+import { AppwriteService } from './appwrite.service';
+import { Account, ID, Models } from 'appwrite';
+import { BehaviorSubject } from 'rxjs/internal/BehaviorSubject';
+import { StorageProxyService } from './storage-proxy.service';
 
 
 const TOKEN_KEY = 'user-token';
 
-export interface User {
-   name: string;
-   role: string;
-   permissions: string[];
-}
-
-
 @Injectable({
-   providedIn: 'root'
+  providedIn: 'root'
 })
 export class AuthService {
-   private currentUser: BehaviorSubject<User | null> = new BehaviorSubject<User | null>(null);
+  private account: Account;
+  public user : BehaviorSubject<any | null> = new BehaviorSubject<any | null>(null);
 
-   constructor(private router: Router, private storageProxy: StorageProxyService) {
-      this.loadUser();
-   }
+  constructor(private router: Router, private appwrite: AppwriteService, private storageProxy: StorageProxyService) {
+    this.account = new Account(appwrite.client);
+    this.loadUser();
+  }
 
-   async loadUser() {
-      // Normally load e.g. JWT at this point
-      const token = await this.storageProxy.storage.get(TOKEN_KEY);
+  async loadUser() {
+    // Normally load e.g. JWT at this point
+    const token = await this.storageProxy.storage.get(TOKEN_KEY);
 
-      if (token) {
-         this.currentUser.next(JSON.parse(token));
-      } else {
-         this.currentUser.next(null);
-      }
-   }
+    if (token) {
+      const user = await this.getUser();
+      this.user.next(user);
+    }
+ }
 
-   async signIn(name: string): Promise<BehaviorSubject<User | null>> {
-      // Local Dummy check, usually server request!
-      let userObj: User | undefined = undefined;
+  // Access the current user
+  async getUser(): Promise<Models.User<Models.Preferences>> {
+    return this.account.get();
+  }
 
-      if (name === 'user') {
-         userObj = {
-            name: 'Tony Test',
-            role: 'USER',
-            permissions: ['read']
-         };
-      } else if (name === 'admin') {
-         userObj = {
-            name: 'Adam Admin',
-            role: 'ADMIN',
-            permissions: ['read', 'write']
-         };
-      } else if (name === 'service') {
-        userObj = {
-           name: 'Service Account',
-           role: 'SERVICE_USER',
-           permissions: ['read']
-        };
-     }
+  async signup(email: string, password: string, name: string) {
+    await this.account.create(ID.unique(), email, password, name);
+    return await this.login(email, password);
+  }
 
-      if (userObj) {
-         await this.storageProxy.storage.set(TOKEN_KEY, JSON.stringify(userObj));
-         this.currentUser.next(userObj);
-      } else {
-         this.currentUser.next(null);
-      }
+  async login(email: string, password: string) {
+    await this.account.createEmailPasswordSession(email, password);
+    this.user.next(await this.getUser());
 
-      return this.currentUser;
-   }
+    return this.user;
+  }
 
-   // Access the current user
-   getUser(): BehaviorSubject<User | null> {
-      return this.currentUser;
-   }
+  // Remove all information of the previous user
+  async logout() {
+    await this.account.deleteSession('current');
+    await this.storageProxy.storage.remove(TOKEN_KEY);
+    await this.appwrite.destroy();
 
-   // Remove all information of the previous user
-   async logout() {
-      await this.storageProxy.storage.remove(TOKEN_KEY);
+    this.user.next(null);
 
-      this.currentUser.next(null);
-      this.router.navigateByUrl('/', { replaceUrl: true });
-   }
+    this.router.navigateByUrl('/', { replaceUrl: true });
+  }
 
-   // Check if a user has a certain permission
-   hasPermission(permissions: string[]): boolean {
-      for (const permission of permissions) {
-         if (!this.currentUser.value) {
-            return false;
-         } else if (<User>this.currentUser.value) {
-            const u = (<User>this.currentUser.value);
-            if (!u.permissions.includes(permission)) {
-               return false;
-            }
-         }
-      }
-      return true;
-   }
+  // Check if a user has a certain permission
+  hasPermission(permissions: string[]): boolean {
+    // for (const permission of permissions) {
+    //   if (!this.currentUser.value) {
+    //     return false;
+    //   } else if (<User>this.currentUser.value) {
+    //     const u = (<User>this.currentUser.value);
+    //     if (!u.permissions.includes(permission)) {
+    //       return false;
+    //     }
+    //   }
+    // }
+    return true;
+  }
 }

@@ -18,12 +18,22 @@
 
    <div id="container">
      <strong class="capitalize"></strong>
+
      <ion-list class="routes">
        <ion-item *ngFor="let b of routes" [button]="true" [routerLink]="[ '/routes/' + b.Id ]">
          <ion-label>{{b.Name}}</ion-label>
          <ion-note>{{b.Difficulty}} &#64; {{b.Angle}}&deg;</ion-note>
        </ion-item>
      </ion-list>
+
+     <div class="fab-add">
+      <ion-fab>
+        <ion-fab-button>
+          <ion-icon name="add"></ion-icon>
+        </ion-fab-button>
+      </ion-fab>
+     </div>
+
    </div>
    <ion-modal trigger="open-filter" (willDismiss)="onWillDismiss($event)">
       <ng-template>

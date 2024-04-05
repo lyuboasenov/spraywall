@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { AlertController } from '@ionic/angular';
 import { AuthService } from 'src/app/services/auth.service';
 
 @Component({
@@ -12,9 +13,16 @@ export class SignupPage implements OnInit {
 
   formGroup: FormGroup; // declare it here
 
-  constructor(private auth: AuthService, private router: Router, public formBuilder: FormBuilder) {
+  constructor(private auth: AuthService, private router: Router, public formBuilder: FormBuilder, private alertCtrl: AlertController) {
     this.formGroup = formBuilder.group({
-      username: [
+      name: [
+        "",
+        Validators.compose([
+          Validators.minLength(4),
+          Validators.required
+        ])
+      ],
+      email: [
         "",
         Validators.compose([
           Validators.minLength(4),
@@ -43,17 +51,25 @@ export class SignupPage implements OnInit {
    return control.value.password === control.value.confpassword ? null : { mismatch: true };
   }
 
-  ngOnInit() {
-    const user = this.auth.getUser();
-    if (user.value) {
+  async ngOnInit() {
+    if (this.auth.user) {
       this.router.navigateByUrl('/routes', {replaceUrl: true });
     }
   }
 
   async onSubmit(formData: any) {
-    //todo register
+    try {
+      this.auth.signup(formData.email, formData.password, formData.name);
 
-    this.router.navigateByUrl('/', {replaceUrl: true });
+      this.router.navigateByUrl('/', {replaceUrl: true });
+    } catch (e) {
+      let alert = await this.alertCtrl.create({
+        header: 'Error',
+        message: 'Error occurred while signing up!',
+        buttons: ['OK']
+      });
+      await alert.present();
+    }
   }
 
 }

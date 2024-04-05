@@ -1,7 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { environment } from 'src/environments/environment';
-import { AuthService, User } from './services/auth.service';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { AuthService } from './services/auth.service';
 
 @Component({
   selector: 'app-root',
@@ -9,9 +8,9 @@ import { BehaviorSubject, Observable } from 'rxjs';
   styleUrls: ['app.component.scss'],
 })
 export class AppComponent implements OnInit {
-   @Input() user: null | User = null;
+  @Input() user: any | null = null;
 
-   public appPages = [
+  public appPages = [
     { title: 'Routes', url: '/routes', icon: 'reorder-four' },
     { title: 'Add route', url: '/routes/add', icon: 'add' },
   ];
@@ -19,9 +18,9 @@ export class AppComponent implements OnInit {
   public environment = environment;
 
   constructor(private auth: AuthService) { }
-   async ngOnInit() {
-      this.auth.getUser().subscribe(next => {
-        this.user = next;
-      });
-   }
+  async ngOnInit() {
+    this.auth.user.subscribe(next => {
+      this.user = next;
+    });
+ }
 }

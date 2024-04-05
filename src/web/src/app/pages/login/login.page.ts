@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { AlertController } from '@ionic/angular';
 import { AuthService } from 'src/app/services/auth.service';
 
 @Component({
@@ -11,9 +12,9 @@ import { AuthService } from 'src/app/services/auth.service';
 export class LoginPage implements OnInit {
   formGroup: FormGroup; // declare it here
 
-  constructor(private auth: AuthService, private router: Router, public formBuilder: FormBuilder) {
+  constructor(private auth: AuthService, private router: Router, public formBuilder: FormBuilder, private alertCtrl: AlertController) {
     this.formGroup = formBuilder.group({
-      username: [
+      email: [
         "",
         Validators.compose([
           Validators.minLength(4),
@@ -32,28 +33,30 @@ export class LoginPage implements OnInit {
     });
   }
 
-  ngOnInit() {
-    const user = this.auth.getUser();
-    if (user.value) {
-      this.router.navigateByUrl('/routes', {replaceUrl: true });
+  async ngOnInit() {
+    try {
+      const user = await this.auth.getUser();
+      this.router.navigateByUrl('/routes', { replaceUrl: true });
+    } catch (e) {
+      // silently continue
     }
   }
 
-  async signIn(userName: string) {
-   const user = await this.auth.signIn(userName);
-   // You could now route to different pages
-   // based on the user role
-   // let role = user['role'];
+  async onSubmit(formData: any) {
+    try {
+      const user = await this.auth.login(formData.email, formData.password);
 
-   this.router.navigateByUrl('/routes', {replaceUrl: true });
- }
+      if (user) {
+        this.router.navigateByUrl('/routes', { replaceUrl: true });
+      }
+    } catch (e) {
+      let alert = await this.alertCtrl.create({
+        header: 'Error',
+        message: 'Error occurred while logging in!',
+        buttons: ['OK']
+      });
+      await alert.present();
+    }
 
- async onSubmit(formData: any) {
-    const user = await this.auth.signIn(formData.username);
-    // You could now route to different pages
-    // based on the user role
-    // let role = user['role'];
-
-    this.router.navigateByUrl('/routes', {replaceUrl: true });
   }
 }
