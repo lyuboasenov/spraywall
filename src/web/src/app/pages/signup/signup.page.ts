@@ -39,7 +39,7 @@ export class SignupPage implements OnInit {
     }, { validators: this.confirmPasswordValidator });
   }
 
-  confirmPasswordValidator: ValidatorFn = (control: AbstractControl):  ValidationErrors | null => {
+  confirmPasswordValidator: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
    return control.value.password === control.value.confpassword ? null : { mismatch: true };
   }
 

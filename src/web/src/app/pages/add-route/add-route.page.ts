@@ -4,7 +4,8 @@ import { Hold, HoldType, WallTemplate } from '../../models/wall-template';
 import { PinchZoomComponent } from '@meddv/ngx-pinch-zoom';
 import { RouteService } from '../../services/route.service';
 import { RouteStyle, RouteType } from '../../models/route'
-import { AbstractControl, FormBuilder, FormGroup, ValidatorFn, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-add-route',
@@ -25,17 +26,51 @@ export class AddRoutePage implements OnInit {
    @Output() public routeStyles: RouteStyle[] = [ RouteStyle.FeetFollow, RouteStyle.OpenFeet, RouteStyle.NoMatches ];
    @Output() public routeTypes: RouteType[] = [ RouteType.Boulder, RouteType.Route ];
    @Output() public difficulties: Map<number, string> = new Map<number, string>();
-   // @Output() public canSave: boolean = false;
 
-   @Input() public routeStyle: RouteStyle = RouteStyle.FeetFollow;
-   @Input() public angle: number = 40;
-   @Input() public name?: string;
-   @Input() public description?: string;
-   @Input() public routeType: RouteType = RouteType.Boulder;
-   @Input() public selectedDifficulty?: number;
 
-   constructor(private routeService: RouteService, private wallTemplateService: WallTemplateService, private formBuilder: FormBuilder) {
+   constructor(private routeService: RouteService, private wallTemplateService: WallTemplateService, private formBuilder: FormBuilder, private router: Router) {
      this.setDifficulty(routeService.boulderDifficulty);
+     this.formGroup = formBuilder.group({
+      routeType: [
+        "",
+        Validators.compose([
+          Validators.required
+        ])
+      ],
+      name: [
+        "",
+        Validators.compose([
+          Validators.required
+        ])
+      ],
+      description: [
+        "",
+        Validators.compose([
+        ])
+      ],
+      selectedDifficulty: [
+        "",
+        Validators.compose([
+          Validators.required
+        ])
+      ],
+      angle: [
+        "",
+        Validators.compose([
+          Validators.required
+        ])
+      ],
+      routeStyle: [
+        "",
+        Validators.compose([
+          Validators.required
+        ])
+      ]
+    }, { validators: this.selectHoldsValidator });
+   }
+
+   selectHoldsValidator: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
+      return this.holds.length > 1 ? null : { missingHolds: true };
    }
 
    async ngOnInit() {
@@ -43,33 +78,24 @@ export class AddRoutePage implements OnInit {
      this.wallTemplateService.drawTemplateBackdrop(canvas);
 
      this.template = await this.wallTemplateService.getTemplate();
+
+     let angle = this.template?.Angles[0];
      if (this.template?.Angles.length ?? 0 > 1) {
-       this.angle = this.template?.Angles[this.template.Angles.length / 2] ?? 40;
+      angle = this.template?.Angles[this.template.Angles.length / 2] ?? 40;
      }
 
      this.formGroup = this.formBuilder.group({
-       name: ["", Validators.required]
-     });
+       name: ["", Validators.required],
+       routeType: [RouteType.Boulder, Validators.required],
+       selectedDifficulty: ["", Validators.required],
+       angle: [angle, Validators.required],
+       routeStyle: [RouteStyle.FeetFollow, Validators.required]
+     }, { validators: this.selectHoldsValidator });
    }
 
-   async isSaveDisabled() {
-     console.log(this.name != undefined && this.name != '');
-     return this.name != undefined && this.name != '';
-   }
-
-   async onSave() {
-     console.log(
-       {
-         routeStyle: this.routeStyle,
-         angle: this.angle,
-         name: this.name,
-         description: this.description,
-         selectedDifficulty: this.selectedDifficulty,
-         routeType: this.routeType,
-         holds: this.holds
-
-       }
-     );
+   async onSubmit(formData: any) {
+      console.log(formData);
+      this.router.navigateByUrl('/routes', {replaceUrl: true });
    }
 
    async selectHold(hold: Hold) {
@@ -81,18 +107,13 @@ export class AddRoutePage implements OnInit {
    }
 
    async changeRouteType(event: any) {
-     this.routeType = event.detail.value;
+     const routeType = event.detail.value;
 
-     let temp = this.selectedDifficulty;
-     this.selectedDifficulty = undefined;
-
-     if (this.routeType === RouteType.Route) {
+     if (routeType === RouteType.Route) {
        this.setDifficulty(this.routeService.routeDifficulty);
-     } else if (this.routeType === RouteType.Boulder) {
+     } else if (routeType === RouteType.Boulder) {
        this.setDifficulty(this.routeService.boulderDifficulty);
      }
-
-     this.selectedDifficulty = temp;
    }
 
    async setDifficulty(source: Map<number, string>) {
@@ -149,6 +170,8 @@ export class AddRoutePage implements OnInit {
      const canvas: HTMLCanvasElement = this.canvas.nativeElement;
      await this.wallTemplateService.drawTemplateBackdrop(canvas);
      await this.wallTemplateService.markHolds(this.holds, this._selectedHold, canvas);
+     // force re-validation
+     this.formGroup.controls['routeStyle'].updateValueAndValidity();
    }
 
 }
