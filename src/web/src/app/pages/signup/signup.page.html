@@ -28,6 +28,9 @@
       <ion-input formControlName="username" type="email" label="Email"></ion-input>
       <ion-input formControlName="password" type="password" label="Password"></ion-input>
       <ion-input formControlName="confpassword" type="password" label="Confirm Password"></ion-input>
+      <div *ngIf="formGroup.hasError('mismatch') && (formGroup.get('confpassword')?.dirty || formGroup.get('confpassword')?.touched)">
+         Passwords do not match.
+       </div>
     </div>
   </form>
 

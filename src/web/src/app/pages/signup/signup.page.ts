@@ -29,14 +29,18 @@ export class SignupPage implements OnInit {
           Validators.pattern("[0-9a-z-A-Z@.#*$!?&+-/]*"),
           Validators.required
         ])],
-      confpassword: ['']
-    }, { validators: this.checkPasswords });
+      confpassword: ['',
+         Validators.compose([
+            Validators.minLength(4),
+            Validators.pattern("[0-9a-z-A-Z@.]*"),
+            Validators.required
+         ])
+      ]
+    }, { validators: this.confirmPasswordValidator });
   }
 
-  checkPasswords: ValidatorFn = (group: AbstractControl):  ValidationErrors | null => {
-    let pass = group.get('password')?.value;
-    let confirmPass = group.get('confpassword')?.value
-    return pass === confirmPass ? null : { notSame: true }
+  confirmPasswordValidator: ValidatorFn = (control: AbstractControl):  ValidationErrors | null => {
+   return control.value.password === control.value.confpassword ? null : { mismatch: true };
   }
 
   ngOnInit() {
