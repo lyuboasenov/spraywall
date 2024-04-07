@@ -21,10 +21,13 @@ ion-menu-button {
  #container a {
    text-decoration: none;
  }
-
+ #container #zoomContainer {
+  margin-right: 2em;
+}
  #container #zoomContainer pinch-zoom{
    height:50em;
  }
+
  #container #rating{
     float: right;
  }
