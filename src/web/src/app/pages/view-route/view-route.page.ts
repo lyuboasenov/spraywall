@@ -75,15 +75,18 @@ export class ViewRoutePage implements OnInit {
       const routeHeight = maxY - minY;
       const routeWidth = maxX - minX;
 
-      const initialScale = Math.min(maxWidth / zoomContainer.clientWidth, maxHeight / zoomContainer.clientHeight);
-      const scale = Math.min(maxWidth / routeWidth, maxHeight / routeHeight);
+      const initialScale = Math.max(maxWidth / zoomContainer.clientWidth, maxHeight / zoomContainer.clientHeight);
 
-      const routeCenter = { x: ( minX + routeWidth / 2) * scale * initialScale, y: ( minY + routeHeight / 2) * scale * initialScale };
-      const containerCenter = { x: zoomContainer.clientWidth / 2, y: zoomContainer.clientHeight / 2};
-
-      this.zoom.toggleZoom();
+      let scale = Math.min(maxWidth / routeWidth, maxHeight / routeHeight);
+      // todo set the scale as well
       //this.zoom.pinchZoom.scale = scale;
-      this.handlePan(this.zoom.pinchZoom, containerCenter, routeCenter);
+      this.zoom.toggleZoom();
+      scale = this.zoom.pinchZoom.scale;
+
+      let routeCenter = { x: ((minX + maxX) * scale) / (2 * initialScale), y: ((minY + maxY) * scale) / (2 * initialScale) };
+      const templateCenter = { x: ((maxWidth) * scale) / (2 * initialScale),y: ((routeHeight) * scale) / (2 * initialScale) }
+
+      this.handlePan(this.zoom.pinchZoom, routeCenter, templateCenter);
     }
   }
 
@@ -93,16 +96,23 @@ export class ViewRoutePage implements OnInit {
         return;
     }
 
-    const { clientX, clientY } = { clientX: start.x, clientY: start.y }
+    // if (!pinchZoom.eventType) {
+      pinchZoom.startX = start.x; // - pinchZoom.elementPosition.left;
+      pinchZoom.startY = start.y; // - pinchZoom.elementPosition.top;
+    // }
 
-    if (!pinchZoom.eventType) {
-      pinchZoom.startX = clientX; // - pinchZoom.elementPosition.left;
-      pinchZoom.startY = clientY; // - pinchZoom.elementPosition.top;
-    }
+    console.log({
+      start: start,
+      end: end,
+      move: {
+        x: end.x - start.x,
+        y: end.y - start.y
+      }
+    })
 
     pinchZoom.eventType = 'pan';
-    pinchZoom.moveX = pinchZoom.initialMoveX + (end.x - pinchZoom.startX);
-    pinchZoom.moveY = pinchZoom.initialMoveY + (end.y - pinchZoom.startY);
+    pinchZoom.moveX = pinchZoom.initialMoveX + (end.x - start.x);
+    pinchZoom.moveY = pinchZoom.initialMoveY + (end.y - start.y);
 
     if (pinchZoom.properties.limitPan) {
       pinchZoom.limitPanY();
@@ -114,6 +124,15 @@ export class ViewRoutePage implements OnInit {
     if (pinchZoom.scale > pinchZoom.minPanScale) {
       pinchZoom.centeringImage();
     }
+
+    console.log({
+      moveX: pinchZoom.moveX,
+      moveY: pinchZoom.moveY,
+      startX: pinchZoom.startX,
+      startY: pinchZoom.startY,
+      initialMoveX: pinchZoom.initialMoveX,
+      initialMoveY: pinchZoom.initialMoveY,
+    });
 
     pinchZoom.transformElement(0);
 };
