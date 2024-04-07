@@ -14,23 +14,23 @@ import { Router } from '@angular/router';
 })
 export class AddRoutePage implements OnInit {
 
-   @ViewChild('canvas', { static: true }) canvas!: ElementRef;
-   @ViewChild('zoom', { static: true }) zoom!: PinchZoomComponent;
+  @ViewChild('canvas', { static: true }) canvas!: ElementRef;
+  @ViewChild('zoom', { static: true }) zoom!: PinchZoomComponent;
 
-   formGroup!: FormGroup; // declare it here
+  formGroup!: FormGroup; // declare it here
 
-   public template: WallTemplate | null = null;
-   @Output() public holds: Hold[] = [];
-   private _selectedHold: Hold | null = null;
+  public template: WallTemplate | null = null;
+  @Output() public holds: Hold[] = [];
+  private _selectedHold: Hold | null = null;
 
-   @Output() public routeStyles: RouteStyle[] = [ RouteStyle.FeetFollow, RouteStyle.OpenFeet, RouteStyle.NoMatches ];
-   @Output() public routeTypes: RouteType[] = [ RouteType.Boulder, RouteType.Route ];
-   @Output() public difficulties: Map<number, string> = new Map<number, string>();
+  @Output() public routeStyles: RouteStyle[] = [RouteStyle.FeetFollow, RouteStyle.OpenFeet, RouteStyle.NoMatches];
+  @Output() public routeTypes: RouteType[] = [RouteType.Boulder, RouteType.Route];
+  @Output() public difficulties: Map<number, string> = new Map<number, string>();
 
 
-   constructor(private routeService: RouteService, private wallTemplateService: WallTemplateService, private formBuilder: FormBuilder, private router: Router) {
-     this.setDifficulty(routeService.boulderDifficulty);
-     this.formGroup = formBuilder.group({
+  constructor(private routeService: RouteService, private wallTemplateService: WallTemplateService, private formBuilder: FormBuilder, private router: Router) {
+    this.setDifficulty(routeService.boulderDifficulty);
+    this.formGroup = formBuilder.group({
       routeType: [
         "",
         Validators.compose([
@@ -48,7 +48,7 @@ export class AddRoutePage implements OnInit {
         Validators.compose([
         ])
       ],
-      selectedDifficulty: [
+      difficulty: [
         "",
         Validators.compose([
           Validators.required
@@ -67,110 +67,120 @@ export class AddRoutePage implements OnInit {
         ])
       ]
     }, { validators: this.selectHoldsValidator });
-   }
+  }
 
-   selectHoldsValidator: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
-      return this.holds.length > 1 ? null : { missingHolds: true };
-   }
+  selectHoldsValidator: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
+    return this.holds.length > 1 ? null : { missingHolds: true };
+  }
 
-   async ngOnInit() {
-     const canvas: HTMLCanvasElement = this.canvas.nativeElement;
-     this.wallTemplateService.drawTemplateBackdrop(canvas);
+  async ngOnInit() {
+    const canvas: HTMLCanvasElement = this.canvas.nativeElement;
+    this.wallTemplateService.drawTemplateBackdrop(canvas);
 
-     this.template = await this.wallTemplateService.getTemplate();
+    this.template = await this.wallTemplateService.getTemplate();
 
-     let angle = this.template?.Angles[0];
-     if (this.template?.Angles.length ?? 0 > 1) {
+    let angle = this.template?.Angles[0];
+    if (this.template?.Angles.length ?? 0 > 1) {
       angle = this.template?.Angles[this.template.Angles.length / 2] ?? 40;
-     }
+    }
 
-     this.formGroup = this.formBuilder.group({
-       name: ["", Validators.required],
-       routeType: [RouteType.Boulder, Validators.required],
-       selectedDifficulty: ["", Validators.required],
-       angle: [angle, Validators.required],
-       routeStyle: [RouteStyle.FeetFollow, Validators.required]
-     }, { validators: this.selectHoldsValidator });
-   }
+    this.formGroup = this.formBuilder.group({
+      name: ["", Validators.required],
+      description: ["", Validators.required],
+      routeType: [RouteType.Boulder, Validators.required],
+      difficulty: ["", Validators.required],
+      angle: [angle, Validators.required],
+      routeStyle: [RouteStyle.FeetFollow, Validators.required]
+    }, { validators: this.selectHoldsValidator });
+  }
 
-   async onSubmit(formData: any) {
-      this.router.navigateByUrl('/routes', {replaceUrl: true });
-   }
+  async onSubmit(formData: any) {
+    const routeId = await this.routeService.create(
+      formData.routeType,
+      formData.name,
+      formData.description,
+      formData.difficulty,
+      formData.angle,
+      formData.routeStyle,
+      this.holds);
 
-   async selectHold(hold: Hold) {
-     this._selectedHold = hold;
+    this.router.navigateByUrl('/routes/' + routeId, { replaceUrl: true });
+  }
 
-     const canvas: HTMLCanvasElement = this.canvas.nativeElement;
-     await this.wallTemplateService.drawTemplateBackdrop(canvas);
-     await this.wallTemplateService.markHolds(this.holds, this._selectedHold, canvas);
-   }
+  async selectHold(hold: Hold) {
+    this._selectedHold = hold;
 
-   async changeRouteType(event: any) {
-     const routeType = event.detail.value;
+    const canvas: HTMLCanvasElement = this.canvas.nativeElement;
+    await this.wallTemplateService.drawTemplateBackdrop(canvas);
+    await this.wallTemplateService.markHolds(this.holds, this._selectedHold, canvas);
+  }
 
-     if (routeType === RouteType.Route) {
-       this.setDifficulty(this.routeService.routeDifficulty);
-     } else if (routeType === RouteType.Boulder) {
-       this.setDifficulty(this.routeService.boulderDifficulty);
-     }
-   }
+  async changeRouteType(event: any) {
+    const routeType = event.detail.value;
 
-   async setDifficulty(source: Map<number, string>) {
-     this.difficulties.clear();
+    if (routeType === RouteType.Route) {
+      this.setDifficulty(this.routeService.routeDifficulty);
+    } else if (routeType === RouteType.Boulder) {
+      this.setDifficulty(this.routeService.boulderDifficulty);
+    }
+  }
 
-     for (let [key, value] of source) {
-       this.difficulties.set(key, value);
-     }
-   }
+  async setDifficulty(source: Map<number, string>) {
+    this.difficulties.clear();
 
-   async changeTypeStartingHold(hold: Hold) {
-     await this.changeType(hold, HoldType.StartingHold);
-   }
-   async changeTypeFinishingHold(hold: Hold) {
-     await this.changeType(hold, HoldType.FinishingHold);
-   }
-   async changeTypeFootHold(hold: Hold) {
-     await this.changeType(hold, HoldType.FootHold);
-   }
-   async changeTypeRegularHold(hold: Hold) {
-     await this.changeType(hold, HoldType.Hold);
-   }
-   async changeType(hold: Hold, type: HoldType) {
-     hold.Type = type;
+    for (let [key, value] of source) {
+      this.difficulties.set(key, value);
+    }
+  }
 
-     const canvas: HTMLCanvasElement = this.canvas.nativeElement;
-     await this.wallTemplateService.drawTemplateBackdrop(canvas);
-     await this.wallTemplateService.markHolds(this.holds, this._selectedHold, canvas);
-   }
+  async changeTypeStartingHold(hold: Hold) {
+    await this.changeType(hold, HoldType.StartingHold);
+  }
+  async changeTypeFinishingHold(hold: Hold) {
+    await this.changeType(hold, HoldType.FinishingHold);
+  }
+  async changeTypeFootHold(hold: Hold) {
+    await this.changeType(hold, HoldType.FootHold);
+  }
+  async changeTypeRegularHold(hold: Hold) {
+    await this.changeType(hold, HoldType.Hold);
+  }
+  async changeType(hold: Hold, type: HoldType) {
+    hold.Type = type;
 
-   async templateClick(event: any) {
-     const ratio = Math.min(this.wallTemplateService.width / event.target.offsetWidth, this.wallTemplateService.height / event.target.offsetHeight);
+    const canvas: HTMLCanvasElement = this.canvas.nativeElement;
+    await this.wallTemplateService.drawTemplateBackdrop(canvas);
+    await this.wallTemplateService.markHolds(this.holds, this._selectedHold, canvas);
+  }
 
-     const x = (event.layerX + (event.target.offsetWidth - event.target.parentElement.clientWidth) / 2) * ratio;
-     const y = (event.layerY + (event.target.offsetHeight - event.target.parentElement.clientHeight) / 2) * ratio
-     const hold = await this.wallTemplateService.findHold(x, y);
+  async templateClick(event: any) {
+    const ratio = Math.min(this.wallTemplateService.width / event.target.offsetWidth, this.wallTemplateService.height / event.target.offsetHeight);
 
-     if (hold) {
+    const x = (event.layerX + (event.target.offsetWidth - event.target.parentElement.clientWidth) / 2) * ratio;
+    const y = (event.layerY + (event.target.offsetHeight - event.target.parentElement.clientHeight) / 2) * ratio
+    const hold = await this.wallTemplateService.findHold(x, y);
 
-       if (this.holds.length == 0) {
-         hold.Type = HoldType.StartingHold;
-       } else {
-         hold.Type = HoldType.Hold;
-       }
+    if (hold) {
 
-       if (!this.holds.includes(hold)) {
-         this.holds.push(hold);
-       } else {
-         let index = this.holds.indexOf(hold);
-         this.holds.splice(index, 1);
-       }
-     }
+      if (this.holds.length == 0) {
+        hold.Type = HoldType.StartingHold;
+      } else {
+        hold.Type = HoldType.Hold;
+      }
 
-     const canvas: HTMLCanvasElement = this.canvas.nativeElement;
-     await this.wallTemplateService.drawTemplateBackdrop(canvas);
-     await this.wallTemplateService.markHolds(this.holds, this._selectedHold, canvas);
-     // force re-validation
-     this.formGroup.controls['routeStyle'].updateValueAndValidity();
-   }
+      if (!this.holds.includes(hold)) {
+        this.holds.push(hold);
+      } else {
+        let index = this.holds.indexOf(hold);
+        this.holds.splice(index, 1);
+      }
+    }
+
+    const canvas: HTMLCanvasElement = this.canvas.nativeElement;
+    await this.wallTemplateService.drawTemplateBackdrop(canvas);
+    await this.wallTemplateService.markHolds(this.holds, this._selectedHold, canvas);
+    // force re-validation
+    this.formGroup.controls['routeStyle'].updateValueAndValidity();
+  }
 
 }

@@ -41,7 +41,7 @@
          </ion-item>
 
          <ion-item>
-            <ion-select formControlName="selectedDifficulty" label="Difficulty" placeholder="Select route difficulty" interface="action-sheet" required="true">
+            <ion-select formControlName="difficulty" label="Difficulty" placeholder="Select route difficulty" interface="action-sheet" required="true">
             <ion-select-option *ngFor="let diff of difficulties | keyvalue" value="{{diff.key}}">{{diff.value}}</ion-select-option>
             </ion-select>
          </ion-item>
