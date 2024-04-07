@@ -16,6 +16,8 @@ export class AppwriteService {
     this.client
       .setEndpoint('https://cloud.appwrite.io/v1')
       .setProject('66105e1a8ea8410c3f42');
+
+    this.loadJWT();
   }
 
   async loadJWT() {
@@ -28,10 +30,11 @@ export class AppwriteService {
       await this.storageProxy.storage.set(TOKEN_KEY, token);
     }
 
-    this.client.setJWT(token);
+    // this.client.setJWT(token);
   }
 
   async destroy() {
+    console.log('AppwriteService.destroy')
     this.client = new Client();
     this.client
       .setEndpoint('https://cloud.appwrite.io/v1')

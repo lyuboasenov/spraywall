@@ -16,7 +16,7 @@ import { AlertController } from '@ionic/angular';
     const user = this.authService.user;
 
     if (!user.value) {
-      this.showAlert();
+      // this.showAlert();
       return false;
     } else {
       let role = user.value.role;
