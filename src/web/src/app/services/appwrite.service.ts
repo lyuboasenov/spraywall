@@ -9,6 +9,7 @@ const TOKEN_KEY = 'user-token';
 })
 export class AppwriteService {
   public client: Client;
+  public DatabaseId: string = '66106025b5416f00fcd8';
 
   constructor(private storageProxy: StorageProxyService) {
     this.client = new Client();
@@ -34,7 +35,6 @@ export class AppwriteService {
   }
 
   async destroy() {
-    console.log('AppwriteService.destroy')
     this.client = new Client();
     this.client
       .setEndpoint('https://cloud.appwrite.io/v1')

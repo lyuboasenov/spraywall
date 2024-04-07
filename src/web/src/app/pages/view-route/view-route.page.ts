@@ -101,15 +101,6 @@ export class ViewRoutePage implements OnInit {
       pinchZoom.startY = start.y; // - pinchZoom.elementPosition.top;
     // }
 
-    console.log({
-      start: start,
-      end: end,
-      move: {
-        x: end.x - start.x,
-        y: end.y - start.y
-      }
-    })
-
     pinchZoom.eventType = 'pan';
     pinchZoom.moveX = pinchZoom.initialMoveX + (end.x - start.x);
     pinchZoom.moveY = pinchZoom.initialMoveY + (end.y - start.y);
@@ -124,15 +115,6 @@ export class ViewRoutePage implements OnInit {
     if (pinchZoom.scale > pinchZoom.minPanScale) {
       pinchZoom.centeringImage();
     }
-
-    console.log({
-      moveX: pinchZoom.moveX,
-      moveY: pinchZoom.moveY,
-      startX: pinchZoom.startX,
-      startY: pinchZoom.startY,
-      initialMoveX: pinchZoom.initialMoveX,
-      initialMoveY: pinchZoom.initialMoveY,
-    });
 
     pinchZoom.transformElement(0);
 };

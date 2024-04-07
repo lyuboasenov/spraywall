@@ -47,10 +47,6 @@ export class ListRoutesPage implements OnInit {
      const arr = Array.from(this.difficulties.keys());
      this.minDifficulty = arr[0];
      this.maxDifficulty = arr[arr.length - 1];
-
-     console.log(arr[0]);
-     console.log(arr[arr.length - 1]);
-
    }
 
    onSelect(b: Route) {
@@ -66,8 +62,6 @@ export class ListRoutesPage implements OnInit {
     }
 
     close() {
-      console.log(this.minDifficulty);
-      console.log(this.maxDifficulty);
       // this.modal.dismiss(this.name, 'confirm');
       this.modal.dismiss('ok', 'close');
     }

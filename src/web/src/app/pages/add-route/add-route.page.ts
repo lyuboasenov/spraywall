@@ -94,7 +94,6 @@ export class AddRoutePage implements OnInit {
    }
 
    async onSubmit(formData: any) {
-      console.log(formData);
       this.router.navigateByUrl('/routes', {replaceUrl: true });
    }
 

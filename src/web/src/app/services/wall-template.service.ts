@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import { Hold, HoldType, RotatedRect, WallTemplate } from '../models/wall-template';
 import { environment } from 'src/environments/environment';
+import { Storage, Databases } from "appwrite";
+import { AppwriteService } from './appwrite.service';
 
 const TEMPLATE_REMOTE_URI: string = environment.api_base_uri + "template.json2024-04-04T19-44-35.json";
 const TEMPLATES_PATH: string = 'templates/template.json';
@@ -13,20 +15,35 @@ export class WallTemplateService {
   private _img = new Image;
   private _imgLoaded = false;
   private _templateLoaded = false;
+  private _db: Databases;
+
+  private _collectionId = '661264719e62da3812a6'; // Wall
+
   public width: number = 0;
   public height: number = 0;
 
-  constructor() {
+
+  constructor(private appwrite: AppwriteService) {
+    this._db = new Databases(appwrite.client);
+
     this._img.onload = (e: any) => {
       this.width = this._img.width;
       this.height = this._img.height;
       this._imgLoaded = true;
     }
+
+    this.getTemplate();
   }
 
   public async getTemplate() : Promise<WallTemplate | null> {
     if (!this._template) {
-      const data = await fetch(TEMPLATE_REMOTE_URI);
+      const wallTemplates = await this._db.listDocuments(this.appwrite.DatabaseId, this._collectionId);
+      const wallTemplateId = wallTemplates.documents[0].$id;
+
+      const wallTemplateData = await this._db.getDocument(this.appwrite.DatabaseId, this._collectionId, wallTemplateId);
+      const href = wallTemplateData['TemplateURL']
+
+      const data = await fetch(href);
       this._template = await data.json();
     }
 
