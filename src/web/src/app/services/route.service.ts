@@ -5,6 +5,7 @@ import { Hold } from '../models/wall-template';
 import { Databases, ID } from 'appwrite';
 import { AppwriteService } from './appwrite.service';
 import { AuthService } from './auth.service';
+import { h } from 'ionicons/dist/types/stencil-public-runtime';
 
 const ROUTES_REMOTE_URI: string = environment.api_base_uri + "boulders-5.json";
 
@@ -84,8 +85,42 @@ export class RouteService {
 
   public async getAll() : Promise<Route[]> {
     if (!this.routes) {
-      const data = await fetch(ROUTES_REMOTE_URI);
-      this.routes = await data.json();
+      let routeArray: Route[] = [];
+      const allRoutes = await this._db.listDocuments(this.appwrite.DatabaseId, this._routeCollectionId);
+
+      for(let r of allRoutes.documents) {
+        let holds: Hold[] = [];
+        for (let h of r['Holds']) {
+          holds.push({
+            Type: h.Type,
+            Center: h.Center,
+            MinRect: {
+              Center: h.Center,
+              Size: '',
+              Angle: 0
+            },
+            Contour: [],
+            Radius: 0
+          });
+        }
+
+        routeArray.push(
+          {
+            Id: r.$id,
+            Name: r['Name'],
+            Description: r['Description'],
+            Angle: r['Angle'],
+            Difficulty: r['Difficulty'],
+            Autor: r['CreatedByName'],
+            Holds: holds,
+            Style: r['Style'],
+            Type: r['Type'],
+            Rating: 5
+          }
+        );
+      }
+
+      this.routes = routeArray;
     }
 
     return this.routes ?? [];

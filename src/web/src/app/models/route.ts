@@ -20,5 +20,6 @@ export interface Route {
   Difficulty: string;
   Autor: string;
   Holds: Hold[];
-  RouteStyle: RouteStyle;
+  Style: RouteStyle;
+  Type: RouteType;
 }
