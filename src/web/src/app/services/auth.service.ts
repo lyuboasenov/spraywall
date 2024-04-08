@@ -32,7 +32,10 @@ export class AuthService {
 
   // Access the current user
   async getUser(): Promise<Models.User<Models.Preferences>> {
-    return this.account.get();
+    const user = this.account.get();
+    this.user.next(user);
+
+    return user;
   }
 
   async signup(email: string, password: string, name: string) {

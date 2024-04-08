@@ -8,7 +8,8 @@
           <ion-note *ngIf="user">hi {{user.name}}</ion-note>
 
           <ion-menu-toggle auto-hide="false" *ngFor="let p of appPages; let i = index">
-            <ion-item routerDirection="root" [routerLink]="[p.url]" lines="none" detail="false" routerLinkActive="selected">
+            <ion-item routerDirection="root" [routerLink]="[p.url]" lines="none" detail="false"
+              routerLinkActive="selected">
               <ion-icon aria-hidden="true" slot="start" [ios]="p.icon + '-outline'" [md]="p.icon + '-sharp'"></ion-icon>
               <ion-label>{{ p.title }}</ion-label>
             </ion-item>
@@ -24,22 +25,29 @@
           </ion-item>
         </ion-list>
 
-        <ion-list id="labels-list">
-         <ion-list-header>Profile</ion-list-header>
-
-         <ion-item lines="none" *ngIf="!user" [routerLink]="['/']">
+        <ion-list id="labels-list" *ngIf="!user">
+          <ion-item lines="none" [routerLink]="['/login']">
             <ion-icon name="log-in-outline" aria-hidden="true" slot="start"></ion-icon>
             <ion-label>Login</ion-label>
-         </ion-item>
-         <ion-item lines="none" *ngIf="user" [routerLink]="['/profile']" appDisableRole disableForRole="SERVICE_USER">
-            <ion-icon aria-hidden="true" slot="start" name="person-circle-outline"></ion-icon>
-            <ion-label>Profile</ion-label>
           </ion-item>
-         <ion-item lines="none" *ngIf="user" [routerLink]="['/logout']">
-            <ion-icon aria-hidden="true" slot="start" name="log-out-outline"></ion-icon>
-            <ion-label>Logout</ion-label>
-          </ion-item>
-       </ion-list>
+        </ion-list>
+
+        <ion-list id="labels-list" *ngIf="user">
+          <ion-list-header>USER</ion-list-header>
+          <ion-menu-toggle auto-hide="false">
+            <ion-item lines="none" *ngIf="user" [routerLink]="['/profile']" appDisableRole
+              disableForRole="SERVICE_USER" routerLinkActive="selected">
+              <ion-icon aria-hidden="true" slot="start" name="person-circle-outline"></ion-icon>
+              <ion-label>Profile</ion-label>
+            </ion-item>
+          </ion-menu-toggle>
+          <ion-menu-toggle auto-hide="false">
+            <ion-item lines="none" *ngIf="user" [routerLink]="['/logout']" routerLinkActive="selected">
+              <ion-icon aria-hidden="true" slot="start" name="log-out-outline"></ion-icon>
+              <ion-label>Logout</ion-label>
+            </ion-item>
+          </ion-menu-toggle>
+        </ion-list>
 
       </ion-content>
     </ion-menu>

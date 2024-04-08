@@ -26,7 +26,7 @@ export class ViewRouteSchemaPage implements OnInit {
   constructor(private routeService: RouteService, private wallTemplateService: WallTemplateService, private router: Router) { }
 
   async ngOnInit() {
-   this.id = this.activatedRoute.snapshot.paramMap.get('id') as string;
+    this.id = this.activatedRoute.snapshot.paramMap.get('id') as string;
     const route = await this.routeService.getById(this.id);
 
     const canvas: HTMLCanvasElement = this.canvas.nativeElement;
@@ -38,9 +38,8 @@ export class ViewRouteSchemaPage implements OnInit {
       await this.markHolds();
       setTimeout(() => this.zoomToRoute(), 100);
     } else {
-      //this.router.navigateByUrl('/not-found', { replaceUrl: true })
+      this.router.navigateByUrl('/not-found', { replaceUrl: true })
     }
-    console.log(1);
   }
 
 

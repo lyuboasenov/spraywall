@@ -103,6 +103,10 @@ export class RouteService {
             Radius: 0
           });
         }
+        let difficulty = this.boulderDifficulty.get(r['Difficulty']);
+        if (r['Type'] === RouteType.Route) {
+          difficulty = this.routeDifficulty.get(r['Difficulty']);
+        }
 
         routeArray.push(
           {
@@ -110,7 +114,7 @@ export class RouteService {
             Name: r['Name'],
             Description: r['Description'],
             Angle: r['Angle'],
-            Difficulty: r['Difficulty'],
+            Difficulty: difficulty ?? 'unknown',
             Autor: r['CreatedByName'],
             Holds: holds,
             Style: r['Style'],

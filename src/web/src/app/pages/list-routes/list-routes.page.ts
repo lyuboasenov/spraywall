@@ -5,6 +5,7 @@ import { IonModal } from '@ionic/angular';
 import { OverlayEventDetail } from '@ionic/core/components';
 import { WallTemplate } from 'src/app/models/wall-template';
 import { WallTemplateService } from 'src/app/services/wall-template.service';
+import { AuthService } from 'src/app/services/auth.service';
 
 @Component({
   selector: 'app-list-routes',
@@ -20,18 +21,22 @@ export class ListRoutesPage implements OnInit {
 
    @Input() public routeStyle!: RouteStyle;
    @Input() public routeType!: RouteType;
+   @Input() user: any | null = null;
+   @Input() public angle!: number;
    public minDifficulty!: number;
    public maxDifficulty!: number;
-   @Input() public angle!: number;
 
 
    public routes: Route[] = [];
    public selectedRoute?: Route;
    public template: WallTemplate | null = null;
 
-   constructor(private routeService: RouteService, private wallTemplateService: WallTemplateService) {
+   constructor(private routeService: RouteService, private wallTemplateService: WallTemplateService, private auth: AuthService) {
       this.routeService.getAll().then((routes: Route[]) => {
          this.routes = routes;
+      });
+      this.auth.user.subscribe(next => {
+        this.user = next;
       });
    }
    async ngOnInit() {
