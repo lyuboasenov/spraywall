@@ -11,6 +11,11 @@
       </ion-button>
     </ion-buttons>
       <ion-title>{{ route?.Name }} [ {{route?.Difficulty}} &#64; {{route?.Angle}}&deg; ] </ion-title>
+      <ion-buttons slot="start" >
+        <ion-button fill="solid" routerLink="/routes">
+          <ion-icon name="chevron-back-outline"></ion-icon>
+        </ion-button>
+      </ion-buttons>
    </ion-toolbar>
 </ion-header>
 

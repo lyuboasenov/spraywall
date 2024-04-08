@@ -1,16 +1,21 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-   <ion-buttons slot="primary">
-     <ion-button fill="solid" routerLink="details">
-       <ion-icon name="checkmark-outline"></ion-icon>
-     </ion-button>
-   </ion-buttons>
-   <ion-buttons slot="primary" >
-     <ion-button fill="solid" routerLink="..">
-      <ion-icon name="map-outline"></ion-icon>
-     </ion-button>
-   </ion-buttons>
-     <ion-title>{{ route?.Name }} [ {{route?.Difficulty}} &#64; {{route?.Angle}}&deg; ] </ion-title>
+    <ion-buttons slot="primary">
+      <ion-button fill="solid" routerLink="details">
+        <ion-icon name="checkmark-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-buttons slot="primary">
+      <ion-button fill="solid" routerLink="..">
+        <ion-icon name="map-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>{{ route?.Name }} [ {{route?.Difficulty}} &#64; {{route?.Angle}}&deg; ] </ion-title>
+    <ion-buttons slot="start">
+      <ion-button fill="solid" routerLink="/routes">
+        <ion-icon name="chevron-back-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
@@ -27,7 +32,7 @@
         <p>{{ route?.Description }}</p>
       </ion-item>
       <ion-item>
-        <p  class="item-header">BY</p>
+        <p class="item-header">BY</p>
         <p>{{ route?.Autor }}</p>
       </ion-item>
       <ion-item>
