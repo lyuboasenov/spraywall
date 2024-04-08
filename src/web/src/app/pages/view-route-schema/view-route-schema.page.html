@@ -1,8 +1,15 @@
 <ion-header [translucent]="true">
    <ion-toolbar>
-      <ion-buttons slot="start">
-         <ion-menu-button></ion-menu-button>
-      </ion-buttons>
+    <ion-buttons slot="primary">
+      <ion-button fill="solid" routerLink="details">
+        <ion-icon name="checkmark-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-buttons slot="primary" >
+      <ion-button fill="solid" routerLink="details">
+        <ion-icon name="information-circle-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
       <ion-title>{{ route?.Name }} [ {{route?.Difficulty}} &#64; {{route?.Angle}}&deg; ] </ion-title>
    </ion-toolbar>
 </ion-header>
@@ -16,19 +23,11 @@
 
   <div id="container">
    <div id="zoomContainer" #zoomContainer>
-      <pinch-zoom #zoom [limit-zoom]=20 [style.width]=schemaSize [style.height]=schemaSize>
+      <pinch-zoom id="zoom" #zoom [limit-zoom]=20>
          <canvas #canvas width="1500" height="700">
             Not supported on this browser
          </canvas>
       </pinch-zoom>
-   </div>
-   <div id="info">
-      <div id="rating">
-         <ion-icon *ngFor="let r of rating" name="star-outline"></ion-icon>
-      </div>
-
-      <p><span class="description">{{route?.Description}}</span></p>
-      <p><span class="author">by {{route?.Autor}}</span></p>
    </div>
 </div>
 </ion-content>
