@@ -1,6 +1,16 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>add-route-details</ion-title>
+   <ion-buttons slot="primary">
+     <ion-button fill="solid" routerLink="/routes">
+      <ion-icon name="close-circle-outline"></ion-icon>
+     </ion-button>
+   </ion-buttons>
+   <ion-buttons slot="primary" >
+     <ion-button fill="solid" routerLink="details" [disabled]="!formGroup.valid" form="form" type="submit">
+      <ion-icon name="save-outline"></ion-icon>
+     </ion-button>
+   </ion-buttons>
+     <ion-title>New route</ion-title>
   </ion-toolbar>
 </ion-header>
 
@@ -10,4 +20,42 @@
       <ion-title size="large">add-route-details</ion-title>
     </ion-toolbar>
   </ion-header>
+  <div id="container">
+    <strong class="capitalize"></strong>
+    <form id="form" [formGroup]="formGroup" (ngSubmit)="onSubmit(formGroup.value)">
+     <ion-list>
+        <ion-item>
+           <ion-select formControlName="routeType" (ionChange)="changeRouteType($event)" placeholder="Select route type" interface="action-sheet">
+           <ion-select-option *ngFor="let type of routeTypes" value="{{type}}">{{type}}</ion-select-option>
+           </ion-select>
+        </ion-item>
+
+        <ion-item>
+           <ion-input formControlName="name" label="Name" placeholder="Enter route name" required="true"></ion-input>
+        </ion-item>
+
+        <ion-item>
+           <ion-textarea formControlName="description" label="Description" placeholder="Enter route description"></ion-textarea>
+        </ion-item>
+
+        <ion-item>
+           <ion-select formControlName="difficulty" label="Difficulty" placeholder="Select route difficulty" interface="action-sheet" required="true">
+           <ion-select-option *ngFor="let diff of difficulties | keyvalue" value="{{diff.key}}">{{diff.value}}</ion-select-option>
+           </ion-select>
+        </ion-item>
+
+        <ion-item *ngIf="(template?.Angles?.length ?? 0) > 1">
+           <ion-select formControlName="angle" label="Angle" placeholder="Select board angle" interface="action-sheet" required="true">
+              <ion-select-option *ngFor="let deg of template?.Angles" value="{{deg}}">{{deg}}&deg;</ion-select-option>
+           </ion-select>
+        </ion-item>
+
+        <ion-item>
+           <ion-select formControlName="routeStyle" placeholder="Select route type" interface="action-sheet" required="true">
+              <ion-select-option *ngFor="let style of routeStyles" value="{{style}}">{{style}}</ion-select-option>
+           </ion-select>
+        </ion-item>
+     </ion-list>
+     </form>
+  </div>
 </ion-content>

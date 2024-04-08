@@ -49,7 +49,7 @@ const routes: Routes = [
     pathMatch: 'full'
   },
   {
-    path: 'routes/add/schema',
+    path: 'routes/add',
     loadChildren: () => import('./pages/add-route-schema/add-route-schema.module').then(m => m.AddRouteSchemaPageModule),
     canActivate: [AuthGuard],
     pathMatch: 'full'

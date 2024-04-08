@@ -1,6 +1,16 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>add-route-schema</ion-title>
+   <ion-buttons slot="primary">
+     <ion-button fill="solid" routerLink="/routes">
+      <ion-icon name="close-circle-outline"></ion-icon>
+     </ion-button>
+   </ion-buttons>
+   <ion-buttons slot="primary" >
+     <ion-button fill="solid" routerLink="details" [disabled]="holds.length > 1 ? false : true">
+      <ion-icon name="checkmark-outline"></ion-icon>
+     </ion-button>
+   </ion-buttons>
+     <ion-title>New route</ion-title>
   </ion-toolbar>
 </ion-header>
 
@@ -10,4 +20,11 @@
       <ion-title size="large">add-route-schema</ion-title>
     </ion-toolbar>
   </ion-header>
+  <div id="container">
+    <pinch-zoom id="zoom" #zoom [limit-zoom]=20>
+      <canvas #canvas width="1500" height="700" (click)="templateClick($event)">
+         Not supported on this browser
+      </canvas>
+   </pinch-zoom>
+  </div>
 </ion-content>

@@ -20,7 +20,7 @@
      <strong class="capitalize"></strong>
 
      <ion-list class="routes">
-       <ion-item *ngFor="let b of routes" [button]="true" [routerLink]="[ '/routes/' + b.Id ]">
+       <ion-item *ngFor="let b of routes" [button]="true" routerDirection="root" [routerLink]="[ '/routes/' + b.Id ]">
          <ion-label>{{b.Name}}</ion-label>
          <ion-note>{{b.Difficulty}} &#64; {{b.Angle}}&deg;</ion-note>
        </ion-item>
@@ -28,7 +28,7 @@
 
      <div class="fab-add" *ngIf="user">
       <ion-fab>
-        <ion-fab-button>
+        <ion-fab-button routerDirection="root" routerLink="/routes/add">
           <ion-icon name="add"></ion-icon>
         </ion-fab-button>
       </ion-fab>

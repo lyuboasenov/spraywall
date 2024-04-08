@@ -24,6 +24,7 @@ export class RouteService {
 
   public routeDifficulty: Map<number, string> = new Map<number, string>();
   public boulderDifficulty: Map<number, string> = new Map<number, string>();
+  public holdBuffer: Hold[] = [];
 
   constructor(private appwrite: AppwriteService, private auth: AuthService) {
     this.boulderDifficulty.set(20, "3");
@@ -83,8 +84,8 @@ export class RouteService {
     this._db = new Databases(this.appwrite.client);
   }
 
-  public async getAll() : Promise<Route[]> {
-    if (!this.routes) {
+  public async getAll(force: boolean = false) : Promise<Route[]> {
+    if (!this.routes || force) {
       let routeArray: Route[] = [];
       const allRoutes = await this._db.listDocuments(this.appwrite.DatabaseId, this._routeCollectionId);
 
