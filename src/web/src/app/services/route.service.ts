@@ -5,7 +5,6 @@ import { Hold } from '../models/wall-template';
 import { Databases, ID } from 'appwrite';
 import { AppwriteService } from './appwrite.service';
 import { AuthService } from './auth.service';
-import { h } from 'ionicons/dist/types/stencil-public-runtime';
 
 const ROUTES_REMOTE_URI: string = environment.api_base_uri + "boulders-5.json";
 
@@ -17,9 +16,6 @@ export class RouteService {
 
   private _db: Databases;
 
-
-  private _pointCollectionId = '661266d5049e132c5e15';
-  private _holdCollectionId = '661266673efa7698f1f5';
   private _routeCollectionId = '66126500b72562898ef7';
 
   public routeDifficulty: Map<number, string> = new Map<number, string>();
@@ -170,7 +166,9 @@ export class RouteService {
         CreatedByName: user.name,
         Holds: apiHolds,
         Type: type,
-        Style: routeStyle
+        Style: routeStyle,
+        FAById: user.$id,
+        FAByName: user.name
       }
     );
 
