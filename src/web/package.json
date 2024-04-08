@@ -30,7 +30,7 @@
     "@ionic/angular": "^7.0.0",
     "@ionic/storage": "^4.0.0",
     "@meddv/ngx-pinch-zoom": "^17.0.1",
-    "appwrite": "^14.0.0",
+    "appwrite": "13.0.2",
     "ionicons": "^7.0.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",

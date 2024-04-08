@@ -11,6 +11,22 @@ export enum RouteStyle {
   NoMatches = <any>"NoMatches"
 }
 
+export interface RouteFilter {
+  RouteType?: RouteType;
+  RouteStyle?: RouteStyle;
+  MinDifficulty?: number;
+  MaxDifficulty?: number;
+  Angle?: number;
+}
+
+export interface LightRoute {
+  Id: string;
+  Name: string;
+  Angle: number;
+  Difficulty: string;
+  Type: RouteType;
+}
+
 export interface Route {
   Id: string;
   Name: string;

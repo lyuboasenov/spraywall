@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { Route, RouteStyle, RouteType } from '../models/route';
+import { LightRoute, Route, RouteFilter, RouteStyle, RouteType } from '../models/route';
 import { Hold } from '../models/wall-template';
-import { Databases, ID } from 'appwrite';
+import { Databases, ID, Query } from 'appwrite';
 import { AppwriteService } from './appwrite.service';
 import { AuthService } from './auth.service';
 
@@ -9,15 +9,19 @@ import { AuthService } from './auth.service';
   providedIn: 'root'
 })
 export class RouteService {
-  private routes?: Route[];
-
   private _db: Databases;
-
   private _routeCollectionId = '66126500b72562898ef7';
 
   public routeDifficulty: Map<number, string> = new Map<number, string>();
   public boulderDifficulty: Map<number, string> = new Map<number, string>();
   public holdBuffer: Hold[] = [];
+  public filter: RouteFilter = {
+    RouteType: undefined,
+    RouteStyle: undefined,
+    MinDifficulty: undefined,
+    MaxDifficulty: undefined,
+    Angle: undefined,
+  };
 
   constructor(private appwrite: AppwriteService, private auth: AuthService) {
     this.boulderDifficulty.set(20, "3");
@@ -77,65 +81,93 @@ export class RouteService {
     this._db = new Databases(this.appwrite.client);
   }
 
-  public async getAll(force: boolean = false) : Promise<Route[]> {
-    if (!this.routes || force) {
-      let routeArray: Route[] = [];
-      const allRoutes = await this._db.listDocuments(this.appwrite.DatabaseId, this._routeCollectionId);
+  public async getAll() : Promise<LightRoute[]> {
+    let routeArray: LightRoute[] = [];
 
-      for(let r of allRoutes.documents) {
-        let holds: Hold[] = [];
-        for (let h of r['Holds']) {
-          holds.push({
-            Type: h.Type,
-            Center: h.Center,
-            MinRect: {
-              Center: h.Center,
-              Size: '',
-              Angle: 0
-            },
-            Contour: [],
-            Radius: 0
-          });
-        }
-        let difficulty = this.boulderDifficulty.get(r['Difficulty']);
-        if (r['Type'] === RouteType.Route) {
-          difficulty = this.routeDifficulty.get(r['Difficulty']);
-        }
+    let query = [];
+    query.push(
+      Query.select(["$id", "Name", "Difficulty", "Angle", "Type"])
+    );
 
-        routeArray.push(
-          {
-            Id: r.$id,
-            Name: r['Name'],
-            Description: r['Description'],
-            Angle: r['Angle'],
-            Difficulty: difficulty ?? 'unknown',
-            Autor: r['CreatedByName'],
-            Holds: holds,
-            Style: r['Style'],
-            Type: r['Type'],
-            Rating: 5
-          }
-        );
-      }
-
-      this.routes = routeArray;
+    if (this.filter.Angle) {
+      query.push(Query.equal("Angle", [this.filter.Angle]))
+    }
+    if (this.filter.RouteType) {
+      query.push(Query.equal("RouteType", [this.filter.RouteType]))
+    }
+    if (this.filter.RouteStyle) {
+      query.push(Query.equal("RouteStyle", [this.filter.RouteStyle]))
+    }
+    if (this.filter.MinDifficulty) {
+      query.push(Query.greaterThanEqual("Difficulty", Number(this.filter.MinDifficulty)))
+    }
+    if (this.filter.MaxDifficulty) {
+      query.push(Query.lessThanEqual("Difficulty", Number(this.filter.MaxDifficulty)))
     }
 
-    return this.routes ?? [];
+    const allRoutes = await this._db.listDocuments(
+      this.appwrite.DatabaseId,
+      this._routeCollectionId,
+      query);
+
+    for(let r of allRoutes.documents) {
+      let difficulty = this.boulderDifficulty.get(r['Difficulty']);
+      if (r['Type'] === RouteType.Route) {
+        difficulty = this.routeDifficulty.get(r['Difficulty']);
+      }
+
+      routeArray.push(
+        {
+          Id: r.$id,
+          Name: r['Name'],
+          Angle: r['Angle'],
+          Difficulty: difficulty ?? 'unknown',
+          Type: r['Type'],
+        }
+      );
+    }
+
+    return routeArray;
+
   }
 
   public async getById(id: string): Promise<Route | null> {
-    if (!this.routes) {
-      await this.getAll();
-    }
+    const route = await this._db.getDocument(
+      this.appwrite.DatabaseId,
+      this._routeCollectionId,
+      id);
 
-    for (const r of this.routes ?? []) {
-      if (r.Id === id) {
-        return r;
+      let holds: Hold[] = [];
+      for (let h of route['Holds']) {
+        holds.push({
+          Type: h.Type,
+          Center: h.Center,
+          MinRect: {
+            Center: h.Center,
+            Size: '',
+            Angle: 0
+          },
+          Contour: [],
+          Radius: 0
+        });
       }
-    }
+      let difficulty = this.boulderDifficulty.get(route['Difficulty']);
+      if (route['Type'] === RouteType.Route) {
+        difficulty = this.routeDifficulty.get(route['Difficulty']);
+      }
 
-    return null
+      return {
+          Id: route.$id,
+          Name: route['Name'],
+          Description: route['Description'],
+          Angle: route['Angle'],
+          Difficulty: difficulty ?? 'unknown',
+          Autor: route['CreatedByName'],
+          Holds: holds,
+          Style: route['Style'],
+          Type: route['Type'],
+          Rating: 5
+        }
   }
 
   public async create(type: RouteType, name: string, description: string, difficulty: number, angle: number, routeStyle: RouteStyle, holds: Hold[], interpolateAngles: number[] = []): Promise<string> {
@@ -172,10 +204,7 @@ export class RouteService {
     for(const interpolateAngle of interpolateAngles) {
 
       const angleDiff: number = interpolateAngle - angle;
-      let interpolatedDifficulty: number = +difficulty+angleDiff;
-
-      console.log(angleDiff);
-      console.log(interpolatedDifficulty);
+      let interpolatedDifficulty: number = Number(difficulty) + Number(angleDiff);
 
       if (angleDiff == 0) {
         continue;
@@ -183,20 +212,6 @@ export class RouteService {
 
       interpolatedDifficulty = Math.min(interpolatedDifficulty, 145);
       interpolatedDifficulty = Math.max(interpolatedDifficulty, 0);
-
-      console.log({
-        Name: name,
-        Description: description,
-        Angle: interpolateAngle,
-        Difficulty: interpolatedDifficulty,
-        CreatedById: user.$id,
-        CreatedByName: user.name,
-        Holds: apiHolds,
-        Type: type,
-        Style: routeStyle,
-        FAById: user.$id,
-        FAByName: user.name
-      });
 
       await this._db.createDocument(
         this.appwrite.DatabaseId,
