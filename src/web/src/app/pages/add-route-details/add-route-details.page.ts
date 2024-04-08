@@ -20,7 +20,6 @@ export class AddRouteDetailsPage implements OnInit {
   @Output() public routeTypes: RouteType[] = [RouteType.Boulder, RouteType.Route];
   @Output() public difficulties: Map<number, string> = new Map<number, string>();
 
-
   constructor(private routeService: RouteService, private wallTemplateService: WallTemplateService, private formBuilder: FormBuilder, private router: Router) {
     this.formGroup = formBuilder.group({
       name: ["", Validators.required],
