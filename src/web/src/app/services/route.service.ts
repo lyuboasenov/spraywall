@@ -1,12 +1,9 @@
 import { Injectable } from '@angular/core';
 import { Route, RouteStyle, RouteType } from '../models/route';
-import { environment } from 'src/environments/environment';
 import { Hold } from '../models/wall-template';
 import { Databases, ID } from 'appwrite';
 import { AppwriteService } from './appwrite.service';
 import { AuthService } from './auth.service';
-
-const ROUTES_REMOTE_URI: string = environment.api_base_uri + "boulders-5.json";
 
 @Injectable({
   providedIn: 'root'
@@ -141,7 +138,7 @@ export class RouteService {
     return null
   }
 
-  public async create(type: RouteType, name: string, description: string, difficulty: number, angle: number, routeStyle: RouteStyle, holds: Hold[]): Promise<string> {
+  public async create(type: RouteType, name: string, description: string, difficulty: number, angle: number, routeStyle: RouteStyle, holds: Hold[], interpolateAngles: number[] = []): Promise<string> {
 
     const user = await this.auth.getUser();
 
@@ -171,6 +168,55 @@ export class RouteService {
         FAByName: user.name
       }
     );
+
+    for(const interpolateAngle of interpolateAngles) {
+
+      const angleDiff: number = interpolateAngle - angle;
+      let interpolatedDifficulty: number = +difficulty+angleDiff;
+
+      console.log(angleDiff);
+      console.log(interpolatedDifficulty);
+
+      if (angleDiff == 0) {
+        continue;
+      }
+
+      interpolatedDifficulty = Math.min(interpolatedDifficulty, 145);
+      interpolatedDifficulty = Math.max(interpolatedDifficulty, 0);
+
+      console.log({
+        Name: name,
+        Description: description,
+        Angle: interpolateAngle,
+        Difficulty: interpolatedDifficulty,
+        CreatedById: user.$id,
+        CreatedByName: user.name,
+        Holds: apiHolds,
+        Type: type,
+        Style: routeStyle,
+        FAById: user.$id,
+        FAByName: user.name
+      });
+
+      await this._db.createDocument(
+        this.appwrite.DatabaseId,
+        this._routeCollectionId,
+        ID.unique(),
+        {
+          Name: name,
+          Description: description,
+          Angle: interpolateAngle,
+          Difficulty: interpolatedDifficulty,
+          CreatedById: user.$id,
+          CreatedByName: user.name,
+          Holds: apiHolds,
+          Type: type,
+          Style: routeStyle,
+          FAById: user.$id,
+          FAByName: user.name
+        }
+      );
+    }
 
     return route.$id;
   }

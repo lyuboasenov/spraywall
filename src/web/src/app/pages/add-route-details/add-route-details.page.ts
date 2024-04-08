@@ -1,6 +1,7 @@
 import { Component, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { AlertController } from '@ionic/angular';
 import { RouteStyle, RouteType } from 'src/app/models/route';
 import { WallTemplate } from 'src/app/models/wall-template';
 import { RouteService } from 'src/app/services/route.service';
@@ -20,7 +21,7 @@ export class AddRouteDetailsPage implements OnInit {
   @Output() public routeTypes: RouteType[] = [RouteType.Boulder, RouteType.Route];
   @Output() public difficulties: Map<number, string> = new Map<number, string>();
 
-  constructor(private routeService: RouteService, private wallTemplateService: WallTemplateService, private formBuilder: FormBuilder, private router: Router) {
+  constructor(private routeService: RouteService, private wallTemplateService: WallTemplateService, private formBuilder: FormBuilder, private router: Router, private alertController: AlertController) {
     this.formGroup = formBuilder.group({
       name: ["", Validators.required],
       description: ["", Validators.required],
@@ -53,6 +54,9 @@ export class AddRouteDetailsPage implements OnInit {
   }
 
   async onSubmit(formData: any) {
+
+    const interpolateAngles = this.template?.Angles ?? [];
+
     const routeId = await this.routeService.create(
       formData.routeType,
       formData.name,
@@ -60,7 +64,8 @@ export class AddRouteDetailsPage implements OnInit {
       formData.difficulty,
       formData.angle,
       formData.routeStyle,
-      this.routeService.holdBuffer);
+      this.routeService.holdBuffer,
+      interpolateAngles);
 
     await this.routeService.getAll(true);
 
@@ -84,5 +89,4 @@ export class AddRouteDetailsPage implements OnInit {
       this.setDifficulty(this.routeService.boulderDifficulty);
     }
   }
-
 }
