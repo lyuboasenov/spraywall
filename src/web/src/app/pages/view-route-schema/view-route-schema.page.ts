@@ -1,5 +1,6 @@
 import { Component, ElementRef, OnInit, ViewChild, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { LoadingController } from '@ionic/angular';
 import { PinchZoomComponent } from '@meddv/ngx-pinch-zoom';
 import { Route } from 'src/app/models/route';
 import { Hold } from 'src/app/models/wall-template';
@@ -12,6 +13,7 @@ import { WallTemplateService } from 'src/app/services/wall-template.service';
   styleUrls: ['./view-route-schema.page.scss'],
 })
 export class ViewRouteSchemaPage implements OnInit {
+  private loading: any | null;
 
   @ViewChild('canvas', { static: true }) canvas!: ElementRef;
   @ViewChild('zoom', { static: true }) zoom!: PinchZoomComponent;
@@ -23,9 +25,11 @@ export class ViewRouteSchemaPage implements OnInit {
    public route?: Route;
    public id!: string;
 
-  constructor(private routeService: RouteService, private wallTemplateService: WallTemplateService, private router: Router) { }
+  constructor(private routeService: RouteService, private wallTemplateService: WallTemplateService, private router: Router, private loadingCtrl: LoadingController) { }
 
   async ngOnInit() {
+    await this.showLoading();
+
     this.id = this.activatedRoute.snapshot.paramMap.get('id') as string;
     const route = await this.routeService.getById(this.id);
 
@@ -40,8 +44,17 @@ export class ViewRouteSchemaPage implements OnInit {
     } else {
       this.router.navigateByUrl('/not-found', { replaceUrl: true })
     }
+
+    this.loading.dismiss();
   }
 
+  async showLoading() {
+    this.loading = await this.loadingCtrl.create({
+      message: 'Loading routes...',
+    });
+
+    this.loading.present();
+  }
 
   async zoomToRoute() {
     if (this._discoveredHolds && this._discoveredHolds.length > 0) {

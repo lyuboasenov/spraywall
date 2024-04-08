@@ -1,7 +1,7 @@
 import { Component, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { RouteService } from '../../services/route.service';
 import { LightRoute, RouteStyle, RouteType } from '../../models/route';
-import { IonModal } from '@ionic/angular';
+import { IonModal, LoadingController } from '@ionic/angular';
 import { OverlayEventDetail } from '@ionic/core/components';
 import { WallTemplate } from 'src/app/models/wall-template';
 import { WallTemplateService } from 'src/app/services/wall-template.service';
@@ -13,6 +13,8 @@ import { AuthService } from 'src/app/services/auth.service';
   styleUrls: ['./list-routes.page.scss'],
 })
 export class ListRoutesPage implements OnInit {
+  private loading: any | null;
+
   @ViewChild(IonModal) modal!: IonModal;
 
   @Output() public routeStyles: RouteStyle[] = [RouteStyle.FeetFollow, RouteStyle.OpenFeet, RouteStyle.NoMatches];
@@ -31,16 +33,28 @@ export class ListRoutesPage implements OnInit {
   public selectedRoute?: LightRoute;
   public template: WallTemplate | null = null;
 
-  constructor(private routeService: RouteService, private wallTemplateService: WallTemplateService, private auth: AuthService) {
+  constructor(private routeService: RouteService, private wallTemplateService: WallTemplateService, private auth: AuthService, private loadingCtrl: LoadingController) {
     this.routeService.getAll().then((routes: LightRoute[]) => {
       this.routes = routes;
+      if (this.template && this.loading) {
+        this.loading.dismiss();
+      }
     });
+    this.wallTemplateService.getTemplate().then(t => {
+      this.template = t;
+
+      if (this.routes && this.loading) {
+        this.loading.dismiss();
+      }
+    });
+
     this.auth.user.subscribe(next => {
       this.user = next;
     });
   }
+
   async ngOnInit() {
-    this.template = await this.wallTemplateService.getTemplate();
+    await this.showLoading();
     this.difficulties.clear();
 
     for (let [key, value] of this.routeService.boulderDifficulty) {
@@ -54,6 +68,14 @@ export class ListRoutesPage implements OnInit {
     this.minDifficulty = this.routeService.filter.MinDifficulty;
     this.maxDifficulty = this.maxDifficulty;
     this.angle = this.routeService.filter.Angle;
+  }
+
+  async showLoading() {
+    this.loading = await this.loadingCtrl.create({
+      message: 'Loading routes...',
+    });
+
+    this.loading.present();
   }
 
   clear() {
