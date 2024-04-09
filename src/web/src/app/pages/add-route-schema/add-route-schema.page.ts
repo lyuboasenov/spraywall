@@ -1,7 +1,7 @@
 import { Component, ElementRef, OnInit, Output, ViewChild } from '@angular/core';
 import { LoadingController } from '@ionic/angular';
 import { PinchZoomComponent } from '@meddv/ngx-pinch-zoom';
-import { Hold, HoldType, WallTemplate } from 'src/app/models/wall-template';
+import { Hold, HoldType, WallTemplate } from 'src/app/models/wall-template/wall-template';
 import { RouteService } from 'src/app/services/route.service';
 import { WallTemplateService } from 'src/app/services/wall-template.service';
 

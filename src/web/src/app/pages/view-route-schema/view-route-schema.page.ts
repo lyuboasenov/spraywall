@@ -3,7 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { LoadingController } from '@ionic/angular';
 import { PinchZoomComponent } from '@meddv/ngx-pinch-zoom';
 import { Route } from 'src/app/models/route';
-import { Hold } from 'src/app/models/wall-template';
+import { Hold } from 'src/app/models/wall-template/wall-template';
 import { RouteService } from 'src/app/services/route.service';
 import { WallTemplateService } from 'src/app/services/wall-template.service';
 

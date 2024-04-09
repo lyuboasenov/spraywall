@@ -2,7 +2,7 @@ import { Component, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { RouteStyle, RouteType } from 'src/app/models/route';
-import { WallTemplate } from 'src/app/models/wall-template';
+import { WallTemplate } from 'src/app/models/wall-template/wall-template';
 import { RouteService } from 'src/app/services/route.service';
 import { WallTemplateService } from 'src/app/services/wall-template.service';
 

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { Hold, HoldType, RotatedRect, WallTemplate } from '../models/wall-template';
+import { Hold, HoldType, RotatedRect, WallTemplate } from '../models/wall-template/wall-template';
 import { environment } from 'src/environments/environment';
-import { Storage, Databases } from "appwrite";
+import { Databases } from "appwrite";
 import { AppwriteService } from './appwrite.service';
 
 const TEMPLATE_REMOTE_URI: string = environment.api_base_uri + "template.json2024-04-04T19-44-35.json";
@@ -43,8 +43,9 @@ export class WallTemplateService {
       const wallTemplateData = await this._db.getDocument(this.appwrite.DatabaseId, this._collectionId, wallTemplateId);
       const href = wallTemplateData['TemplateURL']
 
-      const data = await fetch('https://storage.googleapis.com/spraywall/balkan/template.json2024-04-09T09-30-14.json');
-      this._template = await data.json();
+      const data = await fetch('https://storage.googleapis.com/spraywall/balkan/template2024-04-09T11-27-30.json');
+      const rawTemplate = await data.json();
+
     }
 
     if (this._template?.EncodedImage) {

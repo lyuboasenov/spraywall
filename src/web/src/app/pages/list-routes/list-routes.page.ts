@@ -3,7 +3,7 @@ import { RouteService } from '../../services/route.service';
 import { LightRoute, RouteStyle, RouteType } from '../../models/route';
 import { IonModal, LoadingController } from '@ionic/angular';
 import { OverlayEventDetail } from '@ionic/core/components';
-import { WallTemplate } from 'src/app/models/wall-template';
+import { WallTemplate } from 'src/app/models/wall-template/wall-template';
 import { WallTemplateService } from 'src/app/services/wall-template.service';
 import { AuthService } from 'src/app/services/auth.service';
 

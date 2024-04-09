@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { LightRoute, Route, RouteFilter, RouteStyle, RouteType } from '../models/route';
-import { Hold } from '../models/wall-template';
+import { Hold } from '../models/wall-template/wall-template';
 import { Databases, ID, Query } from 'appwrite';
 import { AppwriteService } from './appwrite.service';
 import { AuthService } from './auth.service';

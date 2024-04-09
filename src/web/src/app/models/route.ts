@@ -1,4 +1,4 @@
-import { Hold } from "./wall-template";
+import { Hold } from "./wall-template/wall-template";
 
 export enum RouteType {
   Boulder = <any>"Boulder",
