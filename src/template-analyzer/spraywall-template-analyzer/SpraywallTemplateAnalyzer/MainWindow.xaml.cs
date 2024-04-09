@@ -129,23 +129,21 @@ namespace SpraywallTemplateAnalyzer {
       }
 
       private void btnExport_Click(object sender, RoutedEventArgs e) {
-         var result = new ExportTemplate();
+         string encodedImage = string.Empty;
+
          if (!string.IsNullOrEmpty(imgLocation) && File.Exists(imgLocation) && null != _selectableHolds) {
             var imgBytes = File.ReadAllBytes(imgLocation);
-            result.EncodedImage = Convert.ToBase64String(imgBytes);
-
-            result.Holds = _processor.FilteredHolds.
-               OrderBy(e => e.MinRect.Size.Width / 2 + e.MinRect.Center.X).
-               ThenBy(e => e.MinRect.Size.Height / 2 + e.MinRect.Center.Y).
-               ToArray();
+            encodedImage = Convert.ToBase64String(imgBytes);
          } else if (_importedTemplate != null) {
-            result.EncodedImage = _importedTemplate.EncodedImage;
+            encodedImage = _importedTemplate.EncodedImage;
+         }
 
-            result.Holds = _processor.FilteredHolds.
+         var result = TemplateExporter.Export(
+            encodedImage,
+            _processor.FilteredHolds.
                OrderBy(e => e.MinRect.Size.Width / 2 + e.MinRect.Center.X).
                ThenBy(e => e.MinRect.Size.Height / 2 + e.MinRect.Center.Y).
-               ToArray();
-         }
+               ToArray());
 
          var dialog = new Microsoft.Win32.SaveFileDialog();
          dialog.FileName = "template";             // Default file name

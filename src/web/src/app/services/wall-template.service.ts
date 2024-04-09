@@ -43,7 +43,7 @@ export class WallTemplateService {
       const wallTemplateData = await this._db.getDocument(this.appwrite.DatabaseId, this._collectionId, wallTemplateId);
       const href = wallTemplateData['TemplateURL']
 
-      const data = await fetch(href);
+      const data = await fetch('https://storage.googleapis.com/spraywall/balkan/template.json2024-04-09T09-30-14.json');
       this._template = await data.json();
     }
 
