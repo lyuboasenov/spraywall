@@ -152,14 +152,13 @@ namespace SpraywallTemplateAnalyzer {
 
          if (dialog.ShowDialog() ?? false) {
             var fi = new FileInfo(dialog.FileName);
-            var newName = fi.Name + DateTime.UtcNow.ToString("yyyy-MM-ddTHH-mm-ss") + fi.Extension;
+            var newName = fi.Name.Substring(0, fi.Name.LastIndexOf(".") + 1) + DateTime.UtcNow.ToString("yyyy-MM-ddTHH-mm-ss") + fi.Extension;
 
             File.WriteAllText(
                Path.Combine(fi.Directory.FullName, newName),
                JsonConvert.SerializeObject(
                   result,
-                  new SizeJsonConverter(),
-                  new PointJsonConverter()));
+                  new ExportHoldJsonConverter()));
          }
       }
 

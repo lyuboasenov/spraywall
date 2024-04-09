@@ -3,6 +3,9 @@ using Newtonsoft.Json;
 using System;
 using System.Drawing;
 using SpraywallTemplateAnalyzer.Models;
+using Emgu.CV.Structure;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace SpraywallTemplateAnalyzer.Serialization {
    public class ExportHoldJsonConverter : JsonConverter {
@@ -16,13 +19,29 @@ namespace SpraywallTemplateAnalyzer.Serialization {
             //{ "X", p.X },
             //{ "Y", p.Y }
          };
-         jo.WriteTo(writer);
+
+         JArray joArray = new JArray {
+            PointToArray(h.Center),
+            h.Radius,
+            RotatedRectToArray(h.MinRect),
+            PointsToArray(h.Contour)
+         };
+
+         joArray.WriteTo(writer);
       }
 
       public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer) {
-         JObject jo = JObject.Load(reader);
-         //return new ExportHold((int) jo["X"], (int) jo["Y"]);
-         return new ExportHold();
+         throw new NotSupportedException();
+      }
+
+      private JArray PointToArray(Point p) { return new JArray(p.X, p.Y); }
+      private JArray PointsToArray(IEnumerable<Point> p) { return new JArray(p.Select(PointToArray).ToArray()); }
+      private JArray RotatedRectToArray(RotatedRect r) { 
+         return new JArray(
+            new JArray((int)r.Center.X, (int)r.Center.Y),
+            new JArray((int) r.Size.Width, (int) r.Size.Height),
+            (int) r.Angle
+            ); 
       }
    }
 }
