@@ -1,4 +1,4 @@
 export enum RouteType {
-  Boulder = <any>"Boulder",
-  Route = <any>"Route"
+  Boulder = 0,
+  Route = 1
 }

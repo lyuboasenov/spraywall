@@ -1,6 +1,6 @@
 export enum RouteStyle {
-  FeetFollow = <any>"FeetFollow",
-  OpenFeet = <any>"OpenFeet",
-  NoMatches = <any>"NoMatches",
-  NoFeet = <any>"NoFeet"
+  FeetFollow = 0,
+  OpenFeet = 1,
+  NoMatches = 2,
+  NoFeet = 4
 }
