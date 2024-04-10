@@ -15,10 +15,12 @@ import { Hold } from '../models/route/hold';
 })
 export class RouteService {
   private _db: Databases;
-  private _routeCollectionId = '66126500b72562898ef7';
+  private _routeCollectionId = '6616dd90781920c2be2e';
 
   public routeDifficulty: Map<number, string> = new Map<number, string>();
   public boulderDifficulty: Map<number, string> = new Map<number, string>();
+  public routeStyles: Map<RouteStyle, string> = new Map<RouteStyle, string>();
+  public routeTypes: Map<RouteType, string> = new Map<RouteType, string>();
   public holdBuffer: RouteHold[] = [];
   public filter: RouteFilter = {
     RouteType: undefined,
@@ -27,8 +29,20 @@ export class RouteService {
     MaxDifficulty: undefined,
     Angle: undefined,
   };
+  public lastRouteType?: RouteType;
+  public lastRouteStyle?: RouteStyle;
+  public lastRouteDifficulty?: number;
+  public lastRouteAngle?: number;
 
   constructor(private appwrite: AppwriteService, private auth: AuthService) {
+    this.routeTypes.set(RouteType.Boulder, "Boulder");
+    this.routeTypes.set(RouteType.Route, "Route");
+
+    this.routeStyles.set(RouteStyle.FeetFollow, "Feet follow hands");
+    this.routeStyles.set(RouteStyle.OpenFeet, "Open feet");
+    this.routeStyles.set(RouteStyle.NoMatches, "No matching");
+    this.routeStyles.set(RouteStyle.NoFeet, "No feet / Campusing");
+
     this.boulderDifficulty.set(20, "3");
     this.boulderDifficulty.set(25, "4-");
     this.boulderDifficulty.set(30, "4");
@@ -93,6 +107,12 @@ export class RouteService {
     query.push(
       Query.select(["$id", "Name", "Difficulty", "Angle", "Type"])
     );
+    query.push(
+      Query.limit(100000)
+    );
+    query.push(
+      Query.orderAsc("Difficulty")
+    );
 
     if (this.filter.Angle) {
       query.push(Query.equal("Angle", [this.filter.Angle]))
@@ -143,10 +163,13 @@ export class RouteService {
       id);
 
       let holds: Hold[] = [];
-      for (let h of route['Holds']) {
+      for (let h of JSON.parse(route['JsonHolds'])) {
         holds.push({
-          Type: h.Type,
-          Center: h.Center,
+          Type: h[2],
+          Center: {
+            X: h[0][0],
+            Y: h[0][1],
+          },
         });
       }
       let difficulty = this.boulderDifficulty.get(route['Difficulty']);
@@ -168,16 +191,29 @@ export class RouteService {
         }
   }
 
-  public async create(type: RouteType, name: string, description: string, difficulty: number, angle: number, routeStyle: RouteStyle, holds: RouteHold[], interpolateAngles: number[] = []): Promise<string> {
+  public async create(
+    wallId: string,
+    type: RouteType,
+    name: string,
+    description: string,
+    difficulty: number,
+    angle: number,
+    routeStyle: RouteStyle,
+    holds: RouteHold[],
+    interpolateAngles: number[] = []): Promise<string> {
 
     const user = await this.auth.getUser();
 
     let apiHolds = [];
     for (let h of holds) {
-      apiHolds.push({
-        Type: h.Type,
-        Center: h.TemplateHold.Center
-      });
+      apiHolds.push([
+        [
+          h.TemplateHold.Center.X,
+          h.TemplateHold.Center.Y
+        ],
+        h.TemplateHold.Radius,
+        h.Type
+      ]);
     }
 
     const route = await this._db.createDocument(
@@ -191,11 +227,13 @@ export class RouteService {
         Difficulty: difficulty,
         CreatedById: user.$id,
         CreatedByName: user.name,
-        Holds: apiHolds,
         Type: type,
         Style: routeStyle,
         FAById: user.$id,
-        FAByName: user.name
+        FAByName: user.name,
+        JsonHolds: JSON.stringify(apiHolds),
+        SettersAngle: angle,
+        Wall: wallId
       }
     );
 
@@ -222,14 +260,20 @@ export class RouteService {
           Difficulty: interpolatedDifficulty,
           CreatedById: user.$id,
           CreatedByName: user.name,
-          Holds: apiHolds,
           Type: type,
           Style: routeStyle,
-          FAById: user.$id,
-          FAByName: user.name
+          JsonHolds: JSON.stringify(apiHolds),
+          SettersAngle: angle,
+          ParentId: route.$id,
+          Wall: wallId
         }
       );
     }
+
+    this.lastRouteAngle = angle;
+    this.lastRouteDifficulty = difficulty;
+    this.lastRouteStyle = routeStyle;
+    this.lastRouteType = type;
 
     return route.$id;
   }

@@ -51,15 +51,12 @@ export class WallTemplateService {
       const data = await fetch('https://storage.googleapis.com/spraywall/balkan/template.2024-04-10T04-07-30.json');
       const rawTemplate = await data.json();
 
-      console.log(rawTemplate);
-
       this._template = {
+        Id: wallTemplateId,
         EncodedImage: rawTemplate.EncodedImage,
         Holds: this.TransformHolds(rawTemplate.Holds),
         Angles: rawTemplate.Angles
       };
-
-      console.log(this._template);
     }
 
     if (this._template?.EncodedImage) {

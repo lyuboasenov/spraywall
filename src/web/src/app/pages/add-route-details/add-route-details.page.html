@@ -26,7 +26,7 @@
      <ion-list>
         <ion-item>
            <ion-select formControlName="routeType" (ionChange)="changeRouteType($event)" placeholder="Select route type" interface="action-sheet">
-           <ion-select-option *ngFor="let type of routeTypes" value="{{type}}">{{type}}</ion-select-option>
+           <ion-select-option *ngFor="let type of routeTypes | keyvalue" [value]="type.key">{{type.value}}</ion-select-option>
            </ion-select>
         </ion-item>
 
@@ -40,7 +40,7 @@
 
         <ion-item>
            <ion-select formControlName="difficulty" label="Difficulty" placeholder="Select route difficulty" interface="action-sheet" required="true">
-           <ion-select-option *ngFor="let diff of difficulties | keyvalue" value="{{diff.key}}">{{diff.value}}</ion-select-option>
+           <ion-select-option *ngFor="let diff of difficulties | keyvalue" [value]="diff.key">{{diff.value}}</ion-select-option>
            </ion-select>
         </ion-item>
 
@@ -52,7 +52,7 @@
 
         <ion-item>
            <ion-select formControlName="routeStyle" placeholder="Select route type" interface="action-sheet" required="true">
-              <ion-select-option *ngFor="let style of routeStyles" value="{{style}}">{{style}}</ion-select-option>
+              <ion-select-option *ngFor="let style of routeStyles | keyvalue" [value]="style.key">{{style.value}}</ion-select-option>
            </ion-select>
         </ion-item>
      </ion-list>

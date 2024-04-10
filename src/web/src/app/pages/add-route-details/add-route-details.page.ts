@@ -17,17 +17,22 @@ export class AddRouteDetailsPage implements OnInit {
   formGroup!: FormGroup; // declare it here
   public template: WallTemplate | null = null;
 
-  @Output() public routeStyles: RouteStyle[] = [RouteStyle.FeetFollow, RouteStyle.OpenFeet, RouteStyle.NoMatches, RouteStyle.NoFeet];
-  @Output() public routeTypes: RouteType[] = [RouteType.Boulder, RouteType.Route];
+  @Output() public routeStyles: Map<RouteStyle, string>;
+  @Output() public routeTypes: Map<RouteType, string>;
   @Output() public difficulties: Map<number, string> = new Map<number, string>();
 
   constructor(private routeService: RouteService, private wallTemplateService: WallTemplateService, private formBuilder: FormBuilder, private router: Router) {
+    this.routeTypes = this.routeService.routeTypes;
+
+    this.routeStyles = this.routeService.routeStyles;
+
     this.formGroup = formBuilder.group({
       name: ["", Validators.required],
       description: ["", Validators.required],
-      routeType: [RouteType.Boulder, Validators.required],
-      difficulty: ["", Validators.required],
-      routeStyle: [RouteStyle.FeetFollow, Validators.required]
+      routeType: [this.routeService.lastRouteType, Validators.required],
+      difficulty: [this.routeService.lastRouteDifficulty, Validators.required],
+      angle: [this.routeService.lastRouteAngle, Validators.required],
+      routeStyle: [this.routeService.lastRouteStyle, Validators.required]
     });
   }
 
@@ -46,10 +51,10 @@ export class AddRouteDetailsPage implements OnInit {
     this.formGroup = this.formBuilder.group({
       name: ["", Validators.required],
       description: ["", Validators.required],
-      routeType: [RouteType.Boulder, Validators.required],
-      difficulty: ["", Validators.required],
-      angle: [angle, Validators.required],
-      routeStyle: [RouteStyle.FeetFollow, Validators.required]
+      routeType: [this.routeService.lastRouteType, Validators.required],
+      difficulty: [this.routeService.lastRouteDifficulty, Validators.required],
+      angle: [this.routeService.lastRouteAngle, Validators.required],
+      routeStyle: [this.routeService.lastRouteStyle, Validators.required]
     });
   }
 
@@ -58,6 +63,7 @@ export class AddRouteDetailsPage implements OnInit {
     const interpolateAngles = this.template?.Angles ?? [];
 
     const routeId = await this.routeService.create(
+      this.template?.Id ?? 'missing',
       formData.routeType,
       formData.name,
       formData.description,
@@ -67,7 +73,7 @@ export class AddRouteDetailsPage implements OnInit {
       this.routeService.holdBuffer,
       interpolateAngles);
 
-    this.router.navigateByUrl('/routes/' + routeId, { replaceUrl: true });
+    await this.router.navigate(['/routes', { id: routeId  }]);
   }
 
   async setDifficulty(source: Map<number, string>) {
