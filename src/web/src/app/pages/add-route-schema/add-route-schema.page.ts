@@ -1,7 +1,9 @@
 import { Component, ElementRef, OnInit, Output, ViewChild } from '@angular/core';
 import { LoadingController } from '@ionic/angular';
 import { PinchZoomComponent } from '@meddv/ngx-pinch-zoom';
-import { Hold, HoldType, WallTemplate } from 'src/app/models/wall-template/wall-template';
+import { HoldType } from 'src/app/models/route/hold-type';
+import { RouteHold } from 'src/app/models/wall-template/route-hold';
+import { WallTemplate } from 'src/app/models/wall-template/wall-template';
 import { RouteService } from 'src/app/services/route.service';
 import { WallTemplateService } from 'src/app/services/wall-template.service';
 
@@ -17,8 +19,8 @@ export class AddRouteSchemaPage implements OnInit {
   @ViewChild('zoom', { static: true }) zoom!: PinchZoomComponent;
 
   public template: WallTemplate | null = null;
-  @Output() public holds: Hold[] = [];
-  private _selectedHold: Hold | null = null;
+  @Output() public holds: RouteHold[] = [];
+  private _selectedHold: RouteHold | null = null;
 
   constructor(private routeService: RouteService, private wallTemplateService: WallTemplateService, private loadingCtrl: LoadingController) { }
 
@@ -44,14 +46,6 @@ export class AddRouteSchemaPage implements OnInit {
     this.loading.present();
   }
 
-  async selectHold(hold: Hold) {
-    this._selectedHold = hold;
-
-    const canvas: HTMLCanvasElement = this.canvas.nativeElement;
-    await this.wallTemplateService.drawTemplateBackdrop(canvas);
-    await this.wallTemplateService.markHolds(this.holds, this._selectedHold, canvas);
-  }
-
   async templateClick(event: any) {
     const ratio = Math.min(this.wallTemplateService.width / event.target.offsetWidth, this.wallTemplateService.height / event.target.offsetHeight);
 
@@ -60,33 +54,40 @@ export class AddRouteSchemaPage implements OnInit {
     const hold = await this.wallTemplateService.findHold(x, y);
 
     if (hold) {
-      if (!this.holds.includes(hold)) {
-        if (this.holds.length == 0) {
-          hold.Type = HoldType.StartingHold;
-        } else {
-          hold.Type = HoldType.Hold;
+      let routeHold: RouteHold | undefined = undefined;
+      for (const h of this.holds) {
+        if (h.TemplateHold === hold) {
+          routeHold = h;
+          break;
         }
-        this.holds.push(hold);
-        this._selectedHold = hold;
+      }
+
+      if (!routeHold) {
+        const routeHold: RouteHold = {
+          Type: this.holds.length == 0 ? HoldType.StartingHold : HoldType.Hold,
+          TemplateHold: hold
+        };
+        this.holds.push(routeHold);
+        this._selectedHold = routeHold;
       } else {
         // every click on a hold advances the type
         // Starting->Hold->Finishing->Foot->REMOVE
 
-        if (hold.Type == HoldType.FootHold) {
-          hold.Type = HoldType.Hold;
+        if (routeHold.Type == HoldType.FootHold) {
+          routeHold.Type = HoldType.Hold;
 
-          let index = this.holds.indexOf(hold);
+          let index = this.holds.indexOf(routeHold);
           this.holds.splice(index, 1);
           this._selectedHold = null;
         } else {
-          if (hold.Type == HoldType.StartingHold) {
-            hold.Type = HoldType.Hold;
-          } else if (hold.Type == HoldType.Hold) {
-            hold.Type = HoldType.FinishingHold;
-          } else if (hold.Type == HoldType.FinishingHold) {
-            hold.Type = HoldType.FootHold;
+          if (routeHold.Type == HoldType.StartingHold) {
+            routeHold.Type = HoldType.Hold;
+          } else if (routeHold.Type == HoldType.Hold) {
+            routeHold.Type = HoldType.FinishingHold;
+          } else if (routeHold.Type == HoldType.FinishingHold) {
+            routeHold.Type = HoldType.FootHold;
           }
-          this._selectedHold = hold;
+          this._selectedHold = routeHold;
         }
       }
     }

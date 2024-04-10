@@ -1,9 +1,14 @@
 import { Injectable } from '@angular/core';
-import { LightRoute, Route, RouteFilter, RouteStyle, RouteType } from '../models/route';
-import { Hold } from '../models/wall-template/wall-template';
 import { Databases, ID, Query } from 'appwrite';
 import { AppwriteService } from './appwrite.service';
 import { AuthService } from './auth.service';
+import { RouteFilter } from '../models/route/route-filter';
+import { RouteSignature } from '../models/route/route-signature';
+import { RouteType } from '../models/route/route-type';
+import { Route } from '../models/route/route';
+import { RouteStyle } from '../models/route/route-style';
+import { RouteHold } from '../models/wall-template/route-hold';
+import { Hold } from '../models/route/hold';
 
 @Injectable({
   providedIn: 'root'
@@ -14,7 +19,7 @@ export class RouteService {
 
   public routeDifficulty: Map<number, string> = new Map<number, string>();
   public boulderDifficulty: Map<number, string> = new Map<number, string>();
-  public holdBuffer: Hold[] = [];
+  public holdBuffer: RouteHold[] = [];
   public filter: RouteFilter = {
     RouteType: undefined,
     RouteStyle: undefined,
@@ -81,8 +86,8 @@ export class RouteService {
     this._db = new Databases(this.appwrite.client);
   }
 
-  public async getAll() : Promise<LightRoute[]> {
-    let routeArray: LightRoute[] = [];
+  public async getAll() : Promise<RouteSignature[]> {
+    let routeArray: RouteSignature[] = [];
 
     let query = [];
     query.push(
@@ -142,13 +147,6 @@ export class RouteService {
         holds.push({
           Type: h.Type,
           Center: h.Center,
-          MinRect: {
-            Center: h.Center,
-            Size: '',
-            Angle: 0
-          },
-          Contour: [],
-          Radius: 0
         });
       }
       let difficulty = this.boulderDifficulty.get(route['Difficulty']);
@@ -170,7 +168,7 @@ export class RouteService {
         }
   }
 
-  public async create(type: RouteType, name: string, description: string, difficulty: number, angle: number, routeStyle: RouteStyle, holds: Hold[], interpolateAngles: number[] = []): Promise<string> {
+  public async create(type: RouteType, name: string, description: string, difficulty: number, angle: number, routeStyle: RouteStyle, holds: RouteHold[], interpolateAngles: number[] = []): Promise<string> {
 
     const user = await this.auth.getUser();
 
@@ -178,7 +176,7 @@ export class RouteService {
     for (let h of holds) {
       apiHolds.push({
         Type: h.Type,
-        Center: h.Center
+        Center: h.TemplateHold.Center
       });
     }
 

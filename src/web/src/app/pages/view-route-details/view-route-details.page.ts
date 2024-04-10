@@ -1,6 +1,6 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Route } from 'src/app/models/route';
+import { Route } from 'src/app/models/route/route';
 import { RouteService } from 'src/app/services/route.service';
 
 @Component({

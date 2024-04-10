@@ -1,8 +1,13 @@
 import { Injectable } from '@angular/core';
-import { Hold, HoldType, RotatedRect, WallTemplate } from '../models/wall-template/wall-template';
+import { WallTemplate } from '../models/wall-template/wall-template';
 import { environment } from 'src/environments/environment';
 import { Databases } from "appwrite";
 import { AppwriteService } from './appwrite.service';
+import { RouteHold } from '../models/wall-template/route-hold';
+import { HoldType } from '../models/route/hold-type';
+import { WallTemplateHold } from '../models/wall-template/wall-template-hold';
+import { RotatedRect } from '../models/common/rotated-rect';
+import { Point } from '../models/common/point';
 
 const TEMPLATE_REMOTE_URI: string = environment.api_base_uri + "template.json2024-04-04T19-44-35.json";
 const TEMPLATES_PATH: string = 'templates/template.json';
@@ -43,9 +48,18 @@ export class WallTemplateService {
       const wallTemplateData = await this._db.getDocument(this.appwrite.DatabaseId, this._collectionId, wallTemplateId);
       const href = wallTemplateData['TemplateURL']
 
-      const data = await fetch('https://storage.googleapis.com/spraywall/balkan/template2024-04-09T11-27-30.json');
+      const data = await fetch('https://storage.googleapis.com/spraywall/balkan/template.2024-04-10T04-07-30.json');
       const rawTemplate = await data.json();
 
+      console.log(rawTemplate);
+
+      this._template = {
+        EncodedImage: rawTemplate.EncodedImage,
+        Holds: this.TransformHolds(rawTemplate.Holds),
+        Angles: rawTemplate.Angles
+      };
+
+      console.log(this._template);
     }
 
     if (this._template?.EncodedImage) {
@@ -55,7 +69,7 @@ export class WallTemplateService {
     return this._template ?? null;
   }
 
-  public markHolds(holds: Hold[] | null, selectedHold: Hold | null, canvas: HTMLCanvasElement) {
+  public markHolds(holds: RouteHold[] | null, selectedHold: RouteHold | null, canvas: HTMLCanvasElement) {
     let ctx = canvas.getContext("2d");
     if (ctx && holds) {
       for (let i = 0; i < holds.length; i++) {
@@ -63,11 +77,11 @@ export class WallTemplateService {
 
         ctx.save();
         ctx.beginPath();
-        ctx.moveTo(r.Contour[0].X, r.Contour[0].Y);
-        for (let j = 1; j < r.Contour.length; j++) {
-          ctx.lineTo(r.Contour[j].X, r.Contour[j].Y);
+        ctx.moveTo(r.TemplateHold.Contour[0].X, r.TemplateHold.Contour[0].Y);
+        for (let j = 1; j < r.TemplateHold.Contour.length; j++) {
+          ctx.lineTo(r.TemplateHold.Contour[j].X, r.TemplateHold.Contour[j].Y);
         }
-        ctx.lineTo(r.Contour[0].X, r.Contour[0].Y);
+        ctx.lineTo(r.TemplateHold.Contour[0].X, r.TemplateHold.Contour[0].Y);
         ctx.closePath();
 
         ctx.clip();
@@ -76,7 +90,7 @@ export class WallTemplateService {
 
         ctx.save();
         ctx.beginPath();
-        ctx.arc(r.Center.X, r.Center.Y, r.Radius + 10, 0, Math.PI * 2, true); // Outer circle
+        ctx.arc(r.TemplateHold.Center.X, r.TemplateHold.Center.Y, r.TemplateHold.Radius + 10, 0, Math.PI * 2, true); // Outer circle
         ctx.closePath();
 
         ctx.lineWidth = 5;
@@ -95,7 +109,7 @@ export class WallTemplateService {
         if (r == selectedHold) {
           ctx.save();
         ctx.beginPath();
-        ctx.arc(r.Center.X, r.Center.Y, r.Radius + 20, 0, Math.PI * 2, true); // Outer circle
+        ctx.arc(r.TemplateHold.Center.X, r.TemplateHold.Center.Y, r.TemplateHold.Radius + 20, 0, Math.PI * 2, true); // Outer circle
         ctx.closePath();
 
         ctx.lineWidth = 5;
@@ -159,11 +173,11 @@ export class WallTemplateService {
     }
   }
 
-  public async findHold(x: number, y:number): Promise<Hold | null> {
+  public async findHold(x: number, y:number): Promise<WallTemplateHold | null> {
     if (this._template?.Holds) {
       let arr = this._template?.Holds;
 
-      let selectedHold: Hold | null = null;
+      let selectedHold: WallTemplateHold | null = null;
       let selectedHoldArea: number | null;
 
       arr.forEach(r => {
@@ -189,4 +203,46 @@ export class WallTemplateService {
       (r.Center.Y - r2 < y) &&
       (r.Center.Y + r2 > y);
   }
+
+  private TransformHolds(holdsArray: any[]): WallTemplateHold[] {
+    const result: WallTemplateHold[] = [];
+    for (const h of holdsArray) {
+
+      const center: Point = {
+        X: h[0][0],
+        Y: h[0][1]
+      };
+
+      const radius: number = h[1];
+
+      const minRect: RotatedRect = {
+        Center: {
+          X: h[2][0][0],
+          Y: h[2][0][1]
+        },
+        Size: {
+          Width: h[2][1][0],
+          Height: h[2][1][1]
+        },
+        Angle: h[2][2]
+      }
+
+      const contour: Point[] = [];
+      for (let i = 0; i < h[3].length; i++) {
+        contour.push({
+          X: h[3][i][0],
+          Y: h[3][i][1],
+        });
+      }
+
+      result.push({
+        Center: center,
+        MinRect: minRect,
+        Contour: contour,
+        Radius: radius,
+      });
+    }
+    return result;
+  }
 }
+

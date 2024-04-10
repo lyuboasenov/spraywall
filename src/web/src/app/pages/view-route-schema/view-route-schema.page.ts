@@ -2,8 +2,8 @@ import { Component, ElementRef, OnInit, ViewChild, inject } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router';
 import { LoadingController } from '@ionic/angular';
 import { PinchZoomComponent } from '@meddv/ngx-pinch-zoom';
-import { Route } from 'src/app/models/route';
-import { Hold } from 'src/app/models/wall-template/wall-template';
+import { Route } from 'src/app/models/route/route';
+import { RouteHold } from 'src/app/models/wall-template/route-hold';
 import { RouteService } from 'src/app/services/route.service';
 import { WallTemplateService } from 'src/app/services/wall-template.service';
 
@@ -20,7 +20,7 @@ export class ViewRouteSchemaPage implements OnInit {
   @ViewChild('zoomContainer', { static: true }) zoomContainer!: ElementRef;
 
   private activatedRoute = inject(ActivatedRoute);
-  private _discoveredHolds: Hold[] = [];
+  private _discoveredHolds: RouteHold[] = [];
 
    public route?: Route;
    public id!: string;
@@ -68,17 +68,17 @@ export class ViewRouteSchemaPage implements OnInit {
 
       for (const hold of this._discoveredHolds) {
         if (hold) {
-          if (minX > hold.Center.X - hold.Radius) {
-            minX = Math.max(0, hold.Center.X - hold.Radius);
+          if (minX > hold.TemplateHold.Center.X - hold.TemplateHold.Radius) {
+            minX = Math.max(0, hold.TemplateHold.Center.X - hold.TemplateHold.Radius);
           }
-          if (maxX < hold.Center.X + hold.Radius) {
-            maxX = Math.min(maxWidth, hold.Center.X + hold.Radius);
+          if (maxX < hold.TemplateHold.Center.X + hold.TemplateHold.Radius) {
+            maxX = Math.min(maxWidth, hold.TemplateHold.Center.X + hold.TemplateHold.Radius);
           }
-          if (minY > hold.Center.Y - hold.Radius) {
-            minY = Math.max(0, hold.Center.Y - hold.Radius);
+          if (minY > hold.TemplateHold.Center.Y - hold.TemplateHold.Radius) {
+            minY = Math.max(0, hold.TemplateHold.Center.Y - hold.TemplateHold.Radius);
           }
-          if (maxY < hold.Center.Y + hold.Radius) {
-            maxY = Math.min(maxHeight, hold.Center.Y + hold.Radius);
+          if (maxY < hold.TemplateHold.Center.Y + hold.TemplateHold.Radius) {
+            maxY = Math.min(maxHeight, hold.TemplateHold.Center.Y + hold.TemplateHold.Radius);
           }
         }
       }
@@ -134,10 +134,10 @@ export class ViewRouteSchemaPage implements OnInit {
     for (const h of this.route?.Holds ?? []) {
       const hold = await this.wallTemplateService.findHold(h.Center.X, h.Center.Y);
       if (hold) {
-        h.Contour = hold.Contour;
-        h.MinRect = hold.MinRect;
-        h.Radius = hold.Radius;
-        this._discoveredHolds.push(h);
+        this._discoveredHolds.push({
+          TemplateHold: hold,
+          Type: h.Type
+        });
       }
     }
 

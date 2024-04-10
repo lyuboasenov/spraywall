@@ -1,7 +1,8 @@
 import { Component, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { RouteStyle, RouteType } from 'src/app/models/route';
+import { RouteStyle } from 'src/app/models/route/route-style';
+import { RouteType } from 'src/app/models/route/route-type';
 import { WallTemplate } from 'src/app/models/wall-template/wall-template';
 import { RouteService } from 'src/app/services/route.service';
 import { WallTemplateService } from 'src/app/services/wall-template.service';
@@ -16,7 +17,7 @@ export class AddRouteDetailsPage implements OnInit {
   formGroup!: FormGroup; // declare it here
   public template: WallTemplate | null = null;
 
-  @Output() public routeStyles: RouteStyle[] = [RouteStyle.FeetFollow, RouteStyle.OpenFeet, RouteStyle.NoMatches];
+  @Output() public routeStyles: RouteStyle[] = [RouteStyle.FeetFollow, RouteStyle.OpenFeet, RouteStyle.NoMatches, RouteStyle.NoFeet];
   @Output() public routeTypes: RouteType[] = [RouteType.Boulder, RouteType.Route];
   @Output() public difficulties: Map<number, string> = new Map<number, string>();
 
