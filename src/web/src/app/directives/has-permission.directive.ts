@@ -13,8 +13,7 @@ export class HasPermissionDirective {
     private viewContainer: ViewContainerRef) { }
 
   async ngOnInit() {
-    const user = this.authService.getUser();
-    if (this.permissions && this.authService.hasPermission(this.permissions)) {
+    if (this.permissions && this.authService.user.value?.hasPermissions(this.permissions)) {
       this.viewContainer.createEmbeddedView(this.templateRef);
     } else {
       this.viewContainer.clear();

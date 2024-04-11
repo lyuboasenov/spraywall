@@ -34,11 +34,8 @@ export class LoginPage implements OnInit {
   }
 
   async ngOnInit() {
-    try {
-      const user = await this.auth.getUser();
+    if (this.auth.user.value) {
       this.router.navigateByUrl('/routes', { replaceUrl: true });
-    } catch (e) {
-      // silently continue
     }
   }
 

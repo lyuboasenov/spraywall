@@ -13,11 +13,9 @@ export class DisableRoleDirective {
     public element: ElementRef) { }
 
   async ngAfterViewInit() {
-    const user = await this.authService.getUser();
-
-    // if (!user || user.role == this.disableForRole) {
-    //   this.renderer.setStyle(this.element.nativeElement, 'pointer-events', 'none');
-    //   this.renderer.setStyle(this.element.nativeElement, 'opacity', 0.4);
-    // }
+    if (this.disableForRole && (!this.authService.user.value || this.authService.user.value.hasPermission(this.disableForRole))) {
+      this.renderer.setStyle(this.element.nativeElement, 'pointer-events', 'none');
+      this.renderer.setStyle(this.element.nativeElement, 'opacity', 0.4);
+    }
   }
 }

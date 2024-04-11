@@ -153,7 +153,6 @@ export class RouteService {
     }
 
     return routeArray;
-
   }
 
   public async getById(id: string): Promise<Route | null> {
@@ -202,7 +201,7 @@ export class RouteService {
     holds: RouteHold[],
     interpolateAngles: number[] = []): Promise<string> {
 
-    const user = await this.auth.getUser();
+    const user = await this.auth.user.value;
 
     let apiHolds = [];
     for (let h of holds) {
@@ -225,12 +224,12 @@ export class RouteService {
         Description: description,
         Angle: angle,
         Difficulty: difficulty,
-        CreatedById: user.$id,
-        CreatedByName: user.name,
+        CreatedById: user?.id,
+        CreatedByName: user?.name,
         Type: type,
         Style: routeStyle,
-        FAById: user.$id,
-        FAByName: user.name,
+        FAById: user?.id,
+        FAByName: user?.name,
         JsonHolds: JSON.stringify(apiHolds),
         SettersAngle: angle,
         Wall: wallId
@@ -258,8 +257,8 @@ export class RouteService {
           Description: description,
           Angle: interpolateAngle,
           Difficulty: interpolatedDifficulty,
-          CreatedById: user.$id,
-          CreatedByName: user.name,
+          CreatedById: user?.id,
+          CreatedByName: user?.name,
           Type: type,
           Style: routeStyle,
           JsonHolds: JSON.stringify(apiHolds),

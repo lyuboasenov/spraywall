@@ -19,9 +19,7 @@ import { AlertController } from '@ionic/angular';
       // this.showAlert();
       return false;
     } else {
-      let role = user.value.role;
-
-      if (!expectedRole || expectedRole == role) {
+      if (!expectedRole || user.value.hasPermission(expectedRole)) {
         return true;
       } else {
         this.showAlert();

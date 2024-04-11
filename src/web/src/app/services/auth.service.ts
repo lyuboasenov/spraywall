@@ -26,7 +26,7 @@ export class AuthService {
     const token = await this.storageProxy.storage.get(TOKEN_KEY);
 
     if (token) {
-      const user = await this.getUser();
+      // const user = await this.getUser();
       // this.user.next(user);
     }
  }
@@ -34,7 +34,6 @@ export class AuthService {
   // Access the current user
   private async _getUser(): Promise<Models.User<Models.Preferences>> {
     const user = this.account.get();
-    this.user.next(user);
 
     return user;
   }
