@@ -43,9 +43,9 @@
         <p class="item-header">STYLE</p>
         <p>{{ route?.Type }} / {{ route?.Style }}</p>
       </ion-item>
-      <ion-item>
-        <p class="item-header">SETTER&apos;S ANGLE</p>
-        <p>{{ route?.Angle }}&deg;</p>
+      <ion-item *ngIf="route?.SettersAngle != route?.Angle">
+        <p class="item-header">SETTER&apos;S</p>
+        <p>{{ route?.SettersDifficulty }} &#64; {{ route?.SettersAngle }}&deg;</p>
       </ion-item>
       <ion-item>
         <p class="item-header">RATING</p>

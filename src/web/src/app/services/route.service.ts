@@ -172,8 +172,10 @@ export class RouteService {
         });
       }
       let difficulty = this.boulderDifficulty.get(route['Difficulty']);
+      let settersdifficulty = this.boulderDifficulty.get(route['SettersDifficulty']);
       if (route['Type'] === RouteType.Route) {
         difficulty = this.routeDifficulty.get(route['Difficulty']);
+        settersdifficulty = this.routeDifficulty.get(route['SettersDifficulty']);
       }
 
       return {
@@ -182,10 +184,12 @@ export class RouteService {
           Description: route['Description'],
           Angle: route['Angle'],
           Difficulty: difficulty ?? 'unknown',
+          SettersAngle: route['SettersAngle'],
+          SettersDifficulty: settersdifficulty ?? 'unknown',
           Autor: route['CreatedByName'],
           Holds: holds,
-          Style: route['Style'],
-          Type: route['Type'],
+          Style: this.routeStyles.get(route['Style']) ?? 'Unknown',
+          Type: this.routeTypes.get(route['Type']) ?? 'Unknown',
           Rating: 5
         }
   }
@@ -232,6 +236,7 @@ export class RouteService {
         FAByName: user?.name,
         JsonHolds: JSON.stringify(apiHolds),
         SettersAngle: angle,
+        SettersDifficulty: difficulty,
         Wall: wallId
       }
     );
@@ -263,6 +268,7 @@ export class RouteService {
           Style: routeStyle,
           JsonHolds: JSON.stringify(apiHolds),
           SettersAngle: angle,
+          SettersDifficulty: difficulty,
           ParentId: route.$id,
           Wall: wallId
         }

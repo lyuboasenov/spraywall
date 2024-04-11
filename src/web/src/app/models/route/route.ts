@@ -1,6 +1,4 @@
 import { Hold } from "./hold";
-import { RouteStyle } from "./route-style";
-import { RouteType } from "./route-type";
 
 export interface Route {
   Id: string;
@@ -9,8 +7,10 @@ export interface Route {
   Angle: number;
   Rating: number;
   Difficulty: string;
+  SettersAngle: number;
+  SettersDifficulty: string;
   Autor: string;
   Holds: Hold[];
-  Style: RouteStyle;
-  Type: RouteType;
+  Style: string;
+  Type: string;
 }
