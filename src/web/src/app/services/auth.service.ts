@@ -4,6 +4,7 @@ import { AppwriteService } from './appwrite.service';
 import { Account, ID, Models } from 'appwrite';
 import { BehaviorSubject } from 'rxjs/internal/BehaviorSubject';
 import { StorageProxyService } from './storage-proxy.service';
+import { User } from '../models/user/user';
 
 
 const TOKEN_KEY = 'user-token';
@@ -13,11 +14,11 @@ const TOKEN_KEY = 'user-token';
 })
 export class AuthService {
   private account: Account;
-  public user : BehaviorSubject<any | null> = new BehaviorSubject<any | null>(null);
+  public user : BehaviorSubject<User | null> = new BehaviorSubject<User | null>(null);
 
   constructor(private router: Router, private appwrite: AppwriteService, private storageProxy: StorageProxyService) {
     this.account = new Account(appwrite.client);
-    this.loadUser();
+    // this.loadUser();
   }
 
   async loadUser() {
@@ -26,12 +27,12 @@ export class AuthService {
 
     if (token) {
       const user = await this.getUser();
-      this.user.next(user);
+      // this.user.next(user);
     }
  }
 
   // Access the current user
-  async getUser(): Promise<Models.User<Models.Preferences>> {
+  private async _getUser(): Promise<Models.User<Models.Preferences>> {
     const user = this.account.get();
     this.user.next(user);
 
@@ -43,11 +44,18 @@ export class AuthService {
     return await this.login(email, password);
   }
 
-  async login(email: string, password: string) {
-    await this.account.createEmailSession(email, password);
-    this.user.next(await this.getUser());
+  async login(email: string, password: string): Promise<User | null> {
+    try {
+      const session = await this.account.createEmailSession(email, password);
+      const apiUser = await this._getUser();
 
-    return this.user;
+      this.user.next(new User(apiUser));
+    } catch (e) {
+      this.user.next(null);
+      throw e;
+    }
+
+    return this.user.value;
   }
 
   // Remove all information of the previous user
