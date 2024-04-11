@@ -42,19 +42,20 @@ export class ListRoutesPage implements OnInit {
     this.routeStyles = this.routeService.routeStyles;
 
     this.routeService.getAll().then((routes: RouteSignature[]) => {
-      this.routes = routes;
-      if (this.template && this.loading) {
-        this.loading.dismiss();
-      }
-      console.log('routes loaded');
+      navigator.locks.request('dismiss-loading', async (lock) => {
+        this.routes = routes;
+        if (this.template && this.loading) {
+          this.loading.dismiss();
+        }
+      });
     });
     this.wallTemplateService.getTemplate().then(t => {
-      this.template = t;
-
-      if (this.routes && this.loading) {
-        this.loading.dismiss();
-      }
-      console.log('template loaded');
+      navigator.locks.request('dismiss-loading', async (lock) => {
+        this.template = t;
+        if (this.routes && this.loading) {
+          this.loading.dismiss();
+        }
+      });
     });
 
     this.auth.user.subscribe(next => {
@@ -81,11 +82,16 @@ export class ListRoutesPage implements OnInit {
   }
 
   async showLoading() {
-    this.loading = await this.loadingCtrl.create({
-      message: 'Loading routes...',
+    navigator.locks.request('dismiss-loading', async (lock) => {
+      if (!this.routes && !this.template){
+        this.loading = await this.loadingCtrl.create({
+          message: 'Loading routes...',
+        });
+
+        this.loading.present();
+      }
     });
 
-    this.loading.present();
   }
 
   clear() {
