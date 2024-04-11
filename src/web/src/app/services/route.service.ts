@@ -118,16 +118,19 @@ export class RouteService {
       query.push(Query.equal("Angle", [this.filter.Angle]))
     }
     if (this.filter.RouteType) {
-      query.push(Query.equal("RouteType", [this.filter.RouteType]))
+      query.push(Query.equal("Type", [this.filter.RouteType]))
     }
     if (this.filter.RouteStyle) {
-      query.push(Query.equal("RouteStyle", [this.filter.RouteStyle]))
+      query.push(Query.equal("Style", [this.filter.RouteStyle]))
     }
     if (this.filter.MinDifficulty) {
       query.push(Query.greaterThanEqual("Difficulty", Number(this.filter.MinDifficulty)))
     }
     if (this.filter.MaxDifficulty) {
       query.push(Query.lessThanEqual("Difficulty", Number(this.filter.MaxDifficulty)))
+    }
+    if (this.filter.SetBy) {
+      query.push(Query.search("CreatedByName", this.filter.SetBy))
     }
 
     const allRoutes = await this._db.listDocuments(

@@ -52,7 +52,7 @@
         <ion-list>
           <ion-item>
             <ion-select [(ngModel)]="routeType" placeholder="Select route type" interface="action-sheet">
-              <ion-select-option *ngFor="let type of routeTypes" value="{{type}}">{{type}}</ion-select-option>
+               <ion-select-option *ngFor="let type of routeTypes | keyvalue" [value]="type.key">{{type.value}}</ion-select-option>
             </ion-select>
           </ion-item>
 
@@ -82,8 +82,12 @@
           <ion-item>
             <ion-select [(ngModel)]="routeStyle" placeholder="Select route type" interface="action-sheet"
               required="true">
-              <ion-select-option *ngFor="let style of routeStyles" value="{{style}}">{{style}}</ion-select-option>
+              <ion-select-option *ngFor="let style of routeStyles | keyvalue" [value]="style.key">{{style.value}}</ion-select-option>
             </ion-select>
+          </ion-item>
+
+          <ion-item>
+            <ion-input [(ngModel)]="setBy" label="Set by" placeholder="Set by ..."></ion-input>
           </ion-item>
         </ion-list>
       </ion-content>

@@ -27,7 +27,7 @@
         <ion-item>
            <ion-select formControlName="routeType" (ionChange)="changeRouteType($event)" placeholder="Select route type" interface="action-sheet">
            <ion-select-option *ngFor="let type of routeTypes | keyvalue" [value]="type.key">{{type.value}}</ion-select-option>
-           </ion-select>
+         </ion-select>
         </ion-item>
 
         <ion-item>

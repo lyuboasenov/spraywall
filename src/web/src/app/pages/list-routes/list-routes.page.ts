@@ -19,8 +19,8 @@ export class ListRoutesPage implements OnInit {
 
   @ViewChild(IonModal) modal!: IonModal;
 
-  @Output() public routeStyles: RouteStyle[] = [RouteStyle.FeetFollow, RouteStyle.OpenFeet, RouteStyle.NoMatches, RouteStyle.NoFeet];
-  @Output() public routeTypes: RouteType[] = [RouteType.Boulder, RouteType.Route];
+  @Output() public routeStyles: Map<RouteStyle, string>;
+  @Output() public routeTypes: Map<RouteType, string>;
   @Output() public difficulties: Map<number, string> = new Map<number, string>();
 
   @Input() user: any | null = null;
@@ -30,17 +30,23 @@ export class ListRoutesPage implements OnInit {
   public angle?: number;
   public minDifficulty?: number;
   public maxDifficulty?: number;
+  public setBy?: string;
 
   public routes: RouteSignature[] = [];
   public selectedRoute?: RouteSignature;
   public template: WallTemplate | null = null;
 
   constructor(private routeService: RouteService, private wallTemplateService: WallTemplateService, private auth: AuthService, private loadingCtrl: LoadingController) {
+    this.routeTypes = this.routeService.routeTypes;
+
+    this.routeStyles = this.routeService.routeStyles;
+
     this.routeService.getAll().then((routes: RouteSignature[]) => {
       this.routes = routes;
       if (this.template && this.loading) {
         this.loading.dismiss();
       }
+      console.log('routes loaded');
     });
     this.wallTemplateService.getTemplate().then(t => {
       this.template = t;
@@ -48,6 +54,7 @@ export class ListRoutesPage implements OnInit {
       if (this.routes && this.loading) {
         this.loading.dismiss();
       }
+      console.log('template loaded');
     });
 
     this.auth.user.subscribe(next => {
@@ -70,6 +77,7 @@ export class ListRoutesPage implements OnInit {
     this.minDifficulty = this.routeService.filter.MinDifficulty;
     this.maxDifficulty = this.maxDifficulty;
     this.angle = this.routeService.filter.Angle;
+    this.setBy = this.routeService.filter.SetBy;
   }
 
   async showLoading() {
@@ -97,6 +105,7 @@ export class ListRoutesPage implements OnInit {
       this.routeService.filter.MinDifficulty = this.minDifficulty;
       this.routeService.filter.MaxDifficulty = this.maxDifficulty;
       this.routeService.filter.Angle = this.angle;
+      this.routeService.filter.SetBy = this.setBy;
 
       this.routes = await this.routeService.getAll();
     } else {
@@ -105,6 +114,7 @@ export class ListRoutesPage implements OnInit {
       this.routeService.filter.MinDifficulty = undefined;
       this.routeService.filter.MaxDifficulty = undefined;
       this.routeService.filter.Angle = undefined;
+      this.routeService.filter.SetBy = undefined;
 
       this.routes = await this.routeService.getAll();
     }

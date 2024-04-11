@@ -7,4 +7,5 @@ export interface RouteFilter {
   MinDifficulty?: number;
   MaxDifficulty?: number;
   Angle?: number;
+  SetBy?: string;
 }
