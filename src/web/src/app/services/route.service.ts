@@ -10,6 +10,7 @@ import { RouteStyle } from '../models/route/route-style';
 import { RouteHold } from '../models/wall-template/route-hold';
 import { Hold } from '../models/route/hold';
 import { Send } from '../models/route/send';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -17,8 +18,8 @@ import { Send } from '../models/route/send';
 export class RouteService {
 
   private _db: Databases;
-  private _routeCollectionId = '6616dd90781920c2be2e';
-  private _logCollectionId = '6618a89ae13d2ab63b99';
+  private _routeCollectionId = environment.AppWrite.Collections.Routes;
+  private _logCollectionId = environment.AppWrite.Collections.Logs;
 
   public routeDifficulty: Map<number, string> = new Map<number, string>();
   public boulderDifficulty: Map<number, string> = new Map<number, string>();

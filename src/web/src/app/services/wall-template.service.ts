@@ -9,9 +9,6 @@ import { WallTemplateHold } from '../models/wall-template/wall-template-hold';
 import { RotatedRect } from '../models/common/rotated-rect';
 import { Point } from '../models/common/point';
 
-const TEMPLATE_REMOTE_URI: string = environment.api_base_uri + "template.json2024-04-04T19-44-35.json";
-const TEMPLATES_PATH: string = 'templates/template.json';
-
 @Injectable({
   providedIn: 'root'
 })
@@ -22,7 +19,7 @@ export class WallTemplateService {
   private _templateLoaded = false;
   private _db: Databases;
 
-  private _collectionId = '661264719e62da3812a6'; // Wall
+  private _collectionId = environment.AppWrite.Collections.WallTemplates; // Wall
 
   public width: number = 0;
   public height: number = 0;
@@ -48,7 +45,7 @@ export class WallTemplateService {
       const wallTemplateData = await this._db.getDocument(this.appwrite.DatabaseId, this._collectionId, wallTemplateId);
       const href = wallTemplateData['TemplateURL']
 
-      const data = await fetch('https://storage.googleapis.com/spraywall/balkan/template.2024-04-10T04-07-30.json');
+      const data = await fetch(href);
       const rawTemplate = await data.json();
 
       this._template = {

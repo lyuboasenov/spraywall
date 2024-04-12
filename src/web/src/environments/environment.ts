@@ -4,8 +4,16 @@
 
 export const environment = {
   production: false,
-  app_icon: "http://balkanclimbing.com/themes/custom/css/images/logo.svg",
-  api_base_uri: "https://storage.googleapis.com/spraywall/balkan/"
+  AppWrite: {
+    Endpoint: 'https://cloud.appwrite.io/v1',
+    ProjectId: '66105e1a8ea8410c3f42',
+    DatabaseId: '66106025b5416f00fcd8',
+    Collections: {
+      WallTemplates: '661264719e62da3812a6',
+      Routes: '6616dd90781920c2be2e',
+      Logs: '6618a89ae13d2ab63b99',
+    }
+  }
 };
 
 /*

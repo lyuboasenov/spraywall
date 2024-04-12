@@ -22,13 +22,6 @@ export class AuthService {
   }
 
   async loadUser() {
-    // Normally load e.g. JWT at this point
-    // const token = await this.storageProxy.storage.get(TOKEN_KEY);
-
-    // if (token) {
-    //   // const user = await this.getUser();
-    //   // this.user.next(user);
-    // }
     try {
       const apiUser = await this._getUser();
 
