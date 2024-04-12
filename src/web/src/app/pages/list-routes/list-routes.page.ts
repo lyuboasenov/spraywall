@@ -31,6 +31,7 @@ export class ListRoutesPage implements OnInit {
   public minDifficulty?: number;
   public maxDifficulty?: number;
   public setBy?: string;
+  public excludeMyAscends?: boolean;
 
   public routes: RouteSignature[] = [];
   public selectedRoute?: RouteSignature;
@@ -79,6 +80,7 @@ export class ListRoutesPage implements OnInit {
     this.maxDifficulty = this.maxDifficulty;
     this.angle = this.routeService.filter.Angle;
     this.setBy = this.routeService.filter.SetBy;
+    this.excludeMyAscends = this.routeService.filter.ExcludeMyAscends;
   }
 
   async showLoading() {
@@ -112,6 +114,7 @@ export class ListRoutesPage implements OnInit {
       this.routeService.filter.MaxDifficulty = this.maxDifficulty;
       this.routeService.filter.Angle = this.angle;
       this.routeService.filter.SetBy = this.setBy;
+      this.routeService.filter.ExcludeMyAscends = this.excludeMyAscends;
 
       this.routes = await this.routeService.getAll();
     } else {
@@ -121,6 +124,7 @@ export class ListRoutesPage implements OnInit {
       this.routeService.filter.MaxDifficulty = undefined;
       this.routeService.filter.Angle = undefined;
       this.routeService.filter.SetBy = undefined;
+      this.routeService.filter.ExcludeMyAscends = undefined;
 
       this.routes = await this.routeService.getAll();
     }

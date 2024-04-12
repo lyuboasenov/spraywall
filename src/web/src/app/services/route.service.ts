@@ -32,6 +32,7 @@ export class RouteService {
     MinDifficulty: undefined,
     MaxDifficulty: undefined,
     Angle: undefined,
+    ExcludeMyAscends: undefined,
   };
   public lastRouteType?: RouteType;
   public lastRouteStyle?: RouteStyle;
@@ -142,7 +143,26 @@ export class RouteService {
       this._routeCollectionId,
       query);
 
+    let sentRouteIds: string[] = [];
+    if (this.filter.ExcludeMyAscends) {
+      const sends = await this._db.listDocuments(
+        this.appwrite.DatabaseId,
+        this._logCollectionId,
+        [
+          Query.select(["Route.$id"]),
+          Query.equal("CreatedById", this.auth.user.value?.id ?? 'invalid-user-id')
+        ]);
+
+      sentRouteIds = sends.documents.map(function (doc) {
+        return doc['Route'].$id
+      });
+    }
+
     for (let r of allRoutes.documents) {
+      if (this.filter.ExcludeMyAscends && sentRouteIds.includes(r.$id)) {
+        continue;
+      }
+
       let difficulty = this.boulderDifficulty.get(r['Difficulty']);
       if (r['Type'] === RouteType.Route) {
         difficulty = this.routeDifficulty.get(r['Difficulty']);

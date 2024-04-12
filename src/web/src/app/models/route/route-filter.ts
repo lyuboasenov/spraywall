@@ -8,4 +8,5 @@ export interface RouteFilter {
   MaxDifficulty?: number;
   Angle?: number;
   SetBy?: string;
+  ExcludeMyAscends?: boolean;
 }
