@@ -65,7 +65,7 @@
           <ion-item>
             <ion-select [(ngModel)]="rating" label="Rating" placeholder="Select route rating" interface="action-sheet"
               required="true">
-              <ion-select-option *ngFor="let r of [].constructor(5); let i = index" value="{{i}}">{{i}}</ion-select-option>
+              <ion-select-option *ngFor="let r of [].constructor(5); let i = index" value="{{i}}">{{i + 1}}</ion-select-option>
             </ion-select>
           </ion-item>
 

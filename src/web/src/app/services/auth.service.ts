@@ -18,16 +18,23 @@ export class AuthService {
 
   constructor(private router: Router, private appwrite: AppwriteService, private storageProxy: StorageProxyService) {
     this.account = new Account(appwrite.client);
-    // this.loadUser();
+    this.loadUser();
   }
 
   async loadUser() {
     // Normally load e.g. JWT at this point
-    const token = await this.storageProxy.storage.get(TOKEN_KEY);
+    // const token = await this.storageProxy.storage.get(TOKEN_KEY);
 
-    if (token) {
-      // const user = await this.getUser();
-      // this.user.next(user);
+    // if (token) {
+    //   // const user = await this.getUser();
+    //   // this.user.next(user);
+    // }
+    try {
+      const apiUser = await this._getUser();
+
+      this.user.next(new User(apiUser));
+    } catch (e) {
+      // silently continue
     }
  }
 

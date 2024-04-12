@@ -102,7 +102,7 @@ export class RouteService {
     this._db = new Databases(this.appwrite.client);
   }
 
-  public async getAll() : Promise<RouteSignature[]> {
+  public async getAll(): Promise<RouteSignature[]> {
     let routeArray: RouteSignature[] = [];
 
     let query = [];
@@ -140,7 +140,7 @@ export class RouteService {
       this._routeCollectionId,
       query);
 
-    for(let r of allRoutes.documents) {
+    for (let r of allRoutes.documents) {
       let difficulty = this.boulderDifficulty.get(r['Difficulty']);
       if (r['Type'] === RouteType.Route) {
         difficulty = this.routeDifficulty.get(r['Difficulty']);
@@ -166,39 +166,50 @@ export class RouteService {
       this._routeCollectionId,
       id);
 
-      let holds: Hold[] = [];
-      for (let h of JSON.parse(route['JsonHolds'])) {
-        holds.push({
-          Type: h[2],
-          Center: {
-            X: h[0][0],
-            Y: h[0][1],
-          },
-        });
-      }
-      let difficulty = this.boulderDifficulty.get(route['Difficulty']);
-      let settersdifficulty = this.boulderDifficulty.get(route['SettersDifficulty']);
-      if (route['Type'] === RouteType.Route) {
-        difficulty = this.routeDifficulty.get(route['Difficulty']);
-        settersdifficulty = this.routeDifficulty.get(route['SettersDifficulty']);
-      }
+    const sends = await this._db.listDocuments(
+      this.appwrite.DatabaseId,
+      this._logCollectionId,
+      [
+        Query.equal("Route", [route.$id]),
+        Query.orderAsc("$createdAt")
+      ]
+    );
 
-      return {
-          Id: route.$id,
-          Name: route['Name'],
-          Description: route['Description'],
-          Angle: route['Angle'],
-          Difficulty: difficulty ?? 'unknown',
-          DifficultyNumber: route['Difficulty'],
-          SettersAngle: route['SettersAngle'],
-          SettersDifficulty: settersdifficulty ?? 'unknown',
-          Autor: route['CreatedByName'],
-          Holds: holds,
-          Style: this.routeStyles.get(route['Style']) ?? 'Unknown',
-          Type: this.routeTypes.get(route['Type']) ?? 'Unknown',
-          RouteType: route['Type'],
-          Rating: 5
-        }
+    console.log(sends);
+
+    let holds: Hold[] = [];
+    for (let h of JSON.parse(route['JsonHolds'])) {
+      holds.push({
+        Type: h[2],
+        Center: {
+          X: h[0][0],
+          Y: h[0][1],
+        },
+      });
+    }
+    let difficulty = this.boulderDifficulty.get(route['Difficulty']);
+    let settersdifficulty = this.boulderDifficulty.get(route['SettersDifficulty']);
+    if (route['Type'] === RouteType.Route) {
+      difficulty = this.routeDifficulty.get(route['Difficulty']);
+      settersdifficulty = this.routeDifficulty.get(route['SettersDifficulty']);
+    }
+
+    return {
+      Id: route.$id,
+      Name: route['Name'],
+      Description: route['Description'],
+      Angle: route['Angle'],
+      Difficulty: difficulty ?? 'unknown',
+      DifficultyNumber: route['Difficulty'],
+      SettersAngle: route['SettersAngle'],
+      SettersDifficulty: settersdifficulty ?? 'unknown',
+      Autor: route['CreatedByName'],
+      Holds: holds,
+      Style: this.routeStyles.get(route['Style']) ?? 'Unknown',
+      Type: this.routeTypes.get(route['Type']) ?? 'Unknown',
+      RouteType: route['Type'],
+      Rating: 5
+    }
   }
 
   public async create(
@@ -248,7 +259,7 @@ export class RouteService {
       }
     );
 
-    for(const interpolateAngle of interpolateAngles) {
+    for (const interpolateAngle of interpolateAngles) {
 
       const angleDiff: number = interpolateAngle - angle;
       let interpolatedDifficulty: number = Number(difficulty) + Number(angleDiff);
@@ -291,6 +302,7 @@ export class RouteService {
   }
 
   async logSend(routeId: string | undefined, comment: string | undefined, sendDifficulty: number | undefined, rating: number | undefined) {
+    const user = await this.auth.user.value;
     await this._db.createDocument(
       this.appwrite.DatabaseId,
       this._logCollectionId,
@@ -299,7 +311,9 @@ export class RouteService {
         Route: routeId,
         Comment: comment,
         Rating: rating,
-        Difficulty: sendDifficulty
+        Difficulty: sendDifficulty,
+        CreatedById: user?.id,
+        CreatedByName: user?.name,
       }
     );
   }
