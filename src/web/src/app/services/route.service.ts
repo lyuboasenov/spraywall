@@ -9,6 +9,7 @@ import { Route } from '../models/route/route';
 import { RouteStyle } from '../models/route/route-style';
 import { RouteHold } from '../models/wall-template/route-hold';
 import { Hold } from '../models/route/hold';
+import { Send } from '../models/route/send';
 
 @Injectable({
   providedIn: 'root'
@@ -175,7 +176,26 @@ export class RouteService {
       ]
     );
 
-    console.log(sends);
+    let rating = 0;
+    let ratingSum = 0;
+    const sendArr: Send[] = []
+    for (const send of sends.documents) {
+      ratingSum += send['Rating'];
+      let difficulty = route['Type'] == 0 ? this.boulderDifficulty.get(route['Difficulty']) : this.routeDifficulty.get(route['Difficulty']);
+      if (!difficulty) {
+         difficulty = 'unknown';
+      }
+      sendArr.push({
+         Date: new Date(send.$createdAt).toDateString(),
+         Difficulty: difficulty,
+         Rating: send['Rating'],
+         Comment: send['Comment'],
+         User: send['CreatedByName']
+      });
+    }
+    if (sends.total > 0) {
+      rating = ratingSum / sends.total;
+    }
 
     let holds: Hold[] = [];
     for (let h of JSON.parse(route['JsonHolds'])) {
@@ -208,7 +228,8 @@ export class RouteService {
       Style: this.routeStyles.get(route['Style']) ?? 'Unknown',
       Type: this.routeTypes.get(route['Type']) ?? 'Unknown',
       RouteType: route['Type'],
-      Rating: 5
+      Rating: rating,
+      Sends: sendArr
     }
   }
 

@@ -3,3 +3,34 @@
   font-weight: lighter;
   width: 10em;
 }
+
+.send-item {
+width:100%;
+}
+
+.send-item p {
+}
+
+.send-comment {
+   white-space: pre;
+}
+.send-user {
+   font-size: .9em;
+   float:left;
+   margin-right: 1em;
+}
+.send-date {
+   font-size: .7em;
+   float:left;
+   margin-right: 1em;
+   margin-top:1.3em;
+}
+.send-rating {
+   font-size: .8em;
+   float:left;
+   margin-right: 1em;
+   margin-top:1.2em;
+}
+.send-meta {
+   float: right;
+}

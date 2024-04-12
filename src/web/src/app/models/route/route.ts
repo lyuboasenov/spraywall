@@ -1,5 +1,6 @@
 import { Hold } from "./hold";
 import { RouteType } from "./route-type";
+import { Send } from "./send";
 
 export interface Route {
   Id: string;
@@ -16,4 +17,5 @@ export interface Route {
   Style: string;
   Type: string;
   RouteType: RouteType;
+  Sends: Send[];
 }
