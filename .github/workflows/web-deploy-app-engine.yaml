@@ -39,16 +39,14 @@ jobs:
         uses: actions/upload-artifact@v1
         with:
           name: deploy_dist
-          path: dist
-        working-directory: src/web
+          path: src/web/dist
 
       - name: Archive code coverage result
         if: success()
         uses: actions/upload-artifact@v1
         with:
           name: deploy_coverage
-          path: coverage
-        working-directory: src/web
+          path: src/web/coverage
 
   deploy:
     runs-on: ubuntu-latest
