@@ -5,11 +5,11 @@ describe('AddRouteSchemaPage', () => {
   let component: AddRouteSchemaPage;
   let fixture: ComponentFixture<AddRouteSchemaPage>;
 
-  beforeEach(async(() => {
+  beforeEach(async () => {
     fixture = TestBed.createComponent(AddRouteSchemaPage);
     component = fixture.componentInstance;
     fixture.detectChanges();
-  }));
+  });
 
   it('should create', () => {
     expect(component).toBeTruthy();
