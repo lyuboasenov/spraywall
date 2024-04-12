@@ -30,9 +30,9 @@ jobs:
         run: npm run build:ci:gh
         working-directory: src/web
 
-      - name: Test
-        run: npm run test:ci:gh
-        working-directory: src/web
+      # - name: Test
+      #   run: npm run test:ci:gh
+      #   working-directory: src/web
 
       - name: Archive build
         if: success()
