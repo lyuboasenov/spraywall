@@ -14,8 +14,10 @@ import { Hold } from '../models/route/hold';
   providedIn: 'root'
 })
 export class RouteService {
+
   private _db: Databases;
   private _routeCollectionId = '6616dd90781920c2be2e';
+  private _logCollectionId = '6618a89ae13d2ab63b99';
 
   public routeDifficulty: Map<number, string> = new Map<number, string>();
   public boulderDifficulty: Map<number, string> = new Map<number, string>();
@@ -187,12 +189,14 @@ export class RouteService {
           Description: route['Description'],
           Angle: route['Angle'],
           Difficulty: difficulty ?? 'unknown',
+          DifficultyNumber: route['Difficulty'],
           SettersAngle: route['SettersAngle'],
           SettersDifficulty: settersdifficulty ?? 'unknown',
           Autor: route['CreatedByName'],
           Holds: holds,
           Style: this.routeStyles.get(route['Style']) ?? 'Unknown',
           Type: this.routeTypes.get(route['Type']) ?? 'Unknown',
+          RouteType: route['Type'],
           Rating: 5
         }
   }
@@ -284,5 +288,19 @@ export class RouteService {
     this.lastRouteType = type;
 
     return route.$id;
+  }
+
+  async logSend(routeId: string | undefined, comment: string | undefined, sendDifficulty: number | undefined, rating: number | undefined) {
+    await this._db.createDocument(
+      this.appwrite.DatabaseId,
+      this._logCollectionId,
+      ID.unique(),
+      {
+        Route: routeId,
+        Comment: comment,
+        Rating: rating,
+        Difficulty: sendDifficulty
+      }
+    );
   }
 }

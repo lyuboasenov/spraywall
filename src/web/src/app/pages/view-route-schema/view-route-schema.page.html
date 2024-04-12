@@ -1,22 +1,20 @@
 <ion-header [translucent]="true">
-   <ion-toolbar>
+  <ion-toolbar>
     <ion-buttons slot="primary">
-      <ion-button fill="solid" routerLink="details">
+      <ion-button fill="solid" (click)="openSendModal()" *ngIf="user">
         <ion-icon name="checkmark-outline"></ion-icon>
       </ion-button>
-    </ion-buttons>
-    <ion-buttons slot="primary" >
       <ion-button fill="solid" routerLink="details">
         <ion-icon name="information-circle-outline"></ion-icon>
       </ion-button>
     </ion-buttons>
-      <ion-title>{{ route?.Name }} [ {{route?.Difficulty}} &#64; {{route?.Angle}}&deg; ] </ion-title>
-      <ion-buttons slot="start" >
-        <ion-button fill="solid" routerLink="/routes">
-          <ion-icon name="chevron-back-outline"></ion-icon>
-        </ion-button>
-      </ion-buttons>
-   </ion-toolbar>
+    <ion-title>{{ route?.Name }} [ {{route?.Difficulty}} &#64; {{route?.Angle}}&deg; ] </ion-title>
+    <ion-buttons slot="start">
+      <ion-button fill="solid" routerLink="/routes">
+        <ion-icon name="chevron-back-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
@@ -27,12 +25,52 @@
   </ion-header>
 
   <div id="container">
-   <div id="zoomContainer" #zoomContainer>
+    <div id="zoomContainer" #zoomContainer>
       <pinch-zoom id="zoom" #zoom [limit-zoom]=20>
-         <canvas #canvas width="1500" height="700">
-            Not supported on this browser
-         </canvas>
+        <canvas #canvas width="1500" height="700">
+          Not supported on this browser
+        </canvas>
       </pinch-zoom>
-   </div>
-</div>
+    </div>
+  </div>
+
+  <ion-modal [isOpen]="isSendModalOpen" (willDismiss)="onWillDismiss($event)">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar>
+          <ion-buttons slot="secondary">
+            <ion-button (click)="close()">CLOSE</ion-button>
+          </ion-buttons>
+          <ion-buttons slot="primary">
+            <ion-button (click)="send()" [strong]="true">SEND</ion-button>
+          </ion-buttons>
+          <ion-title>SEND</ion-title>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content class="ion-padding">
+        <ion-list>
+
+          <ion-item>
+            <ion-textarea [(ngModel)]="comment" label="Comment" placeholder="Enter send comment"></ion-textarea>
+          </ion-item>
+
+          <ion-item>
+            <ion-select [(ngModel)]="sendDifficulty" label="Difficulty" placeholder="Select route difficulty"
+              interface="action-sheet" required="true">
+              <ion-select-option *ngFor="let diff of difficulties | keyvalue"
+                value="{{diff.key}}">{{diff.value}}</ion-select-option>
+            </ion-select>
+          </ion-item>
+
+          <ion-item>
+            <ion-select [(ngModel)]="rating" label="Rating" placeholder="Select route rating" interface="action-sheet"
+              required="true">
+              <ion-select-option *ngFor="let r of [].constructor(5); let i = index" value="{{i}}">{{i}}</ion-select-option>
+            </ion-select>
+          </ion-item>
+
+        </ion-list>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
 </ion-content>

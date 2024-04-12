@@ -1,11 +1,14 @@
-import { Component, ElementRef, OnInit, ViewChild, inject } from '@angular/core';
+import { OverlayEventDetail } from '@ionic/core/components';
+import { Component, ElementRef, Input, OnInit, Output, ViewChild, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { LoadingController } from '@ionic/angular';
+import { IonModal, LoadingController } from '@ionic/angular';
 import { PinchZoomComponent } from '@meddv/ngx-pinch-zoom';
 import { Route } from 'src/app/models/route/route';
 import { RouteHold } from 'src/app/models/wall-template/route-hold';
 import { RouteService } from 'src/app/services/route.service';
 import { WallTemplateService } from 'src/app/services/wall-template.service';
+import { RouteType } from 'src/app/models/route/route-type';
+import { AuthService } from 'src/app/services/auth.service';
 
 @Component({
   selector: 'app-view-route-schema',
@@ -13,8 +16,10 @@ import { WallTemplateService } from 'src/app/services/wall-template.service';
   styleUrls: ['./view-route-schema.page.scss'],
 })
 export class ViewRouteSchemaPage implements OnInit {
+  @Input() user: any | null = null;
   private loading: any | null;
 
+  @ViewChild(IonModal) modal!: IonModal;
   @ViewChild('canvas', { static: true }) canvas!: ElementRef;
   @ViewChild('zoom', { static: true }) zoom!: PinchZoomComponent;
   @ViewChild('zoomContainer', { static: true }) zoomContainer!: ElementRef;
@@ -22,16 +27,34 @@ export class ViewRouteSchemaPage implements OnInit {
   private activatedRoute = inject(ActivatedRoute);
   private _discoveredHolds: RouteHold[] = [];
 
-   public route?: Route;
-   public id!: string;
+  public route?: Route;
+  public id!: string;
 
-  constructor(private routeService: RouteService, private wallTemplateService: WallTemplateService, private router: Router, private loadingCtrl: LoadingController) { }
+  public isSendModalOpen: boolean = false;
+  public comment?: string;
+  public sendDifficulty?: number;
+  public rating?: number;
+  @Output() public difficulties: Map<number, string> = new Map<number, string>();
+
+  constructor(private routeService: RouteService, private wallTemplateService: WallTemplateService, private router: Router, private loadingCtrl: LoadingController, private auth: AuthService) { }
 
   async ngOnInit() {
+    this.auth.user.subscribe(next => {
+      this.user = next;
+    });
+
     await this.showLoading();
 
     this.id = this.activatedRoute.snapshot.paramMap.get('id') as string;
     const route = await this.routeService.getById(this.id);
+
+    this.difficulties.clear();
+    if (route?.RouteType == RouteType.Boulder) {
+      this.difficulties = this.routeService.boulderDifficulty;
+    } else if (route?.RouteType == RouteType.Route) {
+      this.difficulties = this.routeService.routeDifficulty;
+    }
+    this.sendDifficulty = route?.DifficultyNumber;
 
     const canvas: HTMLCanvasElement = this.canvas.nativeElement;
     await this.wallTemplateService.drawTemplateBackdrop(canvas);
@@ -50,7 +73,7 @@ export class ViewRouteSchemaPage implements OnInit {
 
   async showLoading() {
     this.loading = await this.loadingCtrl.create({
-      message: 'Loading routes...',
+      message: 'Loading route ...',
     });
 
     this.loading.present();
@@ -143,6 +166,26 @@ export class ViewRouteSchemaPage implements OnInit {
 
     const canvas: HTMLCanvasElement = this.canvas.nativeElement;
     this.wallTemplateService.markHolds(this._discoveredHolds, null, canvas);
+  }
+
+  async openSendModal() {
+    this.isSendModalOpen = true;
+  }
+
+  async send() {
+    await this.modal.dismiss('ok', 'send');
+  }
+
+  async close() {
+    await this.modal.dismiss(null, 'close');
+  }
+
+  async onWillDismiss(event: Event) {
+    const ev = event as CustomEvent<OverlayEventDetail<string>>;
+    if (ev.detail.role === 'send') {
+      await this.routeService.logSend(this.route?.Id, this.comment, this.sendDifficulty, this.rating);
+    }
+    this.isSendModalOpen = false;
   }
 
 }

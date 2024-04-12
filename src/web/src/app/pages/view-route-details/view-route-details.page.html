@@ -43,7 +43,7 @@
         <p class="item-header">STYLE</p>
         <p>{{ route?.Type }} / {{ route?.Style }}</p>
       </ion-item>
-      <ion-item *ngIf="route?.SettersAngle != route?.Angle">
+      <ion-item *ngIf="route?.SettersAngle !== route?.Angle">
         <p class="item-header">SETTER&apos;S</p>
         <p>{{ route?.SettersDifficulty }} &#64; {{ route?.SettersAngle }}&deg;</p>
       </ion-item>
@@ -54,4 +54,43 @@
     </ion-list>
   </div>
 
+  <ion-modal [isOpen]="isSendModalOpen" (willDismiss)="onWillDismiss($event)">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar>
+          <ion-buttons slot="secondary">
+            <ion-button (click)="close()">CLOSE</ion-button>
+          </ion-buttons>
+          <ion-buttons slot="primary">
+            <ion-button (click)="send()" [strong]="true">SEND</ion-button>
+          </ion-buttons>
+          <ion-title>SEND</ion-title>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content class="ion-padding">
+        <ion-list>
+
+          <ion-item>
+            <ion-textarea [(ngModel)]="comment" label="Comment" placeholder="Enter send comment"></ion-textarea>
+          </ion-item>
+
+          <ion-item>
+            <ion-select [(ngModel)]="sendDifficulty" label="Difficulty" placeholder="Select route difficulty"
+              interface="action-sheet" required="true">
+              <ion-select-option *ngFor="let diff of difficulties | keyvalue"
+                value="{{diff.key}}">{{diff.value}}</ion-select-option>
+            </ion-select>
+          </ion-item>
+
+          <ion-item>
+            <ion-select [(ngModel)]="rating" label="Rating" placeholder="Select route rating" interface="action-sheet"
+              required="true">
+              <ion-select-option *ngFor="let r of [].constructor(5); let i = index" value="{{i}}">{{i}}</ion-select-option>
+            </ion-select>
+          </ion-item>
+
+        </ion-list>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
 </ion-content>
