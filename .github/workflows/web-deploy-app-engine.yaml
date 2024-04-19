@@ -68,7 +68,6 @@ jobs:
           touch deploy_dist/app.yaml
           echo "runtime: python312" >> deploy_dist/app.yaml
           echo "api_version: 1" >> deploy_dist/app.yaml
-          echo "threadsafe: true" >> deploy_dist/app.yaml
           echo "" >> deploy_dist/app.yaml
           echo "handlers:" >> deploy_dist/app.yaml
           echo "- url: /" >> deploy_dist/app.yaml
