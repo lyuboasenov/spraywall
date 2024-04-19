@@ -70,15 +70,15 @@ jobs:
           runtime: nodejs20
 
           handlers:
+          # image files
+          - url: /assets/(.*\.(bmp|gif|ico|jpeg|jpg|png|svg))
+            static_files: ./assets/\1
+            upload: ./(.*\.(bmp|gif|ico|jpeg|jpg|png|svg))
+
           - url: /(.*\.css)
             mime_type: text/css
             static_files: ./\1
             upload: ./(.*\.css)
-
-          - url: /(.*\.html)
-            mime_type: text/html
-            static_files: ./\1
-            upload: ./(.*\.html)
 
           - url: /(.*\.js)
             mime_type: text/javascript
@@ -90,32 +90,14 @@ jobs:
             static_files: ./\1
             upload: ./(.*\.txt)
 
-          # - url: /(.*\.xml)
-          #   mime_type: application/xml
-          #   static_files: ./\1
-          #   upload: ./(.*\.xml)
-
-          # image files
-          - url: /(.*\.(bmp|gif|ico|jpeg|jpg|png|svg))
-            static_files: ./\1
-            upload: ./(.*\.(bmp|gif|ico|jpeg|jpg|png|svg))
-
-          # # index files
-          # - url: /(.+)/
-          #   static_files: ./\1/index.html
-          #   upload: ./(.+)/index.html
-
-          # # redirect to 'url + /index.html' url.
-          # - url: /(.+)
-          #   static_files: ./redirector.html
-          #   upload: ./redirector.html
+          - url: /svg
+            static_dir: ionic/static/svg
 
           # site root
           - url: /
             static_files: ./index.html
             upload: ./index.html
           EOM
-
 
           cat deploy_dist/app.yaml
 
