@@ -72,13 +72,11 @@ jobs:
           handlers:
           - url: /
             static_files: index.html
-            upload: deploy_dist/index.html
+            upload: ./index.html
           - url: /
-            static_dir: deploy_dist
+            static_dir: ./
           - url: /.*
             script: auto
-          - url: /
-            script: index.html
           EOM
 
 
