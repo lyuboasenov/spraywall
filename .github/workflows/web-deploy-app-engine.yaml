@@ -87,8 +87,9 @@ jobs:
 
       - id: 'deploy'
         uses: 'google-github-actions/deploy-appengine@v2'
-        project_id: spraywall
-        deliverables: deploy_dist
+        with:
+          project_id: spraywall
+          deliverables: deploy_dist
 
       # Example of using the output
       - id: 'test'
