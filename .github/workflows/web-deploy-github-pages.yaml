@@ -52,7 +52,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     permissions:
-      contents: 'read'
+      contents: 'write'
       id-token: 'write'
     steps:
       - name: Checkout
@@ -63,33 +63,10 @@ jobs:
         with:
           name: deploy_dist
 
-      - name: Create app.yaml
-        run: |
-          touch deploy_dist/app.yaml
-          echo "runtime: python39" >> deploy_dist/app.yaml
-          echo "entrypoint: gunicorn -b :$PORT main:app" >> deploy_dist/app.yaml
-          echo "env_variables:   GINICORN_PORT: 8080" >> deploy_dist/app.yaml
-
-          cat deploy_dist/app.yaml
-
-          echo "ls -a ${{ github.workspace }}"
-          ls -a ${{ github.workspace }}
-
-          echo "ls -a ${{ github.workspace }}/deploy_dist"
-          ls -a ${{ github.workspace }}/deploy_dist
-        shell: bash
-
-      # Deploy to App Engine
-      - id: 'auth'
-        uses: 'google-github-actions/auth@v2'
+      - name: Deploy to GitHub Pages
+        uses: JamesIves/github-pages-deploy-action@v4
         with:
-          credentials_json: '${{ secrets.GCP_APP_ENGINE_DEPLOY }}'
-
-      - id: 'deploy'
-        uses: 'google-github-actions/deploy-appengine@v2'
-        project_id: spraywall
-        deliverables: deploy_dist
-
-      # Example of using the output
-      - id: 'test'
-        run: 'curl "${{ steps.deploy.outputs.version_url }}"'
+          # GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # BRANCH: gh-pages
+          # FOLDER: deploy_dist
+          folder: deploy_dist
