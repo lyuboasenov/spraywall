@@ -66,9 +66,10 @@ jobs:
       - name: Create app.yaml
         run: |
           touch deploy_dist/app.yaml
-          echo "runtime: python39" >> deploy_dist/app.yaml
+          echo "runtime: python312" >> deploy_dist/app.yaml
           echo "entrypoint: gunicorn -b :$PORT main:app" >> deploy_dist/app.yaml
-          echo "env_variables:   GINICORN_PORT: 8080" >> deploy_dist/app.yaml
+          echo "env_variables:" >> deploy_dist/app.yaml
+          echo "  GINICORN_PORT: 8080" >> deploy_dist/app.yaml
 
           cat deploy_dist/app.yaml
 
