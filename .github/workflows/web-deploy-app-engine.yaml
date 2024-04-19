@@ -27,7 +27,7 @@ jobs:
         working-directory: src/web
 
       - name: Build
-        run: npm run build:ci:gh
+        run: npm run build:ci:app_engine
         working-directory: src/web
 
       # - name: Test
