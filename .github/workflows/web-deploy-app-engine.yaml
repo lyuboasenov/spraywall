@@ -66,7 +66,7 @@ jobs:
       - name: Create app.yaml
         run: |
           touch app.yaml
-          echo "runtime: python312" >> app.yaml
+          echo "runtime: nodejs20" >> app.yaml
           echo "" >> app.yaml
           echo "handlers:" >> app.yaml
           echo "- url: /" >> app.yaml
@@ -75,6 +75,10 @@ jobs:
           echo "" >> app.yaml
           echo "- url: /" >> app.yaml
           echo "  static_dir: deploy_dist" >> app.yaml
+          echo "- url: /.*" >> app.yaml
+          echo "  script: auto" >> app.yaml
+          echo "- url: /" >> app.yaml
+          echo "  script: index.html" >> app.yaml
           echo "" >> app.yaml
 
 
