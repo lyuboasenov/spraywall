@@ -65,21 +65,20 @@ jobs:
 
       - name: Create app.yaml
         run: |
-          touch deploy_dist/app.yaml
-          echo "runtime: python312" >> deploy_dist/app.yaml
-          echo "api_version: 1" >> deploy_dist/app.yaml
-          echo "" >> deploy_dist/app.yaml
-          echo "handlers:" >> deploy_dist/app.yaml
-          echo "- url: /" >> deploy_dist/app.yaml
-          echo "  static_files: index.html" >> deploy_dist/app.yaml
-          echo "  upload: ./index.html" >> deploy_dist/app.yaml
-          echo "" >> deploy_dist/app.yaml
-          echo "- url: /" >> deploy_dist/app.yaml
-          echo "  static_dir: ./" >> deploy_dist/app.yaml
-          echo "" >> deploy_dist/app.yaml
+          touch app.yaml
+          echo "runtime: python312" >> app.yaml
+          echo "" >> app.yaml
+          echo "handlers:" >> app.yaml
+          echo "- url: /" >> app.yaml
+          echo "  static_files: index.html" >> app.yaml
+          echo "  upload: deploy_dist/index.html" >> app.yaml
+          echo "" >> app.yaml
+          echo "- url: /" >> app.yaml
+          echo "  static_dir: deploy_dist" >> app.yaml
+          echo "" >> app.yaml
 
 
-          cat deploy_dist/app.yaml
+          cat app.yaml
 
           echo "ls -a ${{ github.workspace }}"
           ls -a ${{ github.workspace }}
@@ -98,7 +97,6 @@ jobs:
         uses: 'google-github-actions/deploy-appengine@v2'
         with:
           project_id: spraywall
-          deliverables: deploy_dist
 
       # Example of using the output
       - id: 'test'
