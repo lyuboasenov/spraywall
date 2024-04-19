@@ -67,9 +67,18 @@ jobs:
         run: |
           touch deploy_dist/app.yaml
           echo "runtime: python312" >> deploy_dist/app.yaml
-          echo "entrypoint: gunicorn -b :$PORT main:app" >> deploy_dist/app.yaml
-          echo "env_variables:" >> deploy_dist/app.yaml
-          echo "  GINICORN_PORT: 8080" >> deploy_dist/app.yaml
+          echo "api_version: 1" >> deploy_dist/app.yaml
+          echo "threadsafe: true" >> deploy_dist/app.yaml
+          echo "" >> deploy_dist/app.yaml
+          echo "handlers:" >> deploy_dist/app.yaml
+          echo "- url: /" >> deploy_dist/app.yaml
+          echo "  static_files: index.html" >> deploy_dist/app.yaml
+          echo "  upload: ./index.html" >> deploy_dist/app.yaml
+          echo "" >> deploy_dist/app.yaml
+          echo "- url: /" >> deploy_dist/app.yaml
+          echo "  static_dir: ./" >> deploy_dist/app.yaml
+          echo "" >> deploy_dist/app.yaml
+
 
           cat deploy_dist/app.yaml
 
