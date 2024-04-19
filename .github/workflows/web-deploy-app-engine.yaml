@@ -72,6 +72,8 @@ jobs:
 
           cat > deploy_dist/app.yaml <<-EOM
           runtime: python27
+          api_version: 1
+          threadsafe: true
 
           handlers:
           # image files
