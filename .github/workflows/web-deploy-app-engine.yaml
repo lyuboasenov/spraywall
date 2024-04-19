@@ -71,7 +71,7 @@ jobs:
           EOM
 
           cat > deploy_dist/app.yaml <<-EOM
-          runtime: nodejs20
+          runtime: python312
 
           handlers:
           # image files
