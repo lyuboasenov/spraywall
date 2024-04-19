@@ -71,7 +71,7 @@ jobs:
           EOM
 
           cat > deploy_dist/app.yaml <<-EOM
-          runtime: python
+          runtime: python27
 
           handlers:
           # image files
