@@ -66,6 +66,10 @@ jobs:
       - name: Create app.yaml
         run: |
           touch deploy_dist/app.yaml
+          cat > deploy_dist/.gcloudignore <<-EOM
+          svg/
+          EOM
+
           cat > deploy_dist/app.yaml <<-EOM
           runtime: nodejs20
 
@@ -100,6 +104,7 @@ jobs:
           EOM
 
           cat deploy_dist/app.yaml
+          cat deploy_dist/.gcloudignore
 
           echo "ls -a ${{ github.workspace }}"
           ls -a ${{ github.workspace }}
