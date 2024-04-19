@@ -71,7 +71,7 @@ jobs:
           EOM
 
           cat > deploy_dist/app.yaml <<-EOM
-          runtime: python312
+          runtime: python
 
           handlers:
           # image files
