@@ -62,6 +62,8 @@ export class ListRoutesPage implements OnInit {
     this.auth.user.subscribe(next => {
       this.user = next;
     });
+
+    this.user = auth.user?.value;
   }
 
   async ngOnInit() {
@@ -93,7 +95,6 @@ export class ListRoutesPage implements OnInit {
         this.loading.present();
       }
     });
-
   }
 
   clear() {
@@ -107,7 +108,6 @@ export class ListRoutesPage implements OnInit {
   async onWillDismiss(event: Event) {
     const ev = event as CustomEvent<OverlayEventDetail<string>>;
     if (ev.detail.role === 'close') {
-
       this.routeService.filter.RouteType = this.routeType;
       this.routeService.filter.RouteStyle = this.routeStyle;
       this.routeService.filter.MinDifficulty = this.minDifficulty;

@@ -29,7 +29,7 @@
       </ion-item>
     </ion-list>
 
-    <div class="fab-add" *ngIf="user?.labels?.includes('routesetter') ?? false">
+    <div class="fab-add" *ngIf="user?.hasPermission('routesetter') ?? false">
       <ion-fab>
         <ion-fab-button routerDirection="root" routerLink="/routes/add">
           <ion-icon name="add"></ion-icon>
