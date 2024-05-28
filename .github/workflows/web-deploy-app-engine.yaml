@@ -73,8 +73,9 @@ jobs:
         uses: 'google-github-actions/upload-cloud-storage@v2'
         with:
           path: deploy_dist
-          destination: balkan_spraywall_com
+          destination: balkan_spraywall_com/v1
           project_id: spraywall
+          parent: false
 
       # - id: 'deploy'
       #   uses: 'google-github-actions/deploy-appengine@v2'
