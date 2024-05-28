@@ -27,12 +27,8 @@ jobs:
         working-directory: src/web
 
       - name: Build
-        run: npm run build:ci:app_engine
+        run: npm run build:ci:gcp
         working-directory: src/web
-
-      # - name: Test
-      #   run: npm run test:ci:gh
-      #   working-directory: src/web
 
       - name: Archive build
         if: success()
@@ -40,13 +36,6 @@ jobs:
         with:
           name: deploy_dist
           path: src/web/www
-
-      # - name: Archive code coverage result
-      #   if: success()
-      #   uses: actions/upload-artifact@v1
-      #   with:
-      #     name: deploy_coverage
-      #     path: src/web/coverage
 
   deploy:
     runs-on: ubuntu-latest
@@ -73,16 +62,6 @@ jobs:
         uses: 'google-github-actions/upload-cloud-storage@v2'
         with:
           path: deploy_dist
-          destination: balkan_spraywall_com/v1
+          destination: balkan_spraywall_com
           project_id: spraywall
           parent: false
-
-      # - id: 'deploy'
-      #   uses: 'google-github-actions/deploy-appengine@v2'
-      #   with:
-      #     project_id: spraywall
-      #     deliverables: deploy_dist
-
-      # # Example of using the output
-      # - id: 'test'
-      #   run: 'curl "${{ steps.deploy.outputs.version_url }}"'
