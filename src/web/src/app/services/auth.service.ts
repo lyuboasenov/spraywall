@@ -24,7 +24,6 @@ export class AuthService {
   async loadUser() {
     try {
       const apiUser = await this._getUser();
-
       this.user.next(new User(apiUser));
     } catch (e) {
       // silently continue
@@ -34,7 +33,6 @@ export class AuthService {
   // Access the current user
   private async _getUser(): Promise<Models.User<Models.Preferences>> {
     const user = this.account.get();
-
     return user;
   }
 

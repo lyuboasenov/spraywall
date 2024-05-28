@@ -11,7 +11,7 @@ import { AuthService } from 'src/app/services/auth.service';
 })
 export class SignupPage implements OnInit {
 
-  formGroup: FormGroup; // declare it here
+  formGroup!: FormGroup; // declare it here
 
   constructor(private auth: AuthService, private router: Router, public formBuilder: FormBuilder, private alertCtrl: AlertController) {
     this.formGroup = formBuilder.group({
@@ -52,7 +52,7 @@ export class SignupPage implements OnInit {
   }
 
   async ngOnInit() {
-    if (this.auth.user) {
+    if (this.auth.user.value) {
       this.router.navigateByUrl('/routes', {replaceUrl: true });
     }
   }
