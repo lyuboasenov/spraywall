@@ -64,16 +64,6 @@ const routes: Routes = [
     loadChildren: () => import('./pages/view-route-details/view-route-details.module').then(m => m.ViewRouteDetailsPageModule),
     pathMatch: 'full'
   },
-  // {
-  //   path: 'routes/add',
-  //   loadChildren: () => import('./pages/add-route/add-route.module').then(m => m.AddRoutePageModule),
-  //   canActivate: [AuthGuard]
-  // },
-  // {
-  //   path: 'routes/:id',
-  //   loadChildren: () => import('./pages/view-route/view-route.module').then(m => m.ViewRoutePageModule),
-  //   canActivate: [AuthGuard]
-  // },
   {
     path: 'walls',
     loadChildren: () => import('./pages/list-walls/list-walls.module').then(m => m.ListWallsPageModule),

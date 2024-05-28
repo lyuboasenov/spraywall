@@ -68,7 +68,7 @@ export class AddRouteDetailsPage implements OnInit {
       formData.name,
       formData.description,
       formData.difficulty,
-      formData.angle,
+      Number(formData.angle),
       formData.routeStyle,
       this.routeService.holdBuffer,
       interpolateAngles);

@@ -71,17 +71,17 @@ export class AddRouteSchemaPage implements OnInit {
         this._selectedHold = routeHold;
       } else {
         // every click on a hold advances the type
-        // Starting->Hold->Finishing->Foot->REMOVE
+        // Hold->Finishing->Foot->Starting->REMOVE
 
-        if (routeHold.Type == HoldType.FootHold) {
+        if (routeHold.Type == HoldType.StartingHold) {
           routeHold.Type = HoldType.Hold;
 
           let index = this.holds.indexOf(routeHold);
           this.holds.splice(index, 1);
           this._selectedHold = null;
         } else {
-          if (routeHold.Type == HoldType.StartingHold) {
-            routeHold.Type = HoldType.Hold;
+          if (routeHold.Type == HoldType.FootHold) {
+            routeHold.Type = HoldType.StartingHold;
           } else if (routeHold.Type == HoldType.Hold) {
             routeHold.Type = HoldType.FinishingHold;
           } else if (routeHold.Type == HoldType.FinishingHold) {

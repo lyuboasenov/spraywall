@@ -172,12 +172,14 @@ export class WallTemplateService {
       let arr = this._template?.Holds;
 
       let selectedHold: WallTemplateHold | null = null;
-      let selectedHoldArea: number | null;
+      let selectedHoldDistance: number | null;
 
       arr.forEach(r => {
-        if (this.regionMatch(x, y, r.MinRect)) {
-          if (null == selectedHoldArea || selectedHoldArea > r.MinRect.Size.Width * r.MinRect.Size.Height) {
+        let distanceFromCenter = Math.sqrt(Math.pow(x - r.Center.X, 2) + Math.pow(y - r.Center.Y, 2));
+        if (distanceFromCenter < r.Radius) {
+          if (null == selectedHoldDistance || selectedHoldDistance > distanceFromCenter) {
             selectedHold = r;
+            selectedHoldDistance = distanceFromCenter;
           }
         }
       });
@@ -186,16 +188,6 @@ export class WallTemplateService {
     }
 
     return null;
-  }
-
-  private regionMatch(x: number, y: number, r: RotatedRect) {
-    let r1 = r.Size.Width / 2;
-    let r2 = r.Size.Height / 2;
-
-    return (r.Center.X - r1 < x) &&
-      (r.Center.X + r1 > x) &&
-      (r.Center.Y - r2 < y) &&
-      (r.Center.Y + r2 > y);
   }
 
   private TransformHolds(holdsArray: any[]): WallTemplateHold[] {
