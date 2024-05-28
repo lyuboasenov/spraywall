@@ -138,7 +138,7 @@ namespace SpraywallTemplateAnalyzer {
             encodedImage = _importedTemplate.EncodedImage;
          }
 
-         var result = TemplateExporter.Export(
+         ExportTemplate? result = TemplateExporter.Export(
             encodedImage,
             _processor.FilteredHolds.
                OrderBy(e => e.MinRect.Size.Width / 2 + e.MinRect.Center.X).

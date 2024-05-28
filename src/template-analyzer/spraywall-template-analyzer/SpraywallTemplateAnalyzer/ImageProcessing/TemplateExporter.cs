@@ -18,10 +18,13 @@ namespace SpraywallTemplateAnalyzer.ImageProcessing {
 
       private static IEnumerable<ExportHold> ExportHolds(IEnumerable<Hold> holds) {
          foreach (var hold in holds) {
+            var center = new Point((int) hold.Contour.Average(h => h.X), (int) hold.Contour.Average(h => h.Y));
+            var radius = (uint) Math.Sqrt(hold.Contour.Max(p => Math.Pow(center.X - p.X, 2) + Math.Pow(center.Y - p.Y, 2)));
+
             yield return new ExportHold() {
-               Center = hold.Center,
+               Center = center,
                MinRect = hold.MinRect,
-               Radius = hold.Radius,
+               Radius = radius,
                Contour = ReduceContour(hold.Contour),
             };
          }
@@ -32,9 +35,9 @@ namespace SpraywallTemplateAnalyzer.ImageProcessing {
          if (contour.Length <= CONTOUR_MAX_SIZE) {
             return contour;
          } else {
-            int ratio = contour.Length / CONTOUR_MAX_SIZE;
+            float ratio = (float) contour.Length / CONTOUR_MAX_SIZE;
             for (int i = 0; i < CONTOUR_MAX_SIZE; i++) {
-               var section = contour.Take(new Range(i * ratio, Math.Min((i + 1) * ratio - 1, contour.Length - 1)));
+               var section = contour.Take(new Range((Index) (i * ratio), (Index) Math.Min(Math.Ceiling((i + 1) * ratio - 1), contour.Length - 1)));
                if (section.Any()) {
                   int x = (int) section.Average(p => p.X);
                   int y = (int) section.Average(p => p.Y);
