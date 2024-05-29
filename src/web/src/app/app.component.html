@@ -26,6 +26,10 @@
         </ion-list> -->
 
         <ion-list id="labels-list" *ngIf="!user">
+          <ion-item lines="none" [routerLink]="['/routes']">
+            <ion-icon name="reorder-four" aria-hidden="true" slot="start"></ion-icon>
+            <ion-label>Routes</ion-label>
+          </ion-item>
           <ion-item lines="none" [routerLink]="['/login']">
             <ion-icon name="log-in-outline" aria-hidden="true" slot="start"></ion-icon>
             <ion-label>Login</ion-label>
