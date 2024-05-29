@@ -12,7 +12,6 @@ export class AppComponent implements OnInit {
 
   public appPages = [
     { title: 'Routes', url: '/routes', icon: 'reorder-four' },
-    // { title: 'Add route', url: '/routes/add', icon: 'add' },
   ];
   public labels = ['Feet follow', 'Open feet', 'No matches'];
   public environment = environment;

@@ -6,9 +6,6 @@ import { BehaviorSubject } from 'rxjs/internal/BehaviorSubject';
 import { StorageProxyService } from './storage-proxy.service';
 import { User } from '../models/user/user';
 
-
-const TOKEN_KEY = 'user-token';
-
 @Injectable({
   providedIn: 'root'
 })
@@ -58,7 +55,6 @@ export class AuthService {
   // Remove all information of the previous user
   async logout() {
     await this.account.deleteSession('current');
-    await this.storageProxy.storage.remove(TOKEN_KEY);
     await this.appwrite.destroy();
 
     this.user.next(null);
