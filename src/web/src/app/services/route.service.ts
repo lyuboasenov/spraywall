@@ -120,7 +120,7 @@ export class RouteService {
     );
 
     if (this.filter.Angle) {
-      query.push(Query.equal("Angle", [this.filter.Angle]))
+      query.push(Query.equal("Angle", [Number(this.filter.Angle)]))
     }
     if (this.filter.RouteType) {
       query.push(Query.equal("Type", [this.filter.RouteType]))
