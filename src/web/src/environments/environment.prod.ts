@@ -1,6 +1,6 @@
 export const environment = {
   production: true,
-  app_icon: "http://balkanclimbing.com/themes/custom/css/images/logo.svg",
+  app_icon: "https://balkanclimbing.com/themes/custom/css/images/logo.svg",
   AppWrite: {
     Endpoint: 'https://cloud.appwrite.io/v1',
     ProjectId: '66105e1a8ea8410c3f42',
