@@ -28,11 +28,11 @@ export class AddRouteDetailsPage implements OnInit {
 
     this.formGroup = formBuilder.group({
       name: ["", Validators.required],
-      description: ["", Validators.required],
-      routeType: [this.routeService.lastRouteType, Validators.required],
+      description: [""],
+      routeType: [this.routeService.lastRouteType ?? 0, Validators.required],
       difficulty: [this.routeService.lastRouteDifficulty, Validators.required],
       angle: [this.routeService.lastRouteAngle, Validators.required],
-      routeStyle: [this.routeService.lastRouteStyle, Validators.required]
+      routeStyle: [this.routeService.lastRouteStyle ?? 0, Validators.required]
     });
   }
 
@@ -50,11 +50,11 @@ export class AddRouteDetailsPage implements OnInit {
 
     this.formGroup = this.formBuilder.group({
       name: ["", Validators.required],
-      description: ["", Validators.required],
-      routeType: [this.routeService.lastRouteType, Validators.required],
-      difficulty: [this.routeService.lastRouteDifficulty, Validators.required],
+      description: [""],
+      routeType: [this.routeService.lastRouteType ?? 0, Validators.required],
+      difficulty: [this.routeService.lastRouteDifficulty ?? 95, Validators.required],
       angle: [this.routeService.lastRouteAngle, Validators.required],
-      routeStyle: [this.routeService.lastRouteStyle, Validators.required]
+      routeStyle: [this.routeService.lastRouteStyle ?? 0, Validators.required]
     });
   }
 
