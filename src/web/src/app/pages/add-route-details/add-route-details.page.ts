@@ -73,6 +73,8 @@ export class AddRouteDetailsPage implements OnInit {
       this.routeService.holdBuffer,
       interpolateAngles);
 
+    this.routeService.holdBuffer = [];
+
     await this.router.navigateByUrl('/routes/' + routeId);
   }
 

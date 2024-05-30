@@ -1,4 +1,5 @@
 import { Component, ElementRef, OnInit, Output, ViewChild } from '@angular/core';
+import { Router } from '@angular/router';
 import { LoadingController } from '@ionic/angular';
 import { PinchZoomComponent } from '@meddv/ngx-pinch-zoom';
 import { HoldType } from 'src/app/models/route/hold-type';
@@ -22,7 +23,7 @@ export class AddRouteSchemaPage implements OnInit {
   @Output() public holds: RouteHold[] = [];
   private _selectedHold: RouteHold | null = null;
 
-  constructor(private routeService: RouteService, private wallTemplateService: WallTemplateService, private loadingCtrl: LoadingController) { }
+  constructor(private router: Router, private routeService: RouteService, private wallTemplateService: WallTemplateService, private loadingCtrl: LoadingController) { }
 
   async ngOnInit() {
     await this.showLoading();
@@ -36,6 +37,17 @@ export class AddRouteSchemaPage implements OnInit {
     this.holds = this.routeService.holdBuffer;
 
     this.loading.dismiss();
+  }
+
+  async cancel() {
+    this.routeService.holdBuffer = [];
+    this.holds = this.routeService.holdBuffer;
+
+    const canvas: HTMLCanvasElement = this.canvas.nativeElement;
+    this.wallTemplateService.drawTemplateBackdrop(canvas);
+
+    await this.router.navigateByUrl('/');
+
   }
 
   async showLoading() {
