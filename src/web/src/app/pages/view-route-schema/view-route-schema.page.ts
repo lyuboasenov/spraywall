@@ -65,7 +65,7 @@ export class ViewRouteSchemaPage implements OnInit {
       await this.markHolds();
       setTimeout(() => this.zoomToRoute(), 100);
     } else {
-      this.router.navigateByUrl('/not-found', { replaceUrl: true })
+      this.router.navigateByUrl('/not-found')
     }
 
     this.loading.dismiss();

@@ -35,8 +35,13 @@ export class LoginPage implements OnInit {
 
   async ngOnInit() {
     if (this.auth.user.value) {
-      this.router.navigateByUrl('/routes', { replaceUrl: true });
+      this.router.navigateByUrl('/routes');
     }
+    this.auth.user.subscribe(next => {
+      if (next) {
+         this.router.navigateByUrl('/routes');
+      }
+    });
   }
 
   async onSubmit(formData: any) {
@@ -44,7 +49,7 @@ export class LoginPage implements OnInit {
       const user = await this.auth.login(formData.email, formData.password);
 
       if (user) {
-        this.router.navigateByUrl('/routes', { replaceUrl: true });
+        this.router.navigateByUrl('/routes');
       }
     } catch (e) {
       let alert = await this.alertCtrl.create({

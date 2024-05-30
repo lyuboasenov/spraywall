@@ -59,7 +59,7 @@ export class AuthService {
 
     this.user.next(null);
 
-    this.router.navigateByUrl('/', { replaceUrl: true });
+    this.router.navigateByUrl('/');
   }
 
   // Check if a user has a certain permission

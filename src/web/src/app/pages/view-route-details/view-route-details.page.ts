@@ -47,7 +47,7 @@ export class ViewRouteDetailsPage implements OnInit {
     if (route) {
       this.route = route;
     } else {
-      this.router.navigateByUrl('/not-found', { replaceUrl: true })
+      this.router.navigateByUrl('/not-found')
     }
   }
 

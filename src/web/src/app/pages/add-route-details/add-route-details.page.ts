@@ -73,7 +73,7 @@ export class AddRouteDetailsPage implements OnInit {
       this.routeService.holdBuffer,
       interpolateAngles);
 
-    await this.router.navigate(['/routes', { id: routeId  }]);
+    await this.router.navigateByUrl('/routes/' + routeId);
   }
 
   async setDifficulty(source: Map<number, string>) {

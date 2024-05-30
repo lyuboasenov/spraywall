@@ -53,7 +53,7 @@ export class SignupPage implements OnInit {
 
   async ngOnInit() {
     if (this.auth.user.value) {
-      this.router.navigateByUrl('/routes', {replaceUrl: true });
+      this.router.navigateByUrl('/routes');
     }
   }
 
@@ -61,7 +61,7 @@ export class SignupPage implements OnInit {
     try {
       this.auth.signup(formData.email, formData.password, formData.name);
 
-      this.router.navigateByUrl('/', {replaceUrl: true });
+      this.router.navigateByUrl('/');
     } catch (e) {
       let alert = await this.alertCtrl.create({
         header: 'Error',

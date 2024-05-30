@@ -152,7 +152,7 @@ export class WallTemplateService {
       var data = imageData.data;
       for (var i = 0; i < data.length; i += 4) {
         // calculate the luma value
-        let darkenFactor = 0.3;
+        let darkenFactor = 0.6;
         var luma = 0.299 * data[i] * darkenFactor + 0.587 * data[i+1] * darkenFactor + 0.114 * data[i+2] * darkenFactor;
 
         // set it to RGB
