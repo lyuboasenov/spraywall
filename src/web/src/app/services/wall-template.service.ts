@@ -54,9 +54,7 @@ export class WallTemplateService {
         Holds: this.TransformHolds(rawTemplate.Holds),
         Angles: rawTemplate.Angles
       };
-    }
 
-    if (this._template?.EncodedImage) {
       this._img.src = "data:image/jpeg;base64, " + this._template?.EncodedImage;
     }
 

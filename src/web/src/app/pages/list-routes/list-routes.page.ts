@@ -39,23 +39,21 @@ export class ListRoutesPage implements OnInit {
 
   constructor(private routeService: RouteService, private wallTemplateService: WallTemplateService, private auth: AuthService, private loadingCtrl: LoadingController) {
     this.routeTypes = this.routeService.routeTypes;
-
     this.routeStyles = this.routeService.routeStyles;
 
-    this.routeService.getAll().then((routes: RouteSignature[]) => {
-      navigator.locks.request('dismiss-loading', async (lock) => {
-        this.routes = routes;
-        if (this.template && this.loading) {
-          this.loading.dismiss();
-        }
-      });
-    });
     this.wallTemplateService.getTemplate().then(t => {
-      navigator.locks.request('dismiss-loading', async (lock) => {
-        this.template = t;
-        if (this.routes && this.loading) {
-          this.loading.dismiss();
-        }
+      this.template = t;
+
+      if (!this.routeService.filter.Angle && this.template?.Angles ||
+        this.routeService.filter.Angle && this.template?.Angles && !this.template?.Angles.includes(this.routeService.filter.Angle)
+      ) {
+        this.routeService.filter.Angle = this.template.Angles[this.template?.Angles.length / 2];
+        this.angle = this.routeService.filter.Angle;
+      }
+
+      this.routeService.getAll().then((routes: RouteSignature[]) => {
+        this.routes = routes;
+        this.loading?.dismiss();
       });
     });
 
@@ -87,7 +85,7 @@ export class ListRoutesPage implements OnInit {
 
   async showLoading() {
     navigator.locks.request('dismiss-loading', async (lock) => {
-      if (!this.routes && !this.template){
+      if (this.routes.length == 0 && !this.template){
         this.loading = await this.loadingCtrl.create({
           message: 'Loading routes...',
         });
@@ -128,6 +126,11 @@ export class ListRoutesPage implements OnInit {
 
       this.routes = await this.routeService.getAll();
     }
+  }
+
+  async angleChange(event: any) {
+    this.routeService.filter.Angle = this.angle;
+    this.routes = await this.routeService.getAll();
   }
 
 }
