@@ -1,6 +1,6 @@
-import { Component, OnInit, Output } from '@angular/core';
+import { Component, OnInit, Output, inject } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { RouteStyle } from 'src/app/models/route/route-style';
 import { RouteType } from 'src/app/models/route/route-type';
 import { WallTemplate } from 'src/app/models/wall-template/wall-template';
@@ -13,6 +13,9 @@ import { WallTemplateService } from 'src/app/services/wall-template.service';
   styleUrls: ['./add-route-details.page.scss'],
 })
 export class AddRouteDetailsPage implements OnInit {
+  public id!: string;
+
+  private activatedRoute = inject(ActivatedRoute);
 
   formGroup!: FormGroup; // declare it here
   public template: WallTemplate | null = null;
@@ -48,30 +51,60 @@ export class AddRouteDetailsPage implements OnInit {
       angle = this.template?.Angles[this.template.Angles.length / 2] ?? 40;
     }
 
-    this.formGroup = this.formBuilder.group({
-      name: ["", Validators.required],
-      description: [""],
-      routeType: [this.routeService.lastRouteType ?? 0, Validators.required],
-      difficulty: [this.routeService.lastRouteDifficulty ?? 95, Validators.required],
-      angle: [this.routeService.lastRouteAngle, Validators.required],
-      routeStyle: [this.routeService.lastRouteStyle ?? 0, Validators.required]
-    });
+    this.id = this.activatedRoute.snapshot.paramMap.get('id') as string;
+    if (this.id) {
+      const route = await this.routeService.getById(this.id);
+
+      if (route) {
+        this.formGroup = this.formBuilder.group({
+          name: [route.Name, Validators.required],
+          description: [route.Description],
+          routeType: [route.RouteType, Validators.required],
+          difficulty: [route.DifficultyNumber, Validators.required],
+          angle: [route.Angle, Validators.required],
+          routeStyle: [route.Style, Validators.required]
+        });
+      }
+    } else {
+      this.formGroup = this.formBuilder.group({
+        name: ["", Validators.required],
+        description: [""],
+        routeType: [this.routeService.lastRouteType ?? 0, Validators.required],
+        difficulty: [this.routeService.lastRouteDifficulty ?? 95, Validators.required],
+        angle: [this.routeService.lastRouteAngle, Validators.required],
+        routeStyle: [this.routeService.lastRouteStyle ?? 0, Validators.required]
+      });
+    }
   }
 
   async onSubmit(formData: any) {
 
     const interpolateAngles = this.template?.Angles ?? [];
 
-    const routeId = await this.routeService.create(
-      this.template?.Id ?? 'missing',
-      formData.routeType,
-      formData.name,
-      formData.description,
-      formData.difficulty,
-      Number(formData.angle),
-      formData.routeStyle,
-      this.routeService.holdBuffer,
-      interpolateAngles);
+    let routeId = this.id;
+    if (this.id) {
+      await this.routeService.update(
+        this.id,
+        this.template?.Id ?? 'missing',
+        formData.routeType,
+        formData.name,
+        formData.description,
+        formData.difficulty,
+        Number(formData.angle),
+        formData.routeStyle,
+        this.routeService.holdBuffer);
+    } else {
+      routeId = await this.routeService.create(
+        this.template?.Id ?? 'missing',
+        formData.routeType,
+        formData.name,
+        formData.description,
+        formData.difficulty,
+        Number(formData.angle),
+        formData.routeStyle,
+        this.routeService.holdBuffer,
+        interpolateAngles);
+    }
 
     this.routeService.holdBuffer = [];
 

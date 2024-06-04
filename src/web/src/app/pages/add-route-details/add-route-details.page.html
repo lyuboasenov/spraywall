@@ -55,7 +55,7 @@
         <ion-item *ngIf="(template?.Angles?.length ?? 0) > 1">
           <ion-select formControlName="angle" label="Angle" placeholder="Select board angle" interface="action-sheet"
             required="true">
-            <ion-select-option *ngFor="let deg of template?.Angles" value="{{deg}}">{{deg}}&deg;</ion-select-option>
+            <ion-select-option *ngFor="let deg of template?.Angles" [value]="deg">{{deg}}&deg;</ion-select-option>
           </ion-select>
         </ion-item>
 

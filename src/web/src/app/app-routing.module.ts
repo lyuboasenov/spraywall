@@ -49,7 +49,19 @@ const routes: Routes = [
     pathMatch: 'full'
   },
   {
+    path: 'routes/edit/:id/details',
+    loadChildren: () => import('./pages/add-route-details/add-route-details.module').then(m => m.AddRouteDetailsPageModule),
+    canActivate: [AuthGuard],
+    pathMatch: 'full'
+  },
+  {
     path: 'routes/add',
+    loadChildren: () => import('./pages/add-route-schema/add-route-schema.module').then(m => m.AddRouteSchemaPageModule),
+    canActivate: [AuthGuard],
+    pathMatch: 'full'
+  },
+  {
+    path: 'routes/edit/:id',
     loadChildren: () => import('./pages/add-route-schema/add-route-schema.module').then(m => m.AddRouteSchemaPageModule),
     canActivate: [AuthGuard],
     pathMatch: 'full'

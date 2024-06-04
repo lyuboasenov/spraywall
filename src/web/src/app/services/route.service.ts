@@ -343,6 +343,62 @@ export class RouteService {
     return route.$id;
   }
 
+
+  public async update(
+    id: string,
+    wallId: string,
+    type: RouteType,
+    name: string,
+    description: string,
+    difficulty: number,
+    angle: number,
+    routeStyle: RouteStyle,
+    holds: RouteHold[]): Promise<string> {
+
+    const user = await this.auth.user.value;
+
+    let apiHolds = [];
+    for (let h of holds) {
+      apiHolds.push([
+        [
+          h.TemplateHold.Center.X,
+          h.TemplateHold.Center.Y
+        ],
+        h.TemplateHold.Radius,
+        h.Type
+      ]);
+    }
+
+    const route = await this._db.updateDocument(
+      this.appwrite.DatabaseId,
+      this._routeCollectionId,
+      id,
+      {
+        Name: name,
+        Description: description,
+        Angle: angle,
+        Difficulty: difficulty,
+        CreatedById: user?.id,
+        CreatedByName: user?.name,
+        Type: type,
+        Style: routeStyle,
+        FAById: user?.id,
+        FAByName: user?.name,
+        JsonHolds: JSON.stringify(apiHolds),
+        SettersAngle: angle,
+        SettersDifficulty: difficulty,
+        Wall: wallId
+      }
+    );
+
+    this.lastRouteAngle = angle;
+    this.lastRouteDifficulty = difficulty;
+    this.lastRouteStyle = routeStyle;
+    this.lastRouteType = type;
+
+    return route.$id;
+  }
+
   async logSend(routeId: string | undefined, comment: string | undefined, sendDifficulty: number | undefined, rating: number | undefined) {
     const user = await this.auth.user.value;
     await this._db.createDocument(
