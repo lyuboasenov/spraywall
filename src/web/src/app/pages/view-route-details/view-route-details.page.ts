@@ -19,6 +19,7 @@ export class ViewRouteDetailsPage implements OnInit {
 
    public route?: Route;
    public id!: string;
+   public parent_id!: string;
 
    @ViewChild(IonModal) modal!: IonModal;
    public isSendModalOpen: boolean = false;
@@ -46,6 +47,7 @@ export class ViewRouteDetailsPage implements OnInit {
 
     if (route) {
       this.route = route;
+      this.parent_id = this.route?.ParentId ?? this.route?.Id;
     } else {
       this.router.navigateByUrl('/not-found')
     }

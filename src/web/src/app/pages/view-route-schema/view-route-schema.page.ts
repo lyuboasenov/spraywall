@@ -29,6 +29,7 @@ export class ViewRouteSchemaPage implements OnInit {
 
   public route?: Route;
   public id!: string;
+  public parent_id!: string;
 
   public isSendModalOpen: boolean = false;
   public comment?: string;
@@ -64,6 +65,7 @@ export class ViewRouteSchemaPage implements OnInit {
 
       await this.markHolds();
       setTimeout(() => this.zoomToRoute(), 100);
+      this.parent_id = this.route?.ParentId ?? this.route?.Id;
     } else {
       this.router.navigateByUrl('/not-found')
     }

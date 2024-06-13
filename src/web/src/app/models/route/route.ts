@@ -4,6 +4,7 @@ import { Send } from "./send";
 
 export interface Route {
   Id: string;
+  ParentId: string;
   Name: string;
   Description: string;
   Angle: number;

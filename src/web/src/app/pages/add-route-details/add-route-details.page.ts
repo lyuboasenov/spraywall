@@ -92,7 +92,8 @@ export class AddRouteDetailsPage implements OnInit {
         formData.difficulty,
         Number(formData.angle),
         formData.routeStyle,
-        this.routeService.holdBuffer);
+        this.routeService.holdBuffer,
+        interpolateAngles);
     } else {
       routeId = await this.routeService.create(
         this.template?.Id ?? 'missing',

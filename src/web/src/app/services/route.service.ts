@@ -237,6 +237,7 @@ export class RouteService {
 
     return {
       Id: route.$id,
+      ParentId: route['ParentId'],
       Name: route['Name'],
       Description: route['Description'],
       Angle: route['Angle'],
@@ -343,7 +344,6 @@ export class RouteService {
     return route.$id;
   }
 
-
   public async update(
     id: string,
     wallId: string,
@@ -353,7 +353,8 @@ export class RouteService {
     difficulty: number,
     angle: number,
     routeStyle: RouteStyle,
-    holds: RouteHold[]): Promise<string> {
+    holds: RouteHold[],
+    interpolateAngles: number[] = []): Promise<string> {
 
     const user = await this.auth.user.value;
 
@@ -390,6 +391,96 @@ export class RouteService {
         Wall: wallId
       }
     );
+
+    // related routes
+    let query = [
+      Query.select(["$id", "Difficulty", "Angle"]),
+      Query.equal("ParentId", [id]),
+      Query.limit(100000),
+      Query.orderAsc("Difficulty")
+    ];
+
+    const relatedRoutes = await this._db.listDocuments(
+      this.appwrite.DatabaseId,
+      this._routeCollectionId,
+      query);
+
+    if (relatedRoutes) {
+      for (const relatedRoute of relatedRoutes.documents) {
+
+        const interpolateAngle: number = Number(relatedRoute['Angle']);
+
+        const index = interpolateAngles.indexOf(5);
+        if (index > -1) { // only splice array when item is found
+          interpolateAngles.splice(index, 1); // 2nd parameter means remove one item only
+        }
+
+        const angleDiff: number = interpolateAngle - angle;
+        let interpolatedDifficulty: number = Number(difficulty) + Number(angleDiff);
+
+        if (angleDiff == 0) {
+          continue;
+        }
+
+        interpolatedDifficulty = Math.min(interpolatedDifficulty, 145);
+        interpolatedDifficulty = Math.max(interpolatedDifficulty, 0);
+
+        await this._db.updateDocument(
+          this.appwrite.DatabaseId,
+          this._routeCollectionId,
+          relatedRoute.$id,
+          {
+            Name: name,
+            Description: description,
+            Angle: interpolateAngle,
+            Difficulty: interpolatedDifficulty,
+            CreatedById: user?.id,
+            CreatedByName: user?.name,
+            Type: type,
+            Style: routeStyle,
+            JsonHolds: JSON.stringify(apiHolds),
+            SettersAngle: angle,
+            SettersDifficulty: difficulty,
+            ParentId: route.$id,
+            Wall: wallId
+          }
+        );
+      }
+    }
+
+    for (const interpolateAngle of interpolateAngles) {
+
+      const angleDiff: number = interpolateAngle - angle;
+      let interpolatedDifficulty: number = Number(difficulty) + Number(angleDiff);
+
+      if (angleDiff == 0) {
+        continue;
+      }
+
+      interpolatedDifficulty = Math.min(interpolatedDifficulty, 145);
+      interpolatedDifficulty = Math.max(interpolatedDifficulty, 0);
+
+      await this._db.createDocument(
+        this.appwrite.DatabaseId,
+        this._routeCollectionId,
+        ID.unique(),
+        {
+          Name: name,
+          Description: description,
+          Angle: interpolateAngle,
+          Difficulty: interpolatedDifficulty,
+          CreatedById: user?.id,
+          CreatedByName: user?.name,
+          Type: type,
+          Style: routeStyle,
+          JsonHolds: JSON.stringify(apiHolds),
+          SettersAngle: angle,
+          SettersDifficulty: difficulty,
+          ParentId: route.$id,
+          Wall: wallId
+        }
+      );
+    }
 
     this.lastRouteAngle = angle;
     this.lastRouteDifficulty = difficulty;

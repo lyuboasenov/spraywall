@@ -1,7 +1,7 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-buttons slot="primary">
-      <ion-button fill="solid" *ngIf="user?.hasPermission('routesetter') ?? false" routerLink="/routes/edit/{{id}}">
+      <ion-button fill="solid" *ngIf="user?.hasPermission('routesetter') ?? false" routerLink="/routes/edit/{{parent_id}}">
         <ion-icon name="create-outline"></ion-icon>
       </ion-button>
       <ion-button fill="solid" (click)="openSendModal()" *ngIf="user">
