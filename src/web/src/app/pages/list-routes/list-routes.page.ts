@@ -44,8 +44,9 @@ export class ListRoutesPage implements OnInit {
     this.wallTemplateService.getTemplate().then(t => {
       this.template = t;
 
-      if (!this.routeService.filter.Angle && this.template?.Angles ||
-        this.routeService.filter.Angle && this.template?.Angles && !this.template?.Angles.includes(this.routeService.filter.Angle)
+      if (this.template?.Angles &&
+        (!this.routeService.filter.Angle ||
+        (this.routeService.filter.Angle && !this.template?.Angles.includes(Number(this.routeService.filter.Angle))))
       ) {
         this.routeService.filter.Angle = this.template.Angles[this.template?.Angles.length / 2];
         this.angle = this.routeService.filter.Angle;
@@ -81,6 +82,7 @@ export class ListRoutesPage implements OnInit {
     this.angle = this.routeService.filter.Angle;
     this.setBy = this.routeService.filter.SetBy;
     this.excludeMyAscends = this.routeService.filter.ExcludeMyAscends;
+    this.angle = this.routeService.filter.Angle;
   }
 
   async showLoading() {
