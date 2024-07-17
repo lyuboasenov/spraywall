@@ -446,40 +446,40 @@ export class RouteService {
           }
         );
       }
-    }
+    } else {
+      for (const interpolateAngle of interpolateAngles) {
 
-    for (const interpolateAngle of interpolateAngles) {
+        const angleDiff: number = interpolateAngle - angle;
+        let interpolatedDifficulty: number = Number(difficulty) + Number(angleDiff);
 
-      const angleDiff: number = interpolateAngle - angle;
-      let interpolatedDifficulty: number = Number(difficulty) + Number(angleDiff);
-
-      if (angleDiff == 0) {
-        continue;
-      }
-
-      interpolatedDifficulty = Math.min(interpolatedDifficulty, 145);
-      interpolatedDifficulty = Math.max(interpolatedDifficulty, 0);
-
-      await this._db.createDocument(
-        this.appwrite.DatabaseId,
-        this._routeCollectionId,
-        ID.unique(),
-        {
-          Name: name,
-          Description: description,
-          Angle: interpolateAngle,
-          Difficulty: interpolatedDifficulty,
-          CreatedById: user?.id,
-          CreatedByName: user?.name,
-          Type: type,
-          Style: routeStyle,
-          JsonHolds: JSON.stringify(apiHolds),
-          SettersAngle: angle,
-          SettersDifficulty: difficulty,
-          ParentId: route.$id,
-          Wall: wallId
+        if (angleDiff == 0) {
+          continue;
         }
-      );
+
+        interpolatedDifficulty = Math.min(interpolatedDifficulty, 145);
+        interpolatedDifficulty = Math.max(interpolatedDifficulty, 0);
+
+        await this._db.createDocument(
+          this.appwrite.DatabaseId,
+          this._routeCollectionId,
+          ID.unique(),
+          {
+            Name: name,
+            Description: description,
+            Angle: interpolateAngle,
+            Difficulty: interpolatedDifficulty,
+            CreatedById: user?.id,
+            CreatedByName: user?.name,
+            Type: type,
+            Style: routeStyle,
+            JsonHolds: JSON.stringify(apiHolds),
+            SettersAngle: angle,
+            SettersDifficulty: difficulty,
+            ParentId: route.$id,
+            Wall: wallId
+          }
+        );
+      }
     }
 
     this.lastRouteAngle = angle;
