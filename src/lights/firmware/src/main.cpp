@@ -14,6 +14,10 @@ int           patternCurrent = 0;       // Current Pattern Number
 int           patternInterval = 5000;   // Pattern Interval (ms)
 bool          patternComplete = false;
 
+void data_received(uint8_t* data, size_t len);
+void set_brightness(uint8_t brightness);
+void set_setting(uint8_t* data, size_t len);
+
 void setup() {
    #ifdef DEBUG_OUTPUT_ENABLED
    Serial.begin(115200);
@@ -27,15 +31,16 @@ void setup() {
    DEBUG_OUTPUT(verbosity_t::info, "MAIN", "  ----------------------------------  ");
 
    _ble.begin();
+   _ble._data_received_callback = &data_received;
+   _ble._set_brightness_callback = &set_brightness;
+   _ble._set_setting_callback = &set_setting;
 
   _ledEngine.begin();
 }
 
 void loop() {
    // put your main code here, to run repeatedly:
-   if (_ble.connected()) {
-      _ledEngine.light_route(_ble.get_received_data(), _ble.get_received_data_length());
-   } else {
+   if (!_ble.connected()) {
       unsigned long currentMillis = millis();                     //  Update current time
       if( patternComplete || (currentMillis - patternPrevious) >= patternInterval) {  //  Check for expired time
          patternComplete = false;
@@ -74,5 +79,19 @@ void loop() {
             break;
          }
       }
+   }
+}
+
+void data_received(uint8_t* data, size_t len) {
+   _ledEngine.light_route(data, len);
+}
+
+void set_brightness(uint8_t brightness) {
+   _ledEngine.set_brightness(brightness);
+}
+
+void set_setting(uint8_t* data, size_t len) {
+   if (len == 4) {
+      _ledEngine.set_color(data[0], data[1], data[2], data[3]);
    }
 }

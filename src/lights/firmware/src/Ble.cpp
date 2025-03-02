@@ -23,15 +23,28 @@ Ble::Ble() :
       BLEUUID((uint16_t) FIRMWARE_REVISION_STR_CHARACTERISTIC_UUID),
       BLECharacteristic::PROPERTY_NOTIFY |
       BLECharacteristic::PROPERTY_WRITE),
-   _light_led_descriptor(BLEUUID((uint16_t)0x2901)),
-   _light_led_characteristics(
-      BLEUUID((uint16_t) LIGHT_LED_STR_CHARACTERISTIC_UUID),
-      BLECharacteristic::PROPERTY_NOTIFY |
+   _light_pattern_descriptor(BLEUUID((uint16_t)0x2901)),
+   _light_pattern_characteristics(
+      BLEUUID((uint16_t) LIGHT_PATTERN_CHARACTERISTIC_UUID),
+      BLECharacteristic::PROPERTY_WRITE),
+   _brightness_descriptor(BLEUUID((uint16_t)0x2901)),
+   _brightness_characteristics(
+      BLEUUID((uint16_t) BRIGHTNESS_CHARACTERISTIC_UUID),
+      BLECharacteristic::PROPERTY_WRITE),
+   _settings_descriptor(BLEUUID((uint16_t)0x2901)),
+   _settings_characteristics(
+      BLEUUID((uint16_t) SETTINGS_CHARACTERISTIC_UUID),
       BLECharacteristic::PROPERTY_WRITE)
-    { }
+    {
+      _device_name_descriptor.setValue("Device name");
+      _model_number_descriptor.setValue("Model number");
+      _firmware_revision_descriptor.setValue("Firmware");
+      _light_pattern_descriptor.setValue("Set light pattern");
+      _brightness_descriptor.setValue("Set light brightness");
+      _settings_descriptor.setValue("Set colors");
+    }
 
 void Ble::begin() {
-
    BLEDevice::init(DEVICE_NAME);
    _server = BLEDevice::createServer();
    _server->setCallbacks(new MyServerCallbacks(this));
@@ -52,11 +65,22 @@ void Ble::begin() {
    _firmware_revision_characteristics.addDescriptor(&_firmware_revision_descriptor);
    _firmware_revision_characteristics.setCallbacks(new FirmwareRevisionCallback(this));
 
-   deviceInfoService->addCharacteristic(&_light_led_characteristics);
-   _light_led_characteristics.addDescriptor(&_light_led_descriptor);
-   _light_led_characteristics.setCallbacks(new LightLedCallback(this));
+   BLEService *rcService = _server->createService(BLEUUID((uint16_t) REMOTE_CTRL_SERVICE_UUID));
+
+   rcService->addCharacteristic(&_light_pattern_characteristics);
+   _light_pattern_characteristics.addDescriptor(&_light_pattern_descriptor);
+   _light_pattern_characteristics.setCallbacks(new SetLightPatternCallback(this));
+
+   rcService->addCharacteristic(&_brightness_characteristics);
+   _brightness_characteristics.addDescriptor(&_brightness_descriptor);
+   _brightness_characteristics.setCallbacks(new SetBrightnessLedCallback(this));
+
+   rcService->addCharacteristic(&_settings_characteristics);
+   _settings_characteristics.addDescriptor(&_settings_descriptor);
+   _settings_characteristics.setCallbacks(new SetSettingCallback(this));
 
    deviceInfoService->start();
+   rcService->start();
 
    BLEDevice::startAdvertising();
 }
@@ -84,24 +108,14 @@ bool Ble::connected() {
 void Ble::on_connect(BLEServer * server) {
    if (server == _server) {
       _device_connected = true;
+      _server->startAdvertising();
+      BLE_DEBUG(verbosity_t::info, "CONNECT");
    }
 }
 
 void Ble::on_disconnect(BLEServer * server) {
    if (server == _server) {
       _device_connected = false;
+      BLE_DEBUG(verbosity_t::info, "DISCONNECT");
    }
-}
-
-void Ble::on_light_led(size_t len, uint8_t* data) {
-   _received_data_length = len;
-   _received_data = data;
-}
-
-size_t Ble::get_received_data_length() {
-   return _received_data_length;
-}
-
-uint8_t* Ble::get_received_data() {
-   return _received_data;
 }

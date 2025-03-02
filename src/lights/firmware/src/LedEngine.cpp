@@ -19,7 +19,10 @@ LedEngine::LedEngine() :
 void LedEngine::begin() {
    _strip.begin();           // INITIALIZE NeoPixel strip object (REQUIRED)
    _strip.show();            // Turn OFF all pixels ASAP
-   _strip.setBrightness(LED_BRIGHTNESS);
+
+   _preferences.begin("spray-wall", false);
+
+   _strip.setBrightness(_preferences.getUChar("brightness", LED_BRIGHTNESS));
 }
 
 int LedEngine::get_pixel_interval() {
@@ -141,24 +144,51 @@ void LedEngine::light_route(uint8_t* data, size_t length) {
    _strip.show();
 }
 
-uint32_t LedEngine::color(byte b) {
+uint32_t LedEngine::color(uint8_t b) {
    u_int32_t color;
    switch (b) {
       case 1:
-      color = LedEngine::color(0, 255, 0);
+      color = LedEngine::color(
+         _preferences.getUChar("cr" + b, 0),
+         _preferences.getUChar("cg" + b, 255),
+         _preferences.getUChar("cb" + b, 0));
       break;
       case 2:
-      color = LedEngine::color(0, 255, 255);
+      color = LedEngine::color(
+         _preferences.getUChar("cr" + b, 0),
+         _preferences.getUChar("cg" + b, 255),
+         _preferences.getUChar("cb" + b, 255));
       break;
       case 3:
-      color = LedEngine::color(255, 224, 102);
+      color = LedEngine::color(
+         _preferences.getUChar("cr" + b, 255),
+         _preferences.getUChar("cg" + b, 224),
+         _preferences.getUChar("cb" + b, 102));
       break;
       case 4:
-      color = LedEngine::color(255, 0, 0);
+      color = LedEngine::color(
+         _preferences.getUChar("cr" + b, 255),
+         _preferences.getUChar("cg" + b, 0),
+         _preferences.getUChar("cb" + b, 0));
       break;
       default:
-      color = LedEngine::color(255, 141, 161);
+      color = LedEngine::color(
+         _preferences.getUChar("cr" + b, 255),
+         _preferences.getUChar("cg" + b, 141),
+         _preferences.getUChar("cb" + b, 161));
       break;
    }
    return color;
+}
+
+void LedEngine::set_brightness(uint8_t brightness) {
+   _preferences.putUChar("brightness", brightness);
+   _strip.setBrightness(brightness);
+   light_route(_last_pattern, _last_pattern_length);
+}
+
+void LedEngine::set_color(uint8_t type, uint8_t r, uint8_t g, uint8_t b) {
+   _preferences.putUChar("cr" + type, r);
+   _preferences.putUChar("cg" + type, g);
+   _preferences.putUChar("cb" + type, b);
 }

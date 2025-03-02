@@ -17,17 +17,18 @@
 #endif
 
 #define DEVICE_INFO_SERVICE_UUID 0x180A
-#define DEVICE_NAME_CHARACTERISTIC_UUID 0x2A00
 
+#define DEVICE_NAME_CHARACTERISTIC_UUID 0x2A00
 #define MODEL_NUMBER_STR_CHARACTERISTIC_UUID 0x2A24
 #define SERIAL_NUMBER_STR_CHARACTERISTIC_UUID 0x2A25
 #define FIRMWARE_REVISION_STR_CHARACTERISTIC_UUID 0x2A26
 #define HARDWARE_REVISION_STR_CHARACTERISTIC_UUID 0x2A27
 #define MANUFACTURER_NAME_CHARACTERISTIC_UUID 0x2A29
-#define LIGHT_LED_STR_CHARACTERISTIC_UUID 0x2ACF //Step Climber Data
 
-// #define SYSTEM_ID_CHARACTERISTIC_UUID 0x2A23
-// #define SOFTWARE_REVISION_STR_CHARACTERISTIC_UUID 0x2A28
+#define REMOTE_CTRL_SERVICE_UUID 0x110F // A/V Remote Control Controller
+#define LIGHT_PATTERN_CHARACTERISTIC_UUID 0x2ACF // Step Climber Data
+#define BRIGHTNESS_CHARACTERISTIC_UUID 0x2B01 // Luminous Intensity
+#define SETTINGS_CHARACTERISTIC_UUID 0x2B1E // RC Settings
 
 #define FULL_PACKET 512
 #define CHARPOS_UPDATE_FLAG 5
@@ -42,20 +43,16 @@ class Ble {
    void on_connect(BLEServer * server);
    void on_disconnect(BLEServer * server);
 
-   void on_light_led(size_t len, uint8_t* data);
-
    bool connected();
 
-   size_t get_received_data_length();
-   uint8_t* get_received_data();
+   void (*_data_received_callback)(uint8_t* data, size_t len);
+   void (*_set_brightness_callback)(uint8_t brightness);
+   void (*_set_setting_callback)(uint8_t* data, size_t len);
 
    private:
    BLEServer * _server = NULL;
    bool _device_connected = false;
    bool _old_device_connected = false;
-
-   size_t _received_data_length;
-   uint8_t* _received_data;
 
    BLECharacteristic _device_name_characteristics;
    BLEDescriptor _device_name_descriptor;
@@ -66,8 +63,14 @@ class Ble {
    BLECharacteristic _firmware_revision_characteristics;
    BLEDescriptor _firmware_revision_descriptor;
 
-   BLECharacteristic _light_led_characteristics;
-   BLEDescriptor _light_led_descriptor;
+   BLECharacteristic _light_pattern_characteristics;
+   BLEDescriptor _light_pattern_descriptor;
+
+   BLECharacteristic _brightness_characteristics;
+   BLEDescriptor _brightness_descriptor;
+
+   BLECharacteristic _settings_characteristics;
+   BLEDescriptor _settings_descriptor;
 };
 
 // Setup callbacks onConnect and onDisconnect
@@ -124,15 +127,43 @@ class FirmwareRevisionCallback : public BLECharacteristicCallbacks {
    esp_ota_handle_t _ota_handler = 0;
 };
 
-class LightLedCallback : public BLECharacteristicCallbacks {
+class SetLightPatternCallback : public BLECharacteristicCallbacks {
    void onWrite(BLECharacteristic* pCharacteristic) {
       size_t length = pCharacteristic->getLength();
       if (length > 0) {
-         _ble->on_light_led(length, pCharacteristic->getData());
+         _ble->_data_received_callback(pCharacteristic->getData(), length);
       }
    }
    public:
-   LightLedCallback(Ble* ble) : _ble(ble) { }
+   SetLightPatternCallback(Ble* ble) : _ble(ble) { }
+
+   private:
+   Ble * _ble;
+};
+
+class SetBrightnessLedCallback : public BLECharacteristicCallbacks {
+   void onWrite(BLECharacteristic* pCharacteristic) {
+      size_t length = pCharacteristic->getLength();
+      if (length == 1) {
+         _ble->_set_brightness_callback(pCharacteristic->getData()[0]);
+      }
+   }
+   public:
+   SetBrightnessLedCallback(Ble* ble) : _ble(ble) { }
+
+   private:
+   Ble * _ble;
+};
+
+class SetSettingCallback : public BLECharacteristicCallbacks {
+   void onWrite(BLECharacteristic* pCharacteristic) {
+      size_t length = pCharacteristic->getLength();
+      if (length > 0) {
+         _ble->_set_setting_callback(pCharacteristic->getData(), length);
+      }
+   }
+   public:
+   SetSettingCallback(Ble* ble) : _ble(ble) { }
 
    private:
    Ble * _ble;
