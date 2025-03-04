@@ -5,7 +5,7 @@ import { AuthGuard } from './guards/auth.guard';
 const routes: Routes = [
   {
     path: '',
-    redirectTo: 'routes',
+    redirectTo: 'gyms',
     pathMatch: 'full'
   },
   {
@@ -35,6 +35,11 @@ const routes: Routes = [
   {
     path: 'not-found',
     loadChildren: () => import('./pages/not-found/not-found.module').then(m => m.NotFoundPageModule),
+    pathMatch: 'full'
+  },
+  {
+    path: 'gyms',
+    loadChildren: () => import('./pages/list-gyms/list-gyms.module').then(m => m.ListGymsPageModule),
     pathMatch: 'full'
   },
   {

@@ -40,7 +40,7 @@ export class AuthService {
 
   async login(email: string, password: string): Promise<User | null> {
     try {
-      const session = await this.account.createEmailSession(email, password);
+      const session = await this.account.createSession(email, password);
       const apiUser = await this._getUser();
 
       this.user.next(new User(apiUser));

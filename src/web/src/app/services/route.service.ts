@@ -18,8 +18,8 @@ import { environment } from 'src/environments/environment';
 export class RouteService {
 
   private _db: Databases;
-  private _routeCollectionId = environment.AppWrite.Collections.Routes;
-  private _logCollectionId = environment.AppWrite.Collections.Logs;
+  private readonly _routeCollectionId = environment.AppWrite.Collections.Routes;
+  private readonly _logCollectionId = environment.AppWrite.Collections.Logs;
 
   public routeDifficulty: Map<number, string> = new Map<number, string>();
   public boulderDifficulty: Map<number, string> = new Map<number, string>();
