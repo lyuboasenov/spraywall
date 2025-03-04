@@ -24,7 +24,8 @@ namespace SpraywallTemplateAnalyzer.Serialization {
             PointToArray(h.Center),
             h.Radius,
             RotatedRectToArray(h.MinRect),
-            PointsToArray(h.Contour)
+            PointsToArray(h.Contour),
+            h.Index
          };
 
          joArray.WriteTo(writer);

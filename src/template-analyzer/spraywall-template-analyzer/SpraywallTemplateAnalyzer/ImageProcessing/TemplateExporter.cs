@@ -26,6 +26,7 @@ namespace SpraywallTemplateAnalyzer.ImageProcessing {
                MinRect = hold.MinRect,
                Radius = radius,
                Contour = ReduceContour(hold.Contour),
+               Index = hold.Index,
             };
          }
       }

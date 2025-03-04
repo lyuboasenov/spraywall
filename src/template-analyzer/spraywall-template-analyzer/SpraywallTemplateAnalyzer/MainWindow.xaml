@@ -1,119 +1,122 @@
 ﻿<Window
-   x:Class="SpraywallTemplateAnalyzer.MainWindow"
-   xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-   xmlns:models="clr-namespace:SpraywallTemplateAnalyzer.Models"
-   xmlns:skia="clr-namespace:SkiaSharp.Views.WPF;assembly=SkiaSharp.Views.WPF"
-   xmlns:wpf="clr-namespace:SpraywallTemplateAnalyzer.Wpf"
-   Title="MainWindow"
-   Width="800"
-   Height="450"
-   mc:Ignorable="d">
-   <Window.Resources>
-      <wpf:ColorToSolidColorBrushConverter x:Key="ColorToSolidColorBrushConverter" />
-   </Window.Resources>
-   <Grid>
-      <Grid.RowDefinitions>
-         <RowDefinition Height="Auto" />
-         <RowDefinition Height="*" />
-      </Grid.RowDefinitions>
-      <StackPanel Orientation="Horizontal">
-         <Menu>
-            <MenuItem Header="_File">
-               <MenuItem Click="btnBrawses_Click" Header="_Brawse" />
-               <MenuItem Click="btnLoad_Click" Header="_Load" />
-               <MenuItem Click="btnSave_Click" Header="_Save" />
-               <MenuItem Click="btnExport_Click" Header="_Export" />
-            </MenuItem>
-            <MenuItem Click="btnTuneModel_Click" Header="_Tune model" />
-            <MenuItem Header="_Select">
-               <MenuItem Click="btnSelectAll_Click" Header="_All" />
-               <MenuItem Click="btnSelectNone_Click" Header="_None" />
-            </MenuItem>
-         </Menu>
-         <TextBlock Text="{Binding Value, ElementName=slZoom, StringFormat=N2}" />
-         <Slider
-            x:Name="slZoom"
-            Width="300"
-            LargeChange="0.25"
-            Maximum="8.0"
-            Minimum="0.0"
-            SmallChange="0.01"
-            Value="1.0" />
-      </StackPanel>
-      <Grid Grid.Row="1">
-         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="Auto" />
-         </Grid.ColumnDefinitions>
+    x:Class="SpraywallTemplateAnalyzer.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:models="clr-namespace:SpraywallTemplateAnalyzer.Models"
+    xmlns:skia="clr-namespace:SkiaSharp.Views.WPF;assembly=SkiaSharp.Views.WPF"
+    xmlns:wpf="clr-namespace:SpraywallTemplateAnalyzer.Wpf"
+    Title="MainWindow"
+    Width="800"
+    Height="450"
+    mc:Ignorable="d">
+    <Window.Resources>
+        <wpf:ColorToSolidColorBrushConverter x:Key="ColorToSolidColorBrushConverter" />
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <StackPanel Orientation="Horizontal">
+            <Menu>
+                <MenuItem Header="_File">
+                    <MenuItem Click="btnBrawses_Click" Header="_Brawse" />
+                    <MenuItem Click="btnLoad_Click" Header="_Load" />
+                    <MenuItem Click="btnSave_Click" Header="_Save" />
+                    <MenuItem Click="btnExport_Click" Header="_Export" />
+                </MenuItem>
+                <MenuItem Click="btnTuneModel_Click" Header="_Tune model" />
+                <MenuItem Header="_Select">
+                    <MenuItem Click="btnSelectAll_Click" Header="_All" />
+                    <MenuItem Click="btnSelectNone_Click" Header="_None" />
+                </MenuItem>
+            </Menu>
+            <TextBlock Text="{Binding Value, ElementName=slZoom, StringFormat=N2}" />
+            <Slider
+                x:Name="slZoom"
+                Width="300"
+                LargeChange="0.25"
+                Maximum="8.0"
+                Minimum="0.0"
+                SmallChange="0.01"
+                Value="1.0" />
+        </StackPanel>
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
 
-            <ScrollViewer x:Name="svScroll" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
-            <skia:SKElement
-               Name="img"
-               MouseLeftButtonDown="img_MouseLeftButtonDown"
-               MouseRightButtonDown="img_MouseRightButtonDown"
-               PaintSurface="img_PaintSurface"
-                MouseWheel="img_MouseWheel"
-                MouseMove="img_MouseMove"
-                MouseDown="img_MouseDown"
-                MouseUp="img_MouseUp">
-               <skia:SKElement.LayoutTransform>
-                  <ScaleTransform ScaleX="{Binding ElementName=slZoom, Path=Value}" ScaleY="{Binding ElementName=slZoom, Path=Value}" />
-               </skia:SKElement.LayoutTransform>
-            </skia:SKElement>
-         </ScrollViewer>
+            <ScrollViewer
+                x:Name="svScroll"
+                HorizontalScrollBarVisibility="Auto"
+                VerticalScrollBarVisibility="Auto">
+                <skia:SKElement
+                    Name="img"
+                    MouseDown="img_MouseDown"
+                    MouseLeftButtonDown="img_MouseLeftButtonDown"
+                    MouseMove="img_MouseMove"
+                    MouseRightButtonDown="img_MouseRightButtonDown"
+                    MouseUp="img_MouseUp"
+                    MouseWheel="img_MouseWheel"
+                    PaintSurface="img_PaintSurface">
+                    <skia:SKElement.LayoutTransform>
+                        <ScaleTransform ScaleX="{Binding ElementName=slZoom, Path=Value}" ScaleY="{Binding ElementName=slZoom, Path=Value}" />
+                    </skia:SKElement.LayoutTransform>
+                </skia:SKElement>
+            </ScrollViewer>
 
-         <Grid Grid.Column="1" Width="110">
-            <Grid.RowDefinitions>
-               <RowDefinition Height="Auto" />
-               <RowDefinition Height="*" />
-            </Grid.RowDefinitions>
+            <Grid Grid.Column="1" Width="110">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
 
-            <TextBlock
-               x:Name="txtAddedPoints"
-               Grid.Row="0"
-               HorizontalAlignment="Center">
-               0
-            </TextBlock>
+                <TextBlock
+                    x:Name="txtAddedPoints"
+                    Grid.Row="0"
+                    HorizontalAlignment="Center">
+                    0
+                </TextBlock>
 
-            <ListView
-               x:Name="lstEllipses"
-               Grid.Row="1"
-               ScrollViewer.VerticalScrollBarVisibility="Auto">
-               <ListView.ItemTemplate>
-                  <DataTemplate DataType="models:SelectableRotatedRect">
-                     <StackPanel
-                        Background="{Binding Color, Converter={StaticResource ColorToSolidColorBrushConverter}}"
-                        MouseEnter="StackPanel_MouseEnter"
-                        MouseLeave="StackPanel_MouseLeave"
-                        Orientation="Horizontal">
-                        <CheckBox
-                           Margin="5"
-                           VerticalAlignment="Center"
-                           Click="CheckBox_Checked"
-                           IsChecked="{Binding Path=IsSelected}" />
-                        <Button
-                           x:Name="btnEditItem"
-                           Margin="5"
-                           Padding="5"
-                           Click="btnEditItem_Click"
-                           Content="E" />
-                        <Button
-                           x:Name="btnRemoveItem"
-                           Margin="5"
-                           Padding="5"
-                           Click="btnRemoveItem_Click"
-                           Content="R" />
+                <ListView
+                    x:Name="lstEllipses"
+                    Grid.Row="1"
+                    ScrollViewer.VerticalScrollBarVisibility="Auto">
+                    <ListView.ItemTemplate>
+                        <DataTemplate DataType="models:SelectableRotatedRect">
+                            <StackPanel
+                                Background="{Binding Color, Converter={StaticResource ColorToSolidColorBrushConverter}}"
+                                MouseEnter="StackPanel_MouseEnter"
+                                MouseLeave="StackPanel_MouseLeave"
+                                Orientation="Horizontal">
+                                <CheckBox
+                                    Margin="5"
+                                    VerticalAlignment="Center"
+                                    Click="CheckBox_Checked"
+                                    IsChecked="{Binding Path=IsSelected}" />
+                                <TextBox Width="20" Text="{Binding Path=Hold.Index}" />
+                                <Button
+                                    x:Name="btnEditItem"
+                                    Margin="5"
+                                    Padding="5"
+                                    Click="btnEditItem_Click"
+                                    Content="E" />
+                                <Button
+                                    x:Name="btnRemoveItem"
+                                    Margin="5"
+                                    Padding="5"
+                                    Click="btnRemoveItem_Click"
+                                    Content="R" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+            </Grid>
 
-                     </StackPanel>
-                  </DataTemplate>
-               </ListView.ItemTemplate>
-            </ListView>
-         </Grid>
-
-      </Grid>
-   </Grid>
+        </Grid>
+    </Grid>
 
 </Window>

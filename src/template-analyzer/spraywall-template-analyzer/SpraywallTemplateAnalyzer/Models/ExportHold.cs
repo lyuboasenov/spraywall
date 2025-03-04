@@ -7,5 +7,6 @@ namespace SpraywallTemplateAnalyzer.Models {
       public Point[] Contour { get; set; }
       public Point Center { get; set; }
       public uint Radius { get; set; }
+      public uint Index { get; set; }
    }
 }

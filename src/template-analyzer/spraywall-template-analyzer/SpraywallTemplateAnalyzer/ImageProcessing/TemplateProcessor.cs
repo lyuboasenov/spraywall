@@ -109,6 +109,7 @@ namespace SpraywallTemplateAnalyzer.ImageProcessing {
             CvInvoke.FindContours(cannyEdges, contours, null, RetrType.List, ChainApproxMethod.ChainApproxSimple);
 
             int count = contours.Size;
+            uint index = 0;
             for (int i = 0; i < count; i++) {
                using (VectorOfPoint contour = contours[i])
                using (VectorOfPoint approxContour = new VectorOfPoint()) {
@@ -131,7 +132,8 @@ namespace SpraywallTemplateAnalyzer.ImageProcessing {
                            MinRect = rect,
                            Contour = points,
                            Center = center,
-                           Radius = (uint) Math.Sqrt(radiusSq)
+                           Radius = (uint) Math.Sqrt(radiusSq),
+                           Index = index++
                         });
                      }
                   }
