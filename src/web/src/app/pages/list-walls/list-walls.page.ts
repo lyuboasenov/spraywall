@@ -16,12 +16,7 @@ export class ListWallsPage implements OnInit {
   private loading: any | null;
   public walls: Wall[] = [];
 
-  constructor(private wallService: WallService, private loadingCtrl: LoadingController) {
-    this.wallService.getAll().then((i: Wall[]) => {
-          this.walls = i;
-          this.loading?.dismiss();
-        });
-  }
+  constructor(private wallService: WallService, private loadingCtrl: LoadingController) { }
 
   async ngOnInit() {
     this.gymId = this.activatedRoute.snapshot.paramMap.get('id') as string;
@@ -30,14 +25,17 @@ export class ListWallsPage implements OnInit {
 
   async showLoading() {
     navigator.locks.request('dismiss-loading', async (lock) => {
-      if (this.walls.length == 0){
         this.loading = await this.loadingCtrl.create({
           message: 'Loading walls...',
         });
-
         this.loading.present();
-      }
-    });
+
+        this.wallService.getAll().then((i: Wall[]) => {
+          this.walls = i;
+          console.log(this.walls);
+          this.loading?.dismiss();
+        });
+      });
   }
 
 }

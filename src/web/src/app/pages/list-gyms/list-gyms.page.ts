@@ -13,12 +13,7 @@ export class ListGymsPage implements OnInit {
   private loading: any | null;
   public gyms: Gym[] = [];
 
-  constructor(private gymService: GymService, private loadingCtrl: LoadingController) {
-    this.gymService.getAll().then((g: Gym[]) => {
-      this.gyms = g;
-      this.loading?.dismiss();
-    });
-  }
+  constructor(private gymService: GymService, private loadingCtrl: LoadingController) {}
 
   async ngOnInit() {
     await this.showLoading();
@@ -32,6 +27,11 @@ export class ListGymsPage implements OnInit {
         });
 
         this.loading.present();
+
+        this.gymService.getAll().then((g: Gym[]) => {
+          this.gyms = g;
+          this.loading?.dismiss();
+        });
       }
     });
   }
