@@ -13,7 +13,7 @@ export class ListGymsPage implements OnInit {
   private loading: any | null;
   public gyms: Gym[] = [];
 
-  constructor(private gymService: GymService, private auth: AuthService, private loadingCtrl: LoadingController) {
+  constructor(private gymService: GymService, private loadingCtrl: LoadingController) {
     this.gymService.getAll().then((g: Gym[]) => {
       this.gyms = g;
       this.loading?.dismiss();

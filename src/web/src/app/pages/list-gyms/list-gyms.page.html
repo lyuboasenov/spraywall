@@ -19,7 +19,7 @@
   <div id="container">
     <strong class="capitalize"></strong>
     <ion-list class="gym">
-      <ion-item *ngFor="let b of gyms" [button]="true" routerDirection="root" [routerLink]="[ '/walls/' + b.Id ]">
+      <ion-item *ngFor="let b of gyms" [button]="true" routerDirection="root" [routerLink]="[ '/gyms/' + b.Id + '/walls' ]">
         <ion-label>
 
           <h2><img [hidden]="!b.Logo" src="{{b.Logo}}" /><span [hidden]="b.Logo">{{b.Name}}</span></h2>

@@ -9,6 +9,11 @@ const routes: Routes = [
     pathMatch: 'full'
   },
   {
+    path: '/',
+    redirectTo: 'gyms',
+    pathMatch: 'full'
+  },
+  {
     path: 'login',
     loadChildren: () => import('./pages/login/login.module').then(m => m.LoginPageModule),
     pathMatch: 'full'
@@ -40,6 +45,11 @@ const routes: Routes = [
   {
     path: 'gyms',
     loadChildren: () => import('./pages/list-gyms/list-gyms.module').then(m => m.ListGymsPageModule),
+    pathMatch: 'full'
+  },
+  {
+    path: 'gyms/:id/walls',
+    loadChildren: () => import('./pages/list-walls/list-walls.module').then(m => m.ListWallsPageModule),
     pathMatch: 'full'
   },
   {
@@ -79,12 +89,6 @@ const routes: Routes = [
   {
     path: 'routes/:id/details',
     loadChildren: () => import('./pages/view-route-details/view-route-details.module').then(m => m.ViewRouteDetailsPageModule),
-    pathMatch: 'full'
-  },
-  {
-    path: 'walls',
-    loadChildren: () => import('./pages/list-walls/list-walls.module').then(m => m.ListWallsPageModule),
-    canActivate: [AuthGuard],
     pathMatch: 'full'
   },
   {
