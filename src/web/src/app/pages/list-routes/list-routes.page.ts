@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, inject, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { RouteService } from '../../services/route.service';
 import { IonModal, LoadingController } from '@ionic/angular';
 import { OverlayEventDetail } from '@ionic/core/components';
@@ -8,6 +8,7 @@ import { AuthService } from 'src/app/services/auth.service';
 import { RouteStyle } from 'src/app/models/route/route-style';
 import { RouteType } from 'src/app/models/route/route-type';
 import { RouteSignature } from 'src/app/models/route/route-signature';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-list-routes',
@@ -16,6 +17,7 @@ import { RouteSignature } from 'src/app/models/route/route-signature';
 })
 export class ListRoutesPage implements OnInit {
   private loading: any | null;
+  private activatedRoute = inject(ActivatedRoute);
 
   @ViewChild(IonModal) modal!: IonModal;
 
@@ -25,6 +27,8 @@ export class ListRoutesPage implements OnInit {
 
   @Input() user: any | null = null;
 
+  public gymId!: string;
+  public wallId!: string;
   public routeStyle?: RouteStyle;
   public routeType?: RouteType;
   public angle?: number;
@@ -37,7 +41,12 @@ export class ListRoutesPage implements OnInit {
   public selectedRoute?: RouteSignature;
   public template: WallTemplate | null = null;
 
-  constructor(private routeService: RouteService, private wallTemplateService: WallTemplateService, private auth: AuthService, private loadingCtrl: LoadingController) {
+  constructor(
+    private routeService: RouteService,
+    private wallTemplateService: WallTemplateService,
+    private auth: AuthService,
+    private loadingCtrl: LoadingController,
+    private cd: ChangeDetectorRef) {
     this.routeTypes = this.routeService.routeTypes;
     this.routeStyles = this.routeService.routeStyles;
 
@@ -55,6 +64,9 @@ export class ListRoutesPage implements OnInit {
       this.routeService.getAll().then((routes: RouteSignature[]) => {
         this.routes = routes;
         this.loading?.dismiss();
+
+        this.cd.markForCheck();
+        this.cd.detectChanges();
       });
     });
 
@@ -66,6 +78,9 @@ export class ListRoutesPage implements OnInit {
   }
 
   async ngOnInit() {
+    this.gymId = this.activatedRoute.snapshot.paramMap.get('gymId') as string;
+    this.wallId = this.activatedRoute.snapshot.paramMap.get('wallId') as string;
+
     await this.showLoading();
     this.difficulties.clear();
 
@@ -134,5 +149,4 @@ export class ListRoutesPage implements OnInit {
     this.routeService.filter.Angle = this.angle;
     this.routes = await this.routeService.getAll();
   }
-
 }

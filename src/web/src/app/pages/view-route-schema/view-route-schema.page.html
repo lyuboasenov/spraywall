@@ -1,7 +1,10 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-buttons slot="primary">
-      <ion-button fill="solid" *ngIf="user?.hasPermission('routesetter') ?? false" routerLink="/routes/edit/{{parent_id}}">
+      <ion-button
+        fill="solid"
+        *ngIf="user?.hasPermission('routesetter') ?? false"
+        routerLink="/gyms/{{gymId}}/walls/{{wallId}}/routes/edit/{{parent_id}}">
         <ion-icon name="create-outline"></ion-icon>
       </ion-button>
       <ion-button fill="solid" (click)="openSendModal()" *ngIf="user">
@@ -16,7 +19,7 @@
       <ion-menu-button></ion-menu-button>
     </ion-buttons>
     <ion-buttons slot="start">
-      <ion-button fill="solid" routerLink="/routes">
+      <ion-button fill="solid" routerLink="/gyms/{{gymId}}/walls/{{wallId}}/routes">
         <ion-icon name="chevron-back-outline"></ion-icon>
       </ion-button>
     </ion-buttons>

@@ -29,6 +29,8 @@ export class ViewRouteSchemaPage implements OnInit {
 
   public route?: Route;
   public id!: string;
+  public gymId!: string;
+  public wallId!: string;
   public parent_id!: string;
 
   public isSendModalOpen: boolean = false;
@@ -37,7 +39,12 @@ export class ViewRouteSchemaPage implements OnInit {
   public rating?: number;
   @Output() public difficulties: Map<number, string> = new Map<number, string>();
 
-  constructor(private routeService: RouteService, private wallTemplateService: WallTemplateService, private router: Router, private loadingCtrl: LoadingController, private auth: AuthService) { }
+  constructor(
+    private routeService: RouteService,
+    private wallTemplateService: WallTemplateService,
+    private router: Router,
+    private loadingCtrl: LoadingController,
+    private auth: AuthService) { }
 
   async ngOnInit() {
     this.auth.user.subscribe(next => {
@@ -47,6 +54,8 @@ export class ViewRouteSchemaPage implements OnInit {
     await this.showLoading();
 
     this.id = this.activatedRoute.snapshot.paramMap.get('id') as string;
+    this.gymId = this.activatedRoute.snapshot.paramMap.get('gymId') as string;
+    this.wallId = this.activatedRoute.snapshot.paramMap.get('wallId') as string;
     const route = await this.routeService.getById(this.id);
 
     this.difficulties.clear();

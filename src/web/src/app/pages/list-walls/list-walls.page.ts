@@ -10,7 +10,6 @@ import { WallService } from 'src/app/services/wall.service';
   styleUrls: ['./list-walls.page.scss'],
 })
 export class ListWallsPage implements OnInit {
-
   private activatedRoute = inject(ActivatedRoute);
   public gymId!: string;
   private loading: any | null;

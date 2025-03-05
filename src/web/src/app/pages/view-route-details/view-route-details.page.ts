@@ -19,6 +19,8 @@ export class ViewRouteDetailsPage implements OnInit {
 
    public route?: Route;
    public id!: string;
+   public gymId!: string;
+   public wallId!: string;
    public parent_id!: string;
 
    @ViewChild(IonModal) modal!: IonModal;
@@ -28,13 +30,18 @@ export class ViewRouteDetailsPage implements OnInit {
    public rating?: number;
    @Output() public difficulties: Map<number, string> = new Map<number, string>();
 
-  constructor(private routeService: RouteService, private router: Router, private auth: AuthService) { }
+  constructor(
+    private routeService: RouteService,
+    private router: Router,
+    private auth: AuthService) { }
 
   async ngOnInit() {
     this.auth.user.subscribe(next => {
       this.user = next;
     });
     this.id = this.activatedRoute.snapshot.paramMap.get('id') as string;
+    this.gymId = this.activatedRoute.snapshot.paramMap.get('gymId') as string;
+    this.wallId = this.activatedRoute.snapshot.paramMap.get('wallId') as string;
     const route = await this.routeService.getById(this.id);
 
     this.difficulties.clear();

@@ -53,7 +53,7 @@ const routes: Routes = [
     pathMatch: 'full'
   },
   {
-    path: 'routes',
+    path: 'gyms/:gymId/walls/:wallId/routes',
     loadChildren: () => import('./pages/list-routes/list-routes.module').then(m => m.ListRoutesPageModule),
     pathMatch: 'full'
   },
@@ -82,12 +82,12 @@ const routes: Routes = [
     pathMatch: 'full'
   },
   {
-    path: 'routes/:id',
+    path: 'gyms/:gymId/walls/:wallId/routes/:id',
     loadChildren: () => import('./pages/view-route-schema/view-route-schema.module').then(m => m.ViewRouteSchemaPageModule),
     pathMatch: 'full'
   },
   {
-    path: 'routes/:id/details',
+    path: 'gyms/:gymId/walls/:wallId/routes/:id/details',
     loadChildren: () => import('./pages/view-route-details/view-route-details.module').then(m => m.ViewRouteDetailsPageModule),
     pathMatch: 'full'
   },
