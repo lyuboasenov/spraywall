@@ -35,11 +35,11 @@ export class LoginPage implements OnInit {
 
   async ngOnInit() {
     if (this.auth.user.value) {
-      this.router.navigateByUrl('/routes');
+      this.router.navigateByUrl('/gyms');
     }
     this.auth.user.subscribe(next => {
       if (next) {
-         this.router.navigateByUrl('/routes');
+         this.router.navigateByUrl('/gyms');
       }
     });
   }
@@ -49,7 +49,7 @@ export class LoginPage implements OnInit {
       const user = await this.auth.login(formData.email, formData.password);
 
       if (user) {
-        this.router.navigateByUrl('/routes');
+        this.router.navigateByUrl('/gyms');
       }
     } catch (e) {
       let alert = await this.alertCtrl.create({
@@ -57,6 +57,7 @@ export class LoginPage implements OnInit {
         message: 'Error occurred while logging in!',
         buttons: ['OK']
       });
+      console.error(e);
       await alert.present();
     }
 

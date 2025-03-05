@@ -13,7 +13,10 @@ export class AuthService {
   private account: Account;
   public user : BehaviorSubject<User | null> = new BehaviorSubject<User | null>(null);
 
-  constructor(private router: Router, private appwrite: AppwriteService, private storageProxy: StorageProxyService) {
+  constructor(
+    private router: Router,
+    private appwrite: AppwriteService,
+    private storageProxy: StorageProxyService) {
     this.account = new Account(appwrite.client);
     this.loadUser();
   }
@@ -40,7 +43,7 @@ export class AuthService {
 
   async login(email: string, password: string): Promise<User | null> {
     try {
-      const session = await this.account.createSession(email, password);
+      const session = await this.account.createEmailPasswordSession(email, password);
       const apiUser = await this._getUser();
 
       this.user.next(new User(apiUser));
