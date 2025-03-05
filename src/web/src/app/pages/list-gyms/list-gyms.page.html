@@ -21,8 +21,7 @@
     <ion-list class="gym">
       <ion-item *ngFor="let b of gyms" [button]="true" routerDirection="root" [routerLink]="[ '/gyms/' + b.Id + '/walls' ]">
         <ion-label>
-
-          <h2><img [hidden]="!b.Logo" src="{{b.Logo}}" /><span [hidden]="b.Logo">{{b.Name}}</span></h2>
+          <h2><img *ngIf="b.Logo" src="{{b.Logo}}" /><span *ngIf="!b.Logo">{{b.Name}}</span></h2>
           <p class="desc">{{b.Description}}</p>
           <p class="address">{{b.Address}}</p>
         </ion-label>

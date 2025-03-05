@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
 import { AuthService } from 'src/app/services/auth.service';
 import { LoadingController } from '@ionic/angular';
 import { GymService } from 'src/app/services/gym.service';
@@ -13,7 +13,10 @@ export class ListGymsPage implements OnInit {
   private loading: any | null;
   public gyms: Gym[] = [];
 
-  constructor(private gymService: GymService, private loadingCtrl: LoadingController) {}
+  constructor(
+    private gymService: GymService,
+    private loadingCtrl: LoadingController,
+    private cd: ChangeDetectorRef) {}
 
   async ngOnInit() {
     await this.showLoading();
@@ -28,9 +31,12 @@ export class ListGymsPage implements OnInit {
 
         this.loading.present();
 
-        this.gymService.getAll().then((g: Gym[]) => {
-          this.gyms = g;
+        this.gymService.getAll().then((gyms: Gym[]) => {
+          this.gyms = gyms;
           this.loading?.dismiss();
+
+          this.cd.markForCheck();
+          this.cd.detectChanges();
         });
       }
     });

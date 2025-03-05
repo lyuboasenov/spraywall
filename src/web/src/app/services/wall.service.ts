@@ -3,6 +3,7 @@ import { Databases, Query, Models } from 'appwrite';
 import { AppwriteService } from './appwrite.service';
 import { environment } from 'src/environments/environment';
 import { Wall } from '../models/wall/wall';
+import { GymService } from './gym.service';
 
 @Injectable({
   providedIn: 'root'
@@ -16,7 +17,7 @@ export class WallService {
     this._db = new Databases(this.appwrite.client);
   }
 
-  public async getAll(): Promise<Wall[]> {
+  public async getAll(gymId: string): Promise<Wall[]> {
     let array: Wall[] = [];
 
     let query = [];
@@ -29,8 +30,10 @@ export class WallService {
       this._collectionId,
       query);
 
-    for (let g of all.documents) {
-      array.push(this.deserialize(g));
+    for (let w of all.documents) {
+      if (w['gym'].$id == gymId) {
+        array.push(this.deserialize(w));
+      }
     }
 
     return array;

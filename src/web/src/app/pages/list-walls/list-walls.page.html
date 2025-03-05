@@ -21,8 +21,8 @@
     <ion-list class="gym">
       <ion-item *ngFor="let b of walls" [button]="true" routerDirection="root" [routerLink]="[ '/routes/' + b.Id ]">
         <ion-label>{{b.Name}}</ion-label>
-        <ion-note [hidden]="!b.Description">{{b.Description}}</ion-note>
-        <ion-icon [hidden]="!b.SupportsLED" name="bulb-outline" slot="end" />
+        <ion-note *ngIf="b.Description">{{b.Description}}</ion-note>
+        <ion-icon *ngIf="b.SupportsLED" name="bulb-outline" slot="end" />
       </ion-item>
     </ion-list>
   </div>

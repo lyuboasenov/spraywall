@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { LoadingController } from '@ionic/angular';
 import { Wall } from 'src/app/models/wall/wall';
@@ -16,7 +16,10 @@ export class ListWallsPage implements OnInit {
   private loading: any | null;
   public walls: Wall[] = [];
 
-  constructor(private wallService: WallService, private loadingCtrl: LoadingController) { }
+  constructor(
+    private wallService: WallService,
+    private loadingCtrl: LoadingController,
+        private cd: ChangeDetectorRef) { }
 
   async ngOnInit() {
     this.gymId = this.activatedRoute.snapshot.paramMap.get('id') as string;
@@ -30,10 +33,12 @@ export class ListWallsPage implements OnInit {
         });
         this.loading.present();
 
-        this.wallService.getAll().then((i: Wall[]) => {
+        this.wallService.getAll(this.gymId).then((i: Wall[]) => {
           this.walls = i;
-          console.log(this.walls);
           this.loading?.dismiss();
+
+          this.cd.markForCheck();
+          this.cd.detectChanges();
         });
       });
   }
