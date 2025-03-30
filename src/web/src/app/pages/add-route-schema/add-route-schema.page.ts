@@ -95,6 +95,8 @@ export class AddRouteSchemaPage implements OnInit {
 
     const x = (event.clientX - canvasRect.left) * ratio;
     const y = (event.clientY - canvasRect.top) * ratio
+
+    // TODO: finished here
     const hold = await this.wallTemplateService.findHold(this.wallId, x, y);
 
     if (hold) {
