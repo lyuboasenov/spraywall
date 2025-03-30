@@ -68,7 +68,6 @@ export class ViewRouteSchemaPage implements OnInit {
 
     const canvas: HTMLCanvasElement = this.canvas.nativeElement;
     await this.wallTemplateService.drawTemplateBackdrop(this.wallId, canvas);
-
     if (route) {
       this.route = route;
 

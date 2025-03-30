@@ -4,7 +4,7 @@
       <ion-content>
         <ion-img id="menu-app-icon" [src]="environment.app_icon"></ion-img>
         <ion-list id="inbox-list" *ngIf="user">
-          <ion-list-header>SprayWall</ion-list-header>
+          <ion-list-header>Spraywall</ion-list-header>
           <ion-note *ngIf="user">hi {{user.name}}</ion-note>
 
           <ion-menu-toggle auto-hide="false" *ngFor="let p of appPages; let i = index">

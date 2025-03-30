@@ -35,7 +35,6 @@
     "@ionic/storage-angular": "^4.0.0",
     "@meddv/ngx-pinch-zoom": "^17.0.1",
     "appwrite": "13.0.2",
-    "ionic-cache": "^6.0.3",
     "ionicons": "^7.0.0",
     "rxjs": "~7.8.0",
     "spray-wall": "file:",

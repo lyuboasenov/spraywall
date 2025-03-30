@@ -11,7 +11,7 @@ export class AppComponent implements OnInit {
   @Input() user: any | null = null;
 
   public appPages = [
-    { title: 'Routes', url: '/routes', icon: 'reorder-four' },
+    { title: 'Gyms', url: '/gyms', icon: 'reorder-four' },
   ];
   public labels = ['Feet follow', 'Open feet', 'No matches'];
   public environment = environment;

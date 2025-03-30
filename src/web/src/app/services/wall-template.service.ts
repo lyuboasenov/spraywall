@@ -8,7 +8,6 @@ import { HoldType } from '../models/route/hold-type';
 import { WallTemplateHold } from '../models/wall-template/wall-template-hold';
 import { RotatedRect } from '../models/common/rotated-rect';
 import { Point } from '../models/common/point';
-import { CacheService } from "ionic-cache";
 
 @Injectable({
   providedIn: 'root'
@@ -16,12 +15,11 @@ import { CacheService } from "ionic-cache";
 export class WallTemplateService {
   private _db: Databases;
   private _collectionId = environment.AppWrite.Collections.Walls; // Wall
+  private _templateCache = new Map<string, WallTemplate>();
 
   constructor(
-    private cache: CacheService,
     private appwrite: AppwriteService) {
     this._db = new Databases(appwrite.client);
-    cache.setDefaultTTL(2 * 60 * 60); //set default cache TTL for 2 hour
   }
 
   public async markHolds(wallId: string, holds: RouteHold[] | null, selectedHold: RouteHold | null, canvas: HTMLCanvasElement) {
@@ -196,12 +194,22 @@ export class WallTemplateService {
   }
 
   public  async getTemplate(wallId: string) : Promise<WallTemplate | null> {
-    // return await this.cachingService.get(wallId, this.getTemplateNoCache) as WallTemplate;
-    return await this.cache.getOrSetItem(wallId, () => this.getTemplateNoCache(wallId));
+    if (!this._templateCache.has(wallId)) {
+      const template = await this.getTemplateNoCache(wallId);
+      if (null != template) {
+        this._templateCache.set(wallId, template);
+      }
+    }
+    const template = this._templateCache.get(wallId);
+    if (template === undefined) {
+      return null;
+    } else {
+      return template;
+    }
   }
 
   private static async getTemplateByWall() {
-    WallTemplateService.
+    // WallTemplateService.
   }
 
   private async getTemplateNoCache(wallId: string) : Promise<WallTemplate | null> {
