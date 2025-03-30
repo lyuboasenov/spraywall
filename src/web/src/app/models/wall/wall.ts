@@ -4,4 +4,5 @@ export interface Wall {
   Description: string;
   TemplateURL: string;
   SupportsLED: boolean;
+  Angles: Number[];
 }

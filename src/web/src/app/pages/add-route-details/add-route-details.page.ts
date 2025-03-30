@@ -13,12 +13,13 @@ import { WallTemplateService } from 'src/app/services/wall-template.service';
   styleUrls: ['./add-route-details.page.scss'],
 })
 export class AddRouteDetailsPage implements OnInit {
-  public id!: string;
-
   private activatedRoute = inject(ActivatedRoute);
 
   formGroup!: FormGroup; // declare it here
   public template: WallTemplate | null = null;
+  public id!: string;
+  public gymId!: string;
+  public wallId!: string;
 
   @Output() public routeStyles: Map<RouteStyle, string>;
   @Output() public routeTypes: Map<RouteType, string>;
@@ -40,18 +41,21 @@ export class AddRouteDetailsPage implements OnInit {
   }
 
   async ngOnInit() {
-    this.template = await this.wallTemplateService.getTemplate();
+    this.id = this.activatedRoute.snapshot.paramMap.get('id') as string;
+    this.gymId = this.activatedRoute.snapshot.paramMap.get('gymId') as string;
+    this.wallId = this.activatedRoute.snapshot.paramMap.get('wallId') as string;
+
+    this.template = await this.wallTemplateService.getTemplate(this.wallId);
     this.setDifficulty(this.routeService.boulderDifficulty);
     if (!this.routeService.holdBuffer || this.routeService.holdBuffer.length < 2) {
       // show error redirect
     }
 
-    let angle = this.template?.Angles[0];
-    if (this.template?.Angles.length ?? 0 > 1) {
-      angle = this.template?.Angles[this.template.Angles.length / 2] ?? 40;
+    let angle = this.template?.angles[0];
+    if (this.template?.angles.length ?? 0 > 1) {
+      angle = this.template?.angles[this.template.angles.length / 2] ?? 40;
     }
 
-    this.id = this.activatedRoute.snapshot.paramMap.get('id') as string;
     if (this.id) {
       const route = await this.routeService.getById(this.id);
 
@@ -79,13 +83,13 @@ export class AddRouteDetailsPage implements OnInit {
 
   async onSubmit(formData: any) {
 
-    const interpolateAngles = this.template?.Angles ?? [];
+    const interpolateAngles = this.template?.angles ?? [];
 
     let routeId = this.id;
     if (this.id) {
       await this.routeService.update(
         this.id,
-        this.template?.Id ?? 'missing',
+        this.template?.id ?? 'missing',
         formData.routeType,
         formData.name,
         formData.description,
@@ -96,7 +100,7 @@ export class AddRouteDetailsPage implements OnInit {
         interpolateAngles);
     } else {
       routeId = await this.routeService.create(
-        this.template?.Id ?? 'missing',
+        this.template?.id ?? 'missing',
         formData.routeType,
         formData.name,
         formData.description,

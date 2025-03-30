@@ -105,12 +105,12 @@ export class RouteService {
     this._db = new Databases(this.appwrite.client);
   }
 
-  public async getAll(): Promise<RouteSignature[]> {
+  public async getAll(wallId: string): Promise<RouteSignature[]> {
     let routeArray: RouteSignature[] = [];
 
     let query = [];
     query.push(
-      Query.select(["$id", "Name", "Difficulty", "Angle", "Type"])
+      Query.select(["$id", "Name", "Difficulty", "Angle", "Type", "Wall.$id"])
     );
     query.push(
       Query.limit(100000)
@@ -159,6 +159,9 @@ export class RouteService {
     }
 
     for (let r of allRoutes.documents) {
+      if (r["Wall"]["$id"] != wallId) {
+        continue;
+      }
       if (this.filter.ExcludeMyAscends && sentRouteIds.includes(r.$id)) {
         continue;
       }

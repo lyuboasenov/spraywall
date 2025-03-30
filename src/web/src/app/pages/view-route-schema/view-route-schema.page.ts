@@ -67,7 +67,7 @@ export class ViewRouteSchemaPage implements OnInit {
     this.sendDifficulty = route?.DifficultyNumber;
 
     const canvas: HTMLCanvasElement = this.canvas.nativeElement;
-    await this.wallTemplateService.drawTemplateBackdrop(canvas);
+    await this.wallTemplateService.drawTemplateBackdrop(this.wallId, canvas);
 
     if (route) {
       this.route = route;
@@ -162,11 +162,11 @@ export class ViewRouteSchemaPage implements OnInit {
     }
 
     pinchZoom.transformElement(0);
-};
+  };
 
   private async markHolds() {
     for (const h of this.route?.Holds ?? []) {
-      const hold = await this.wallTemplateService.findHold(h.Center.X, h.Center.Y);
+      const hold = await this.wallTemplateService.findHold(this.wallId, h.Center.X, h.Center.Y);
       if (hold) {
         this._discoveredHolds.push({
           TemplateHold: hold,
@@ -176,7 +176,7 @@ export class ViewRouteSchemaPage implements OnInit {
     }
 
     const canvas: HTMLCanvasElement = this.canvas.nativeElement;
-    this.wallTemplateService.markHolds(this._discoveredHolds, null, canvas);
+    this.wallTemplateService.markHolds(this.wallId, this._discoveredHolds, null, canvas);
   }
 
   async openSendModal() {
@@ -198,5 +198,4 @@ export class ViewRouteSchemaPage implements OnInit {
     }
     this.isSendModalOpen = false;
   }
-
 }

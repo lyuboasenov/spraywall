@@ -2,13 +2,13 @@ import { ChangeDetectorRef, Component, inject, Input, OnInit, Output, ViewChild 
 import { RouteService } from '../../services/route.service';
 import { IonModal, LoadingController } from '@ionic/angular';
 import { OverlayEventDetail } from '@ionic/core/components';
-import { WallTemplate } from 'src/app/models/wall-template/wall-template';
-import { WallTemplateService } from 'src/app/services/wall-template.service';
 import { AuthService } from 'src/app/services/auth.service';
 import { RouteStyle } from 'src/app/models/route/route-style';
 import { RouteType } from 'src/app/models/route/route-type';
 import { RouteSignature } from 'src/app/models/route/route-signature';
 import { ActivatedRoute } from '@angular/router';
+import { Wall } from 'src/app/models/wall/wall';
+import { WallService } from 'src/app/services/wall.service';
 
 @Component({
   selector: 'app-list-routes',
@@ -29,9 +29,11 @@ export class ListRoutesPage implements OnInit {
 
   public gymId!: string;
   public wallId!: string;
+  public wall!: Wall;
+
   public routeStyle?: RouteStyle;
   public routeType?: RouteType;
-  public angle?: number;
+  public angle?: Number;
   public minDifficulty?: number;
   public maxDifficulty?: number;
   public setBy?: string;
@@ -39,36 +41,15 @@ export class ListRoutesPage implements OnInit {
 
   public routes: RouteSignature[] = [];
   public selectedRoute?: RouteSignature;
-  public template: WallTemplate | null = null;
 
   constructor(
     private routeService: RouteService,
-    private wallTemplateService: WallTemplateService,
+    private wallService: WallService,
     private auth: AuthService,
     private loadingCtrl: LoadingController,
     private cd: ChangeDetectorRef) {
     this.routeTypes = this.routeService.routeTypes;
     this.routeStyles = this.routeService.routeStyles;
-
-    this.wallTemplateService.getTemplate().then(t => {
-      this.template = t;
-
-      if (this.template?.Angles &&
-        (!this.routeService.filter.Angle ||
-        (this.routeService.filter.Angle && !this.template?.Angles.includes(Number(this.routeService.filter.Angle))))
-      ) {
-        this.routeService.filter.Angle = this.template.Angles[this.template?.Angles.length / 2];
-        this.angle = this.routeService.filter.Angle;
-      }
-
-      this.routeService.getAll().then((routes: RouteSignature[]) => {
-        this.routes = routes;
-        this.loading?.dismiss();
-
-        this.cd.markForCheck();
-        this.cd.detectChanges();
-      });
-    });
 
     this.auth.user.subscribe(next => {
       this.user = next;
@@ -80,6 +61,30 @@ export class ListRoutesPage implements OnInit {
   async ngOnInit() {
     this.gymId = this.activatedRoute.snapshot.paramMap.get('gymId') as string;
     this.wallId = this.activatedRoute.snapshot.paramMap.get('wallId') as string;
+
+    const wall = await this.wallService.getById(this.wallId);
+
+    if (wall != null) {
+      this.wall = wall;
+
+      if (this.wall?.Angles &&
+        (!this.routeService.filter.Angle ||
+        (this.routeService.filter.Angle && !this.wall?.Angles.includes(Number(this.routeService.filter.Angle))))
+      ) {
+        this.routeService.filter.Angle = this.wall.Angles[this.wall.Angles.length / 2];
+        this.angle = this.routeService.filter.Angle;
+      }
+    } else {
+      console.error("Wall with id '" + this.wallId + "' not found.");
+    }
+
+    this.routeService.getAll(this.wallId).then((routes: RouteSignature[]) => {
+      this.routes = routes;
+      this.loading?.dismiss();
+
+      this.cd.markForCheck();
+      this.cd.detectChanges();
+    });
 
     await this.showLoading();
     this.difficulties.clear();
@@ -102,13 +107,11 @@ export class ListRoutesPage implements OnInit {
 
   async showLoading() {
     navigator.locks.request('dismiss-loading', async (lock) => {
-      if (this.routes.length == 0 && !this.template){
-        this.loading = await this.loadingCtrl.create({
-          message: 'Loading routes...',
-        });
+      this.loading = await this.loadingCtrl.create({
+        message: 'Loading routes...',
+      });
 
-        this.loading.present();
-      }
+      this.loading.present();
     });
   }
 
@@ -131,7 +134,7 @@ export class ListRoutesPage implements OnInit {
       this.routeService.filter.SetBy = this.setBy;
       this.routeService.filter.ExcludeMyAscends = this.excludeMyAscends;
 
-      this.routes = await this.routeService.getAll();
+      this.routes = await this.routeService.getAll(this.wallId);
     } else {
       this.routeService.filter.RouteType = undefined;
       this.routeService.filter.RouteStyle = undefined;
@@ -141,12 +144,12 @@ export class ListRoutesPage implements OnInit {
       this.routeService.filter.SetBy = undefined;
       this.routeService.filter.ExcludeMyAscends = undefined;
 
-      this.routes = await this.routeService.getAll();
+      this.routes = await this.routeService.getAll(this.wallId);
     }
   }
 
   async angleChange(event: any) {
     this.routeService.filter.Angle = this.angle;
-    this.routes = await this.routeService.getAll();
+    this.routes = await this.routeService.getAll(this.wallId);
   }
 }

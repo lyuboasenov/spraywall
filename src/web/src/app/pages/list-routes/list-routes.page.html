@@ -9,12 +9,12 @@
       </ion-button>
       <ion-select
         fill="solid"
-        *ngIf="(template?.Angles?.length ?? 0) > 1"
+        *ngIf="(wall?.Angles?.length ?? 0) > 1"
         (ionChange)="angleChange($event)"
         interface="action-sheet"
         [selectedText]="angle"
         [(ngModel)]="angle">
-        <ion-select-option *ngFor="let deg of template?.Angles" value="{{deg}}">{{deg}}&deg;</ion-select-option>
+        <ion-select-option *ngFor="let deg of wall?.Angles" value="{{deg}}">{{deg}}&deg;</ion-select-option>
       </ion-select>
       <ion-button fill="solid" id="open-filter">
         <ion-icon name="filter-circle-outline"></ion-icon>

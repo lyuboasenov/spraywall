@@ -6,7 +6,7 @@ export interface RouteFilter {
   RouteStyle?: RouteStyle;
   MinDifficulty?: number;
   MaxDifficulty?: number;
-  Angle?: number;
+  Angle?: Number;
   SetBy?: string;
   ExcludeMyAscends?: boolean;
 }

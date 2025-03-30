@@ -8,60 +8,28 @@ import { HoldType } from '../models/route/hold-type';
 import { WallTemplateHold } from '../models/wall-template/wall-template-hold';
 import { RotatedRect } from '../models/common/rotated-rect';
 import { Point } from '../models/common/point';
+import { CacheService } from "ionic-cache";
 
 @Injectable({
   providedIn: 'root'
 })
 export class WallTemplateService {
-  private _template?: WallTemplate;
-  private _img = new Image;
-  private _imgLoaded = false;
-  private _templateLoaded = false;
   private _db: Databases;
+  private _collectionId = environment.AppWrite.Collections.Walls; // Wall
 
-  private _collectionId = environment.AppWrite.Collections.WallTemplates; // Wall
-
-  public width: number = 0;
-  public height: number = 0;
-
-
-  constructor(private appwrite: AppwriteService) {
+  constructor(
+    private cache: CacheService,
+    private appwrite: AppwriteService) {
     this._db = new Databases(appwrite.client);
-
-    this._img.onload = (e: any) => {
-      this.width = this._img.width;
-      this.height = this._img.height;
-      this._imgLoaded = true;
-    }
-
-    this.getTemplate();
+    cache.setDefaultTTL(2 * 60 * 60); //set default cache TTL for 2 hour
   }
 
-  public async getTemplate() : Promise<WallTemplate | null> {
-    if (!this._template) {
-      const wallTemplates = await this._db.listDocuments(this.appwrite.DatabaseId, this._collectionId);
-      const wallTemplateId = wallTemplates.documents[0].$id;
-
-      const wallTemplateData = await this._db.getDocument(this.appwrite.DatabaseId, this._collectionId, wallTemplateId);
-      const href = wallTemplateData['TemplateURL']
-
-      const data = await fetch(href);
-      const rawTemplate = await data.json();
-
-      this._template = {
-        Id: wallTemplateId,
-        EncodedImage: rawTemplate.EncodedImage,
-        Holds: this.TransformHolds(rawTemplate.Holds),
-        Angles: rawTemplate.Angles
-      };
-
-      this._img.src = "data:image/jpeg;base64, " + this._template?.EncodedImage;
+  public async markHolds(wallId: string, holds: RouteHold[] | null, selectedHold: RouteHold | null, canvas: HTMLCanvasElement) {
+    const template = await this.getTemplate(wallId);
+    if (template == null) {
+      console.error("Unable to get template");
+      return;
     }
-
-    return this._template ?? null;
-  }
-
-  public markHolds(holds: RouteHold[] | null, selectedHold: RouteHold | null, canvas: HTMLCanvasElement) {
     let ctx = canvas.getContext("2d");
     if (ctx && holds) {
       for (let i = 0; i < holds.length; i++) {
@@ -77,7 +45,7 @@ export class WallTemplateService {
         ctx.closePath();
 
         ctx.clip();
-        ctx.drawImage(this._img, 0, 0);
+        ctx.drawImage(template.image, 0, 0);
         ctx.restore();
 
         ctx.save();
@@ -121,30 +89,26 @@ export class WallTemplateService {
     }
   }
 
-  public async drawTemplateBackdrop(canvas: HTMLCanvasElement): Promise<void> {
-
-    if (!this._templateLoaded) {
-      await this.getTemplate();
+  public async drawTemplateBackdrop(wallId: string, canvas: HTMLCanvasElement): Promise<void> {
+    const template = await this.getTemplate(wallId);
+    if (template == null) {
+      console.error("Wall with id '" + wallId + "' not found.");
+      return;
     }
 
-    while(!this._imgLoaded) {
-      // Poor man's sleep
-      await new Promise(f => setTimeout(f, 500));
-    }
-
-    canvas.width = this._img.width;
-    canvas.height = this._img.height;
+    canvas.width = template.image?.width ?? 0;
+    canvas.height = template.image?.height ?? 0;
 
     var ctx = canvas.getContext("2d");
     if (ctx) {
       ctx.save();
-      ctx.drawImage(this._img, 0, 0);
+      ctx.drawImage(template.image, 0, 0);
 
       ctx.restore();
       ctx.save();
       // // convert backdrop to grayscale
       // // get image data object
-      var imageData = ctx.getImageData(0, 0, this.width, this.height);
+      var imageData = ctx.getImageData(0, 0, template.width ?? 0, template.height ?? 0);
 
       // get the pixels
       var data = imageData.data;
@@ -165,9 +129,11 @@ export class WallTemplateService {
     }
   }
 
-  public async findHold(x: number, y:number): Promise<WallTemplateHold | null> {
-    if (this._template?.Holds) {
-      let arr = this._template?.Holds;
+  public async findHold(wallId: string, x: number, y:number): Promise<WallTemplateHold | null> {
+    const template = await this.getTemplate(wallId);
+
+    if (template?.holds) {
+      let arr = template?.holds;
 
       let selectedHold: WallTemplateHold | null = null;
       let selectedHoldDistance: number | null;
@@ -188,7 +154,7 @@ export class WallTemplateService {
     return null;
   }
 
-  private TransformHolds(holdsArray: any[]): WallTemplateHold[] {
+  private transformHolds(holdsArray: any[]): WallTemplateHold[] {
     const result: WallTemplateHold[] = [];
     for (const h of holdsArray) {
 
@@ -227,6 +193,51 @@ export class WallTemplateService {
       });
     }
     return result;
+  }
+
+  public  async getTemplate(wallId: string) : Promise<WallTemplate | null> {
+    // return await this.cachingService.get(wallId, this.getTemplateNoCache) as WallTemplate;
+    return await this.cache.getOrSetItem(wallId, () => this.getTemplateNoCache(wallId));
+  }
+
+  private static async getTemplateByWall() {
+    WallTemplateService.
+  }
+
+  private async getTemplateNoCache(wallId: string) : Promise<WallTemplate | null> {
+    const wallTemplateData = await this._db.getDocument(
+      this.appwrite.DatabaseId,
+      this._collectionId,
+      wallId);
+    const href = wallTemplateData['TemplateURL']
+
+    const data = await fetch(href);
+    const rawTemplate = await data.json();
+
+    const template = {
+      id: wallId,
+      encodedImage: rawTemplate.EncodedImage,
+      holds: this.transformHolds(rawTemplate.Holds),
+      angles: rawTemplate.Angles,
+      image: new Image,
+      initialized: false,
+      width: 0,
+      height: 0
+    };
+
+    template.image.src = "data:image/jpeg;base64, " + template?.encodedImage;
+    template.image.onload = (e: any) => {
+      template.width = template.image.width;
+      template.height = template.image.height;
+      template.initialized = true;
+    }
+
+    while(!template.initialized) {
+      // Poor man's sleep
+      await new Promise(f => setTimeout(f, 500));
+    }
+
+    return template ?? null;
   }
 }
 

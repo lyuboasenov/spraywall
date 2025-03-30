@@ -16,6 +16,8 @@ import { WallTemplateService } from 'src/app/services/wall-template.service';
 export class AddRouteSchemaPage implements OnInit {
   private loading: any | null;
   public id!: string;
+  public gymId!: string;
+  public wallId!: string;
 
   private activatedRoute = inject(ActivatedRoute);
 
@@ -29,22 +31,25 @@ export class AddRouteSchemaPage implements OnInit {
   constructor(private router: Router, private routeService: RouteService, private wallTemplateService: WallTemplateService, private loadingCtrl: LoadingController) { }
 
   async ngOnInit() {
+    this.id = this.activatedRoute.snapshot.paramMap.get('id') as string;
+    this.gymId = this.activatedRoute.snapshot.paramMap.get('gymId') as string;
+    this.wallId = this.activatedRoute.snapshot.paramMap.get('wallId') as string;
+
     await this.showLoading();
     const canvas: HTMLCanvasElement = this.canvas.nativeElement;
-    this.wallTemplateService.drawTemplateBackdrop(canvas);
+    this.wallTemplateService.drawTemplateBackdrop(this.wallId, canvas);
 
-    this.template = await this.wallTemplateService.getTemplate();
+    this.template = await this.wallTemplateService.getTemplate(this.wallId);
 
     // reset hold buffer
     this.routeService.holdBuffer = [];
 
-    this.id = this.activatedRoute.snapshot.paramMap.get('id') as string;
     if (this.id) {
       const route = await this.routeService.getById(this.id);
 
       if (route) {
         for (const h of route?.Holds ?? []) {
-          const hold = await this.wallTemplateService.findHold(h.Center.X, h.Center.Y);
+          const hold = await this.wallTemplateService.findHold(this.wallId, h.Center.X, h.Center.Y);
           if (hold) {
             this.routeService.holdBuffer.push({
               TemplateHold: hold,
@@ -58,8 +63,8 @@ export class AddRouteSchemaPage implements OnInit {
 
     this.holds = this.routeService.holdBuffer;
 
-    await this.wallTemplateService.drawTemplateBackdrop(canvas);
-    await this.wallTemplateService.markHolds(this.holds, this._selectedHold, canvas);
+    await this.wallTemplateService.drawTemplateBackdrop(this.wallId, canvas);
+    await this.wallTemplateService.markHolds(this.wallId, this.holds, this._selectedHold, canvas);
 
     this.loading.dismiss();
   }
@@ -69,7 +74,7 @@ export class AddRouteSchemaPage implements OnInit {
     this.holds = this.routeService.holdBuffer;
 
     const canvas: HTMLCanvasElement = this.canvas.nativeElement;
-    this.wallTemplateService.drawTemplateBackdrop(canvas);
+    this.wallTemplateService.drawTemplateBackdrop(this.wallId, canvas);
 
     await this.router.navigateByUrl('/');
 
@@ -86,11 +91,11 @@ export class AddRouteSchemaPage implements OnInit {
   async templateClick(event: any) {
     const canvasRect = event.target.getBoundingClientRect();
 
-    const ratio = Math.min(this.wallTemplateService.width / canvasRect.width, this.wallTemplateService.height / canvasRect.height);
+    const ratio = Math.min(this.template?.width ?? 0 / canvasRect.width, this.template?.height ?? 0 / canvasRect.height);
 
     const x = (event.clientX - canvasRect.left) * ratio;
     const y = (event.clientY - canvasRect.top) * ratio
-    const hold = await this.wallTemplateService.findHold(x, y);
+    const hold = await this.wallTemplateService.findHold(this.wallId, x, y);
 
     if (hold) {
       let routeHold: RouteHold | undefined = undefined;
@@ -132,8 +137,8 @@ export class AddRouteSchemaPage implements OnInit {
     }
 
     const canvas: HTMLCanvasElement = this.canvas.nativeElement;
-    await this.wallTemplateService.drawTemplateBackdrop(canvas);
-    await this.wallTemplateService.markHolds(this.holds, this._selectedHold, canvas);
+    await this.wallTemplateService.drawTemplateBackdrop(this.wallId, canvas);
+    await this.wallTemplateService.markHolds(this.wallId, this.holds, this._selectedHold, canvas);
   }
 
 }

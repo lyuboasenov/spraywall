@@ -3,7 +3,6 @@ import { Databases, Query, Models } from 'appwrite';
 import { AppwriteService } from './appwrite.service';
 import { environment } from 'src/environments/environment';
 import { Wall } from '../models/wall/wall';
-import { GymService } from './gym.service';
 
 @Injectable({
   providedIn: 'root'
@@ -54,7 +53,8 @@ export class WallService {
       Name: doc['Name'],
       TemplateURL: doc['TemplateURL'],
       Description: doc['Description'],
-      SupportsLED: doc['SupportsLED']
+      SupportsLED: doc['SupportsLED'],
+      Angles: doc['Angles']?.split(',').map(Number)
     }
   }
 }
