@@ -91,12 +91,11 @@ export class AddRouteSchemaPage implements OnInit {
   async templateClick(event: any) {
     const canvasRect = event.target.getBoundingClientRect();
 
-    const ratio = Math.min(this.template?.width ?? 0 / canvasRect.width, this.template?.height ?? 0 / canvasRect.height);
+    const ratio = Math.min(((this.template?.width ?? 0) / canvasRect.width), ((this.template?.height ?? 0) / canvasRect.height));
 
     const x = (event.clientX - canvasRect.left) * ratio;
-    const y = (event.clientY - canvasRect.top) * ratio
+    const y = (event.clientY - canvasRect.top) * ratio;
 
-    // TODO: finished here
     const hold = await this.wallTemplateService.findHold(this.wallId, x, y);
 
     if (hold) {
