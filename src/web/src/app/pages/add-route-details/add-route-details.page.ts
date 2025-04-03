@@ -1,5 +1,5 @@
 import { Component, OnInit, Output, inject } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { RouteStyle } from 'src/app/models/route/route-style';
 import { RouteType } from 'src/app/models/route/route-type';
@@ -51,9 +51,11 @@ export class AddRouteDetailsPage implements OnInit {
       // show error redirect
     }
 
-    let angle = this.template?.angles[0];
-    if (this.template?.angles.length ?? 0 > 1) {
+    let angle = 45;
+    let isAngledWall = false;
+    if (this.template?.angles !== undefined && (this.template?.angles.length ?? 0 > 1)) {
       angle = this.template?.angles[this.template.angles.length / 2] ?? 40;
+      true;
     }
 
     if (this.id) {
@@ -65,8 +67,17 @@ export class AddRouteDetailsPage implements OnInit {
           description: [route.Description],
           routeType: [route.RouteType, Validators.required],
           difficulty: [route.DifficultyNumber, Validators.required],
-          angle: [route.Angle, Validators.required],
+          angle: new FormControl(route.Angle, isAngledWall ? Validators.required : []),
           routeStyle: [route.Style, Validators.required]
+        });
+      } else {
+        this.formGroup = this.formBuilder.group({
+          name: ["", Validators.required],
+          description: [""],
+          routeType: [this.routeService.lastRouteType ?? 0, Validators.required],
+          difficulty: [this.routeService.lastRouteDifficulty, Validators.required],
+          angle: new FormControl(this.routeService.lastRouteAngle, isAngledWall ? Validators.required : []),
+          routeStyle: [this.routeService.lastRouteStyle ?? 0, Validators.required]
         });
       }
     } else {
@@ -75,7 +86,7 @@ export class AddRouteDetailsPage implements OnInit {
         description: [""],
         routeType: [this.routeService.lastRouteType ?? 0, Validators.required],
         difficulty: [this.routeService.lastRouteDifficulty ?? 95, Validators.required],
-        angle: [this.routeService.lastRouteAngle, Validators.required],
+        angle: new FormControl(this.routeService.lastRouteAngle, isAngledWall ? Validators.required : []),
         routeStyle: [this.routeService.lastRouteStyle ?? 0, Validators.required]
       });
     }

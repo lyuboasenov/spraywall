@@ -6,8 +6,8 @@ export const environment = {
   production: false,
   app_icon: "https://balkanclimbing.com/themes/custom/css/images/logo.svg",
   AppWrite: {
-    Endpoint: 'https://cloud.appwrite.io/v1',
-    ProjectId: '66105e1a8ea8410c3f42',
+    Endpoint: 'https://appwrite.asenov.duckdns.org/v1',
+    ProjectId: '67eeb11f0029d6c9c734',
     DatabaseId: '66106025b5416f00fcd8',
     Collections: {
       Gyms: '67cb49770016b46409a8',
