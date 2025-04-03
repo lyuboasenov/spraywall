@@ -3,6 +3,12 @@
     <ion-buttons slot="primary">
       <ion-button
         fill="solid"
+        *ngIf="isLightingSupported"
+        (click)="lightRoute()">
+        <ion-icon name="bulb-outline"></ion-icon>
+      </ion-button>
+      <ion-button
+        fill="solid"
         *ngIf="user?.hasPermission('routesetter') ?? false"
         routerLink="/gyms/{{gymId}}/walls/{{wallId}}/routes/edit/{{parent_id}}">
         <ion-icon name="create-outline"></ion-icon>
@@ -18,6 +24,7 @@
     <ion-buttons slot="start">
       <ion-menu-button></ion-menu-button>
     </ion-buttons>
+
     <ion-buttons slot="start">
       <ion-button fill="solid" routerLink="/gyms/{{gymId}}/walls/{{wallId}}/routes">
         <ion-icon name="chevron-back-outline"></ion-icon>

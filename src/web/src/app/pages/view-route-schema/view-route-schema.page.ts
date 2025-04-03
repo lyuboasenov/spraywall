@@ -9,6 +9,7 @@ import { RouteService } from 'src/app/services/route.service';
 import { WallTemplateService } from 'src/app/services/wall-template.service';
 import { RouteType } from 'src/app/models/route/route-type';
 import { AuthService } from 'src/app/services/auth.service';
+import { WallService } from 'src/app/services/wall.service';
 
 @Component({
   selector: 'app-view-route-schema',
@@ -34,6 +35,7 @@ export class ViewRouteSchemaPage implements OnInit {
   public parent_id!: string;
 
   public isSendModalOpen: boolean = false;
+  public isLightingSupported: boolean = false;
   public comment?: string;
   public sendDifficulty?: number;
   public rating?: number;
@@ -42,6 +44,7 @@ export class ViewRouteSchemaPage implements OnInit {
   constructor(
     private routeService: RouteService,
     private wallTemplateService: WallTemplateService,
+    private wallsService: WallService,
     private router: Router,
     private loadingCtrl: LoadingController,
     private auth: AuthService) { }
@@ -57,6 +60,9 @@ export class ViewRouteSchemaPage implements OnInit {
     this.gymId = this.activatedRoute.snapshot.paramMap.get('gymId') as string;
     this.wallId = this.activatedRoute.snapshot.paramMap.get('wallId') as string;
     const route = await this.routeService.getById(this.id);
+    const wall = await this.wallsService.getById(this.wallId);
+
+    this.isLightingSupported = wall?.SupportsLED ?? false;
 
     this.difficulties.clear();
     if (route?.RouteType == RouteType.Boulder) {
@@ -180,6 +186,10 @@ export class ViewRouteSchemaPage implements OnInit {
 
   async openSendModal() {
     this.isSendModalOpen = true;
+  }
+
+  async lightRoute() {
+    alert("Let there be light!");
   }
 
   async send() {
