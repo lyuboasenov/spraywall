@@ -4,6 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { RouteStyle } from 'src/app/models/route/route-style';
 import { RouteType } from 'src/app/models/route/route-type';
 import { WallTemplate } from 'src/app/models/wall-template/wall-template';
+import { MenuService } from 'src/app/services/menu.service';
 import { RouteService } from 'src/app/services/route.service';
 import { WallTemplateService } from 'src/app/services/wall-template.service';
 
@@ -25,7 +26,11 @@ export class AddRouteDetailsPage implements OnInit {
   @Output() public routeTypes: Map<RouteType, string>;
   @Output() public difficulties: Map<number, string> = new Map<number, string>();
 
-  constructor(private routeService: RouteService, private wallTemplateService: WallTemplateService, private formBuilder: FormBuilder, private router: Router) {
+  constructor(private routeService: RouteService,
+    private wallTemplateService: WallTemplateService,
+    private formBuilder: FormBuilder,
+    private router: Router,
+    private menuService: MenuService) {
     this.routeTypes = this.routeService.routeTypes;
 
     this.routeStyles = this.routeService.routeStyles;
@@ -44,6 +49,7 @@ export class AddRouteDetailsPage implements OnInit {
     this.id = this.activatedRoute.snapshot.paramMap.get('id') as string;
     this.gymId = this.activatedRoute.snapshot.paramMap.get('gymId') as string;
     this.wallId = this.activatedRoute.snapshot.paramMap.get('wallId') as string;
+    await this.menuService.navigatedToDetailsPage(this.gymId, this.wallId, this.id);
 
     this.template = await this.wallTemplateService.getTemplate(this.wallId);
     this.setDifficulty(this.routeService.boulderDifficulty);

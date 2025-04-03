@@ -9,6 +9,7 @@ import { RouteSignature } from 'src/app/models/route/route-signature';
 import { ActivatedRoute } from '@angular/router';
 import { Wall } from 'src/app/models/wall/wall';
 import { WallService } from 'src/app/services/wall.service';
+import { MenuService } from 'src/app/services/menu.service';
 
 @Component({
   selector: 'app-list-routes',
@@ -47,7 +48,8 @@ export class ListRoutesPage implements OnInit {
     private wallService: WallService,
     private auth: AuthService,
     private loadingCtrl: LoadingController,
-    private cd: ChangeDetectorRef) {
+    private cd: ChangeDetectorRef,
+    private menuService: MenuService) {
     this.routeTypes = this.routeService.routeTypes;
     this.routeStyles = this.routeService.routeStyles;
 
@@ -61,6 +63,7 @@ export class ListRoutesPage implements OnInit {
   async ngOnInit() {
     this.gymId = this.activatedRoute.snapshot.paramMap.get('gymId') as string;
     this.wallId = this.activatedRoute.snapshot.paramMap.get('wallId') as string;
+    await this.menuService.navigatedToRoutesPage(this.gymId, this.wallId);
 
     const wall = await this.wallService.getById(this.wallId);
 

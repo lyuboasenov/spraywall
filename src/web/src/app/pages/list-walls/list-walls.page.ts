@@ -2,6 +2,7 @@ import { ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { LoadingController } from '@ionic/angular';
 import { Wall } from 'src/app/models/wall/wall';
+import { MenuService } from 'src/app/services/menu.service';
 import { WallService } from 'src/app/services/wall.service';
 
 @Component({
@@ -18,10 +19,12 @@ export class ListWallsPage implements OnInit {
   constructor(
     private wallService: WallService,
     private loadingCtrl: LoadingController,
-        private cd: ChangeDetectorRef) { }
+    private cd: ChangeDetectorRef,
+    private menuService: MenuService) { }
 
   async ngOnInit() {
     this.gymId = this.activatedRoute.snapshot.paramMap.get('id') as string;
+    await this.menuService.navigatedToWallsPage(this.gymId);
     await this.showLoading();
   }
 

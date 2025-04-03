@@ -10,6 +10,7 @@ import { WallTemplateService } from 'src/app/services/wall-template.service';
 import { RouteType } from 'src/app/models/route/route-type';
 import { AuthService } from 'src/app/services/auth.service';
 import { WallService } from 'src/app/services/wall.service';
+import { MenuService } from 'src/app/services/menu.service';
 
 @Component({
   selector: 'app-view-route-schema',
@@ -47,7 +48,8 @@ export class ViewRouteSchemaPage implements OnInit {
     private wallsService: WallService,
     private router: Router,
     private loadingCtrl: LoadingController,
-    private auth: AuthService) { }
+    private auth: AuthService,
+    private menuService: MenuService) { }
 
   async ngOnInit() {
     this.auth.user.subscribe(next => {
@@ -59,6 +61,8 @@ export class ViewRouteSchemaPage implements OnInit {
     this.id = this.activatedRoute.snapshot.paramMap.get('id') as string;
     this.gymId = this.activatedRoute.snapshot.paramMap.get('gymId') as string;
     this.wallId = this.activatedRoute.snapshot.paramMap.get('wallId') as string;
+    await this.menuService.navigatedToSchemaPage(this.gymId, this.wallId, this.id);
+
     const route = await this.routeService.getById(this.id);
     const wall = await this.wallsService.getById(this.wallId);
 

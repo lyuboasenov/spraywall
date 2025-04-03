@@ -6,6 +6,7 @@ import { Route } from 'src/app/models/route/route';
 import { RouteType } from 'src/app/models/route/route-type';
 import { AuthService } from 'src/app/services/auth.service';
 import { RouteService } from 'src/app/services/route.service';
+import { MenuService } from 'src/app/services/menu.service';
 
 @Component({
   selector: 'app-view-route-details',
@@ -33,7 +34,8 @@ export class ViewRouteDetailsPage implements OnInit {
   constructor(
     private routeService: RouteService,
     private router: Router,
-    private auth: AuthService) { }
+    private auth: AuthService,
+    private menuService: MenuService) { }
 
   async ngOnInit() {
     this.auth.user.subscribe(next => {
@@ -42,6 +44,8 @@ export class ViewRouteDetailsPage implements OnInit {
     this.id = this.activatedRoute.snapshot.paramMap.get('id') as string;
     this.gymId = this.activatedRoute.snapshot.paramMap.get('gymId') as string;
     this.wallId = this.activatedRoute.snapshot.paramMap.get('wallId') as string;
+    await this.menuService.navigatedToDetailsPage(this.gymId, this.wallId, this.id);
+
     const route = await this.routeService.getById(this.id);
 
     this.difficulties.clear();

@@ -3,6 +3,7 @@ import { AuthService } from 'src/app/services/auth.service';
 import { LoadingController } from '@ionic/angular';
 import { GymService } from 'src/app/services/gym.service';
 import { Gym } from 'src/app/models/gym/gym';
+import { MenuService } from 'src/app/services/menu.service';
 
 @Component({
   selector: 'app-list-gyms',
@@ -16,9 +17,11 @@ export class ListGymsPage implements OnInit {
   constructor(
     private gymService: GymService,
     private loadingCtrl: LoadingController,
-    private cd: ChangeDetectorRef) {}
+    private cd: ChangeDetectorRef,
+    private menuService: MenuService) {}
 
   async ngOnInit() {
+    await this.menuService.navigatedToGymsPage();
     await this.showLoading();
   }
 

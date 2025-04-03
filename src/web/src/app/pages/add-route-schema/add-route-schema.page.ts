@@ -5,6 +5,7 @@ import { PinchZoomComponent } from '@meddv/ngx-pinch-zoom';
 import { HoldType } from 'src/app/models/route/hold-type';
 import { RouteHold } from 'src/app/models/wall-template/route-hold';
 import { WallTemplate } from 'src/app/models/wall-template/wall-template';
+import { MenuService } from 'src/app/services/menu.service';
 import { RouteService } from 'src/app/services/route.service';
 import { WallTemplateService } from 'src/app/services/wall-template.service';
 
@@ -28,12 +29,17 @@ export class AddRouteSchemaPage implements OnInit {
   @Output() public holds: RouteHold[] = [];
   private _selectedHold: RouteHold | null = null;
 
-  constructor(private router: Router, private routeService: RouteService, private wallTemplateService: WallTemplateService, private loadingCtrl: LoadingController) { }
+  constructor(private router: Router,
+    private routeService: RouteService,
+    private wallTemplateService: WallTemplateService,
+    private loadingCtrl: LoadingController,
+    private menuService: MenuService) { }
 
   async ngOnInit() {
     this.id = this.activatedRoute.snapshot.paramMap.get('id') as string;
     this.gymId = this.activatedRoute.snapshot.paramMap.get('gymId') as string;
     this.wallId = this.activatedRoute.snapshot.paramMap.get('wallId') as string;
+    await this.menuService.navigatedToSchemaPage(this.gymId, this.wallId, this.id);
 
     await this.showLoading();
     const canvas: HTMLCanvasElement = this.canvas.nativeElement;
